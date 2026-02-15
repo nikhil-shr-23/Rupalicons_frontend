@@ -7,7 +7,7 @@ export default function Contact() {
   return (
     <section
       id="contact"
-      className="py-24 bg-accent-dark text-white relative overflow-hidden"
+      className="py-32 bg-accent-dark text-white relative overflow-hidden"
     >
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         {/* Header */}

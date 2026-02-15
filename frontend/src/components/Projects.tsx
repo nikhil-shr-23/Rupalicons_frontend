@@ -41,7 +41,7 @@ export default function Projects() {
   return (
     <section
       id="projects"
-      className="py-24 bg-accent-dark text-white overflow-hidden relative"
+      className="py-32 bg-accent-dark text-white overflow-hidden relative"
     >
       {/* Background Grid Pattern for Dark Section */}
       <div className="absolute inset-0 opacity-10 bg-[linear-gradient(rgba(255,255,255,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.1)_1px,transparent_1px)] bg-size-[50px_50px]"></div>

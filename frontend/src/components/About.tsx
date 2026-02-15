@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 
 export default function About() {
   return (
-    <section id="about" className="py-24 bg-background overflow-hidden">
+    <section id="about" className="py-32 bg-background overflow-hidden">
       <div className="max-w-7xl mx-auto px-6">
         <div className="lg:grid lg:grid-cols-2 lg:gap-20 items-center">
           <motion.div

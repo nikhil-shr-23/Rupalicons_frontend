@@ -34,17 +34,22 @@ export default function Navbar() {
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-12">
             <div className="flex space-x-8 text-sm font-medium tracking-wide">
-              {["Home", "About Us", "Services", "Portfolio"].map((item) => (
+              {[
+                { name: "Home", href: "/" },
+                { name: "About Us", href: "/#about-us" },
+                { name: "Services", href: "/#services" },
+                { name: "Portfolio", href: "/portfolio" },
+              ].map((item) => (
                 <Link
-                  key={item}
-                  href={`#${item.toLowerCase().replace(" ", "-")}`}
+                  key={item.name}
+                  href={item.href}
                   className="relative group overflow-hidden"
                 >
                   <span className="block group-hover:-translate-y-full transition-transform duration-300">
-                    {item}
+                    {item.name}
                   </span>
                   <span className="absolute top-0 left-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300 text-gold">
-                    {item}
+                    {item.name}
                   </span>
                 </Link>
               ))}
