@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/blogs")
-@CrossOrigin(origins = "*") // Allow requests from frontend
+@CrossOrigin(origins = "http://localhost:3000")
 public class BlogController {
 
     @Autowired

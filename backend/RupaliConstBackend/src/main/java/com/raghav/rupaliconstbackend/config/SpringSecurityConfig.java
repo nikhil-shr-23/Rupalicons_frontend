@@ -27,8 +27,9 @@ public class SpringSecurityConfig {
     private final UserDetailsService userDetailsService;
     private final JWTFilter jwtFilter;
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http){
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
+                .cors(org.springframework.security.config.Customizer.withDefaults()) // Enable CORS
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request ->
                         request.requestMatchers("/auth/login","/auth/register","/error").permitAll()

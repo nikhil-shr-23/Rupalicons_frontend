@@ -1,5 +1,6 @@
 package com.raghav.rupaliconstbackend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,8 +26,8 @@ public class Blog {
 
     private String category;
 
-    @Lob
-    @Column(columnDefinition = "OID")
+    @JsonIgnore
+    @Column(columnDefinition = "BYTEA")
     private byte[] image;
 
     private String imageName;
