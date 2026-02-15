@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   Building2,
@@ -10,10 +10,12 @@ import {
   Settings,
   Menu,
   X,
+  LogOut,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { AdminAuthProvider, useAdminAuth } from "@/context/AdminAuthContext";
 
 const sidebarItems = [
   {
@@ -38,13 +40,36 @@ const sidebarItems = [
   },
 ];
 
-export default function AdminLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+function AdminContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { isAuthenticated, logout } = useAdminAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!isAuthenticated && pathname !== "/admin/login") {
+      router.replace("/admin/login");
+    }
+  }, [isAuthenticated, pathname, router]);
+
+  // If on login page, render children directly (no sidebar)
+  if (pathname === "/admin/login") {
+    return <>{children}</>;
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent-dark"></div>
+      </div>
+    );
+  }
+
+  const handleLogout = () => {
+    logout();
+    router.push("/admin/login");
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
@@ -84,8 +109,9 @@ export default function AdminLayout({
           <Button
             variant="ghost"
             className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50 gap-2"
+            onClick={handleLogout}
           >
-            <Settings size={18} />
+            <LogOut size={18} />
             Logout
           </Button>
         </div>
@@ -127,7 +153,7 @@ export default function AdminLayout({
                   Menu
                 </span>
               </div>
-              <nav className="space-y-1">
+              <nav className="space-y-1 flex-1">
                 {sidebarItems.map((item) => {
                   const isActive = pathname === item.href;
                   return (
@@ -148,6 +174,14 @@ export default function AdminLayout({
                   );
                 })}
               </nav>
+              <Button
+                variant="ghost"
+                className="justify-start text-red-500 hover:text-red-600 hover:bg-red-50 gap-2 mt-4"
+                onClick={handleLogout}
+              >
+                <LogOut size={18} />
+                Logout
+              </Button>
             </div>
           </div>
         )}
@@ -155,5 +189,17 @@ export default function AdminLayout({
         <main className="p-6 md:p-8 max-w-7xl mx-auto w-full">{children}</main>
       </div>
     </div>
+  );
+}
+
+export default function AdminLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <AdminAuthProvider>
+      <AdminContent>{children}</AdminContent>
+    </AdminAuthProvider>
   );
 }

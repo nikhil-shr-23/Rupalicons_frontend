@@ -60,3 +60,13 @@ export interface Blog {
     createdAt?: string;
     updatedAt?: string;
 }
+
+export interface Inquiry {
+    id?: number;
+    name: string;
+    phone?: string;
+    email?: string;
+    location?: string;
+    message?: string;
+    createdAt?: string;
+}

@@ -34,7 +34,8 @@ public class SpringSecurityConfig {
                 .authorizeHttpRequests(request ->
                         request.requestMatchers("/auth/login","/auth/register","/error").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/properties/**").permitAll()
-                                .requestMatchers("/blogs/**").permitAll() // Allow all blog operations for now
+                                .requestMatchers("/blogs/**").permitAll()
+                                .requestMatchers("/inquiries/**").permitAll()
                                 .requestMatchers("/properties/**").hasRole("ADMIN")
                                 .requestMatchers("/buyers/**").hasRole("ADMIN")
                                 .anyRequest().authenticated())
