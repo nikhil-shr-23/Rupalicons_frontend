@@ -57,6 +57,12 @@ public class properties {
 
     private String Notes;
 
+    @Column(length = 2048)
+    private String imageUrl;
+
+    @Column(length = 2048)
+    private String brochureUrl;
+
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
 
