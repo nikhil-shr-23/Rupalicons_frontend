@@ -1,26 +1,107 @@
 @import "tailwindcss";
 
 :root {
-  /* Cream Light Background */
+  /* Premium Interior Theme Colors */
   --background: #FDFCF8;
   --foreground: #1A1A1A;
   
-  /* Deep Navy/Black Accent */
+  --card: #FFFFFF;
+  --card-foreground: #1A1A1A;
+
+  --popover: #FFFFFF;
+  --popover-foreground: #1A1A1A;
+
+  --primary: #0B1120; /* Navy */
+  --primary-foreground: #FFFFFF;
+
+  --secondary: #F4F2ED; /* Light Cream/Grey */
+  --secondary-foreground: #1A1A1A;
+
+  --muted: #F4F4F5;
+  --muted-foreground: #71717A;
+
+  --accent: #ECAE16; /* Gold */
+  --accent-foreground: #FFFFFF;
+
+  --destructive: #EF4444;
+  --destructive-foreground: #FFFFFF;
+
+  --border: #E4E4E7;
+  --input: #E4E4E7;
+  --ring: #0B1120;
+
+  --radius: 0.5rem;
+
+  /* Custom Variables */
   --color-accent-dark: #0B1120;
-  
-  /* Gold/Mustard Accent from Reference */
   --color-gold: #ECAE16;
   --color-gold-hover: #D59B12;
-  
-  /* Text Colors */
-  --color-text-primary: #1A1A1A;
-  --color-text-secondary: #4A4A4A;
-  --color-text-light: #FDFCF8;
+}
+
+.dark {
+  --background: #0B1120;
+  --foreground: #FDFCF8;
+
+  --card: #1A1A1A;
+  --card-foreground: #FDFCF8;
+
+  --popover: #1A1A1A;
+  --popover-foreground: #FDFCF8;
+
+  --primary: #FDFCF8;
+  --primary-foreground: #0B1120;
+
+  --secondary: #1F2937;
+  --secondary-foreground: #FDFCF8;
+
+  --muted: #1F2937;
+  --muted-foreground: #A1A1AA;
+
+  --accent: #ECAE16;
+  --accent-foreground: #FFFFFF;
+
+  --destructive: #7F1D1D;
+  --destructive-foreground: #FDFCF8;
+
+  --border: #27272A;
+  --input: #27272A;
+  --ring: #D4D4D8;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  
+  --radius-sm: calc(var(--radius) - 2px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 2px);
+  
   --color-accent-dark: var(--color-accent-dark);
   --color-gold: var(--color-gold);
   --color-gold-hover: var(--color-gold-hover);

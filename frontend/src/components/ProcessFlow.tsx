@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useScroll, useSpring, useTransform } from "framer-motion";
+import { motion, useScroll, useSpring } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
 import { MapPin, PencilRuler, FileCheck, HardHat, Key } from "lucide-react";
 
@@ -76,14 +76,18 @@ export default function ProcessFlow() {
               stepRefs.current[index - 1]?.clientHeight! / 2;
         const currentY = relativeY;
 
-        const amplitude = 60;
+        // Use a smaller amplitude for a tighter, more cohesive premium feel
+        const amplitude = 40;
         const direction = index % 2 === 0 ? 1 : -1;
 
-        // Premium Zig-Zag Curve Logic
-        pathBuilder += ` C ${centerX + amplitude * direction} ${prevY + (currentY - prevY) / 4}, ${centerX + amplitude * direction} ${currentY - (currentY - prevY) / 4}, ${centerX} ${currentY}`;
+        // Control Points for organic flow
+        const cp1Y = prevY + (currentY - prevY) * 0.5;
+        const cp2Y = currentY - (currentY - prevY) * 0.5;
+
+        pathBuilder += ` C ${centerX + amplitude * direction} ${cp1Y}, ${centerX + amplitude * direction} ${cp2Y}, ${centerX} ${currentY}`;
       });
 
-      // Extend to bottom
+      // Extend to bottom smoothly
       const lastStep = stepRefs.current[steps.length - 1];
       if (lastStep) {
         const rect = lastStep.getBoundingClientRect();
@@ -96,9 +100,18 @@ export default function ProcessFlow() {
 
     calculatePath();
     window.addEventListener("resize", calculatePath);
-    setTimeout(calculatePath, 500);
 
-    return () => window.removeEventListener("resize", calculatePath);
+    const observer = new ResizeObserver(() => {
+      calculatePath();
+    });
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    return () => {
+      window.removeEventListener("resize", calculatePath);
+      observer.disconnect();
+    };
   }, []);
 
   return (
@@ -108,7 +121,7 @@ export default function ProcessFlow() {
       id="process"
     >
       <div className="max-w-7xl mx-auto px-6 relative z-10">
-        <div className="text-center mb-20">
+        <div className="text-center mb-24">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -133,25 +146,23 @@ export default function ProcessFlow() {
           {/* Animated SVG Path Layer */}
           <div className="absolute inset-0 w-full h-full pointer-events-none z-0">
             <svg className="w-full h-full overflow-visible">
-              <path
-                d={svgPath}
-                stroke="#E5E7EB"
-                strokeWidth="2"
-                fill="none"
-                strokeDasharray="4 4"
-              />
+              {/* Background Track - Solid and faint for premium feel */}
+              <path d={svgPath} stroke="#E5E7EB" strokeWidth="3" fill="none" />
+
+              {/* Foreground Animated Line */}
               <motion.path
                 d={svgPath}
                 stroke="#ECAE16"
-                strokeWidth="4"
+                strokeWidth="5"
                 fill="none"
                 strokeLinecap="round"
                 style={{ pathLength }}
+                filter="drop-shadow(0px 0px 4px rgba(236, 174, 22, 0.4))"
               />
             </svg>
           </div>
 
-          <div className="space-y-24 relative z-10">
+          <div className="space-y-32 relative z-10">
             {steps.map((step, index) => {
               const isEven = index % 2 === 0;
               return (
@@ -160,25 +171,23 @@ export default function ProcessFlow() {
                   initial={{ opacity: 0, y: 50 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-100px" }}
-                  transition={{ duration: 0.6, delay: 0.2 }}
-                  className={`flex flex-col md:flex-row items-start md:items-center relative ${
+                  transition={{ duration: 0.8, delay: 0.1 }}
+                  className={`flex flex-col md:flex-row items-center relative ${
                     isEven ? "md:flex-row-reverse" : ""
                   }`}
                 >
                   {/* Content Side */}
-                  <div className="ml-16 md:ml-0 md:w-1/2 md:px-12 mb-4 md:mb-0">
+                  <div className="w-full md:w-5/12 px-4 mb-8 md:mb-0">
                     <div
-                      className={`bg-white p-8 rounded-3xl shadow-xl border border-gray-100 relative group hover:-translate-y-2 transition-transform duration-300 ${isEven ? "text-left" : "md:text-right"}`}
+                      className={`bg-white p-8 rounded-3xl shadow-xl border border-gray-100 relative group hover:-translate-y-2 transition-transform duration-500`}
                     >
-                      <div
-                        className={`text-6xl font-black text-gray-100 absolute -top-8 ${isEven ? "right-8" : "md:left-8 right-8"}`}
-                      >
-                        0{index + 1}
+                      <div className="absolute -top-6 -right-6 w-12 h-12 bg-accent-dark text-white rounded-full flex items-center justify-center font-bold text-xl shadow-lg z-20">
+                        {index + 1}
                       </div>
-                      <h3 className="text-2xl font-bold font-syne text-accent-dark mb-4 relative z-10">
+                      <h3 className="text-2xl font-bold font-syne text-accent-dark mb-4 group-hover:text-gold transition-colors">
                         {step.title}
                       </h3>
-                      <p className="text-gray-600 relative z-10 leading-relaxed">
+                      <p className="text-gray-600 leading-relaxed">
                         {step.description}
                       </p>
                     </div>
@@ -186,23 +195,23 @@ export default function ProcessFlow() {
 
                   {/* Center Icon Node (Ref Target) */}
                   <div
-                    className="absolute left-0 md:left-1/2 top-0 md:-translate-x-1/2 flex items-center justify-center"
+                    className="w-full md:w-2/12 flex justify-center py-4 md:py-0"
                     ref={(el) => {
                       stepRefs.current[index] = el;
                     }}
                   >
                     <motion.div
-                      className="w-12 h-12 bg-accent-dark rounded-full border-4 border-white shadow-lg flex items-center justify-center z-20 relative"
-                      whileInView={{ scale: [0, 1.2, 1] }}
+                      className="w-16 h-16 bg-white rounded-full border-4 border-gold shadow-lg flex items-center justify-center z-20 relative"
+                      whileInView={{ scale: [0, 1.2, 1], rotate: [0, 360] }}
                       viewport={{ once: true }}
-                      transition={{ duration: 0.5 }}
+                      transition={{ duration: 0.8 }}
                     >
-                      <step.icon size={20} className="text-gold" />
+                      <step.icon size={24} className="text-accent-dark" />
                     </motion.div>
                   </div>
 
                   {/* Empty Side for Layout Balance */}
-                  <div className="hidden md:block md:w-1/2"></div>
+                  <div className="hidden md:block md:w-5/12"></div>
                 </motion.div>
               );
             })}

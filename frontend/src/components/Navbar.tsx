@@ -1,105 +1,196 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { Menu, X, ArrowUpRight } from "lucide-react";
-import { motion } from "framer-motion";
+import Image from "next/image";
+import { useState, useEffect } from "react";
+import { Menu, X, Phone, Instagram, Facebook } from "lucide-react";
+import { motion, AnimatePresence, Variants } from "framer-motion";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const navVariants: Variants = {
+    hidden: { y: -100, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: { duration: 0.5, ease: "easeInOut" },
+    },
+  };
 
   return (
-    <nav className="fixed w-full z-50 bg-background/80 backdrop-blur-md border-b border-gray-100/10">
-      <div className="max-w-7xl mx-auto px-6 py-6">
-        <div className="flex items-center justify-between">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="flex items-center gap-2"
+    <motion.nav
+      initial="hidden"
+      animate="visible"
+      variants={navVariants}
+      className={`fixed w-full z-50 transition-all duration-300 ${
+        scrolled
+          ? "bg-white/90 backdrop-blur-md shadow-sm py-4"
+          : "bg-transparent py-6"
+      }`}
+    >
+      <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
+        <Link
+          href="/"
+          className="relative h-12 w-48 transition-opacity hover:opacity-80"
+        >
+          <Image
+            src="/logo.png"
+            alt="Rupali Homes"
+            fill
+            className="object-contain object-left"
+            priority
+          />
+        </Link>
+
+        {/* Desktop Navigation */}
+        <div
+          className={`hidden md:flex items-center gap-8 ${scrolled ? "text-gray-800" : "text-white/90"}`}
+        >
+          <Link
+            href="/"
+            className="text-sm uppercase tracking-widest hover:text-gold transition-colors font-medium"
           >
-            <div className="w-8 h-8 md:w-10 md:h-10 border-2 border-gold rounded-b-full flex items-center justify-center">
-              <div className="w-2 h-2 bg-gold rounded-full"></div>
-            </div>
-            <Link
-              href="/"
-              className="text-xl md:text-2xl font-bold font-syne tracking-tight"
-            >
-              RUPALI
-              <span className="block text-xs font-outfit font-normal text-gray-500 uppercase tracking-widest">
-                Homes
-              </span>
-            </Link>
-          </motion.div>
-
-          {/* Desktop Menu */}
-          <div className="hidden md:flex items-center space-x-12">
-            <div className="flex space-x-8 text-sm font-medium tracking-wide">
-              {[
-                { name: "Home", href: "/" },
-                { name: "About Us", href: "/#about-us" },
-                { name: "Services", href: "/#services" },
-                { name: "Portfolio", href: "/portfolio" },
-              ].map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className="relative group overflow-hidden"
-                >
-                  <span className="block group-hover:-translate-y-full transition-transform duration-300">
-                    {item.name}
-                  </span>
-                  <span className="absolute top-0 left-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300 text-gold">
-                    {item.name}
-                  </span>
-                </Link>
-              ))}
-            </div>
-            <Link
-              href="#contact"
-              className="flex items-center gap-2 px-6 py-2 bg-accent-dark text-white rounded-full text-sm font-medium hover:bg-gold transition-colors duration-300"
-            >
-              Contact Us
-              <div className="bg-gold w-6 h-6 rounded-full flex items-center justify-center text-accent-dark">
-                <ArrowUpRight size={14} />
-              </div>
-            </Link>
-          </div>
-
-          {/* Mobile Toggle */}
-          <div className="md:hidden">
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="p-2 text-accent-dark focus:outline-none"
-            >
-              {isOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
-          </div>
+            Home
+          </Link>
+          <a
+            href="/#about"
+            className="text-sm uppercase tracking-widest hover:text-gold transition-colors font-medium"
+          >
+            About
+          </a>
+          <a
+            href="/#projects"
+            className="text-sm uppercase tracking-widest hover:text-gold transition-colors font-medium"
+          >
+            Projects
+          </a>
+          <a
+            href="/#services"
+            className="text-sm uppercase tracking-widest hover:text-gold transition-colors font-medium"
+          >
+            Services
+          </a>
+          <Link
+            href="/portfolio"
+            className="text-sm uppercase tracking-widest hover:text-gold transition-colors font-medium"
+          >
+            Portfolio
+          </Link>
+          <Link
+            href="/blogs"
+            className="text-sm uppercase tracking-widest hover:text-gold transition-colors font-medium"
+          >
+            Blogs
+          </Link>
+          <a
+            href="/#contact"
+            className="px-6 py-2 bg-white text-accent-dark font-bold text-sm uppercase tracking-widest hover:bg-gold hover:text-white transition-all duration-300 rounded-full"
+          >
+            Contact
+          </a>
         </div>
+
+        {/* Mobile Menu Button */}
+        <button
+          className={`md:hidden ${scrolled ? "text-accent-dark" : "text-white"}`}
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          {isOpen ? <X size={28} /> : <Menu size={28} />}
+        </button>
       </div>
 
-      {/* Mobile Menu Overlay */}
-      {isOpen && (
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="md:hidden absolute top-full left-0 w-full bg-background border-b border-gray-100 shadow-xl"
-        >
-          <div className="flex flex-col p-6 space-y-4">
-            {["Home", "About Us", "Services", "Portfolio", "Contact"].map(
-              (item) => (
-                <Link
-                  key={item}
-                  href={`#${item.toLowerCase().replace(" ", "-")}`}
-                  className="text-lg font-syne font-medium hover:text-gold transition-colors"
-                  onClick={() => setIsOpen(false)}
-                >
-                  {item}
-                </Link>
-              ),
-            )}
-          </div>
-        </motion.div>
-      )}
-    </nav>
+      {/* Mobile Overlay */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "100vh" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="fixed inset-0 bg-accent-dark z-40 flex flex-col items-center justify-center space-y-8"
+          >
+            <Link
+              href="/"
+              onClick={() => setIsOpen(false)}
+              className="text-2xl text-white font-syne hover:text-gold"
+            >
+              Home
+            </Link>
+            <a
+              href="/#about"
+              onClick={() => setIsOpen(false)}
+              className="text-2xl text-white font-syne hover:text-gold"
+            >
+              About
+            </a>
+            <a
+              href="/#projects"
+              onClick={() => setIsOpen(false)}
+              className="text-2xl text-white font-syne hover:text-gold"
+            >
+              Projects
+            </a>
+            <a
+              href="/#services"
+              onClick={() => setIsOpen(false)}
+              className="text-2xl text-white font-syne hover:text-gold"
+            >
+              Services
+            </a>
+            <Link
+              href="/portfolio"
+              onClick={() => setIsOpen(false)}
+              className="text-2xl text-white font-syne hover:text-gold"
+            >
+              Portfolio
+            </Link>
+            <Link
+              href="/blogs"
+              onClick={() => setIsOpen(false)}
+              className="text-2xl text-white font-syne hover:text-gold"
+            >
+              Blogs
+            </Link>
+            <a
+              href="/#contact"
+              onClick={() => setIsOpen(false)}
+              className="text-2xl text-white font-syne hover:text-gold"
+            >
+              Contact
+            </a>
+
+            <div className="flex gap-6 mt-8">
+              <a
+                href="#"
+                className="p-3 bg-white/10 rounded-full hover:bg-gold transition-colors"
+              >
+                <Instagram className="text-white" />
+              </a>
+              <a
+                href="#"
+                className="p-3 bg-white/10 rounded-full hover:bg-gold transition-colors"
+              >
+                <Facebook className="text-white" />
+              </a>
+              <a
+                href="tel:+919876543210"
+                className="p-3 bg-white/10 rounded-full hover:bg-gold transition-colors"
+              >
+                <Phone className="text-white" />
+              </a>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.nav>
   );
 }

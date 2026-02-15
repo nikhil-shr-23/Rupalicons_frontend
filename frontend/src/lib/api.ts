@@ -38,6 +38,18 @@ export async function createProject(project: Property): Promise<Property | null>
   }
 }
 
+export async function deleteProject(id: number): Promise<boolean> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/properties/${id}`, {
+      method: "DELETE",
+    });
+    return response.ok;
+  } catch (error) {
+    console.error("Error deleting project:", error);
+    return false;
+  }
+}
+
 export const defaultProperty: Property = {
   devName: "Rupali Developers",
   projectName: "",
