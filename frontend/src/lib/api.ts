@@ -1,4 +1,4 @@
-import { Property, ProjectType, UnitType, ProjectStage, DealType } from "../types";
+import { Property, ProjectType, UnitType, ProjectStage, DealType, Blog } from "../types";
 
 const API_BASE_URL = "http://localhost:8080";
 
@@ -61,3 +61,49 @@ export const defaultProperty: Property = {
   imageUrl: "",
   brochureUrl: ""
 };
+
+export async function fetchBlogs(): Promise<Blog[]> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/blogs`, { cache: 'no-store' });
+    if (!response.ok) throw new Error("Failed to fetch blogs");
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching blogs:", error);
+    return [];
+  }
+}
+
+export async function fetchBlogById(id: number): Promise<Blog | null> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/blogs/${id}`, { cache: 'no-store' });
+    if (!response.ok) throw new Error("Failed to fetch blog");
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching blog:", error);
+    return null;
+  }
+}
+
+export async function createBlog(formData: FormData): Promise<Blog | null> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/blogs`, {
+      method: "POST",
+      body: formData, // FormData automatically sets the Content-Type to multipart/form-data
+    });
+    if (!response.ok) throw new Error("Failed to create blog");
+    return await response.json();
+  } catch (error) {
+    console.error("Error creating blog:", error);
+    return null;
+  }
+}
+
+export async function deleteBlog(id: number): Promise<boolean> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/blogs/${id}`, { method: "DELETE" });
+    return response.ok;
+  } catch (error) {
+    console.error("Error deleting blog:", error);
+    return false;
+  }
+}

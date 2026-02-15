@@ -48,3 +48,15 @@ export interface Property {
   createdAt?: string;
   updatedAt?: string;
 }
+
+export interface Blog {
+    id?: number;
+    title: string;
+    content: string;
+    author: string;
+    category: string;
+    imageType?: string;
+    imageName?: string;
+    createdAt?: string;
+    updatedAt?: string;
+}
