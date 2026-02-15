@@ -1,12 +1,12 @@
 "use client";
 
-import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
-import { Map_pin, PencilRuler, FileCheck, HardHat, Key } from "lucide-react";
+import { motion, useScroll, useSpring, useTransform } from "framer-motion";
+import { useRef, useState, useEffect } from "react";
+import { MapPin, PencilRuler, FileCheck, HardHat, Key } from "lucide-react";
 
 const steps = [
   {
-    icon: Map_pin,
+    icon: MapPin,
     title: "Consultation & Plot Study",
     description:
       "Free site visit, understanding your vision, and preliminary feasibility assessment.",
@@ -39,12 +39,67 @@ const steps = [
 
 export default function ProcessFlow() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const stepRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [svgPath, setSvgPath] = useState("");
+
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start center", "end center"],
   });
 
-  const pathLength = useTransform(scrollYProgress, [0, 1], [0, 1]);
+  const pathLength = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001,
+  });
+
+  useEffect(() => {
+    const calculatePath = () => {
+      if (!containerRef.current || stepRefs.current.length === 0) return;
+
+      const containerRect = containerRef.current.getBoundingClientRect();
+      const centerX = containerRect.width / 2;
+
+      let pathBuilder = `M ${centerX} 0`;
+
+      stepRefs.current.forEach((step, index) => {
+        if (!step) return;
+
+        const rect = step.getBoundingClientRect();
+        const relativeY = rect.top - containerRect.top + rect.height / 2;
+
+        const prevY =
+          index === 0
+            ? 0
+            : stepRefs.current[index - 1]?.getBoundingClientRect().top! -
+              containerRect.top +
+              stepRefs.current[index - 1]?.clientHeight! / 2;
+        const currentY = relativeY;
+
+        const amplitude = 60;
+        const direction = index % 2 === 0 ? 1 : -1;
+
+        // Premium Zig-Zag Curve Logic
+        pathBuilder += ` C ${centerX + amplitude * direction} ${prevY + (currentY - prevY) / 4}, ${centerX + amplitude * direction} ${currentY - (currentY - prevY) / 4}, ${centerX} ${currentY}`;
+      });
+
+      // Extend to bottom
+      const lastStep = stepRefs.current[steps.length - 1];
+      if (lastStep) {
+        const rect = lastStep.getBoundingClientRect();
+        const bottomY = containerRect.height;
+        pathBuilder += ` L ${centerX} ${bottomY}`;
+      }
+
+      setSvgPath(pathBuilder);
+    };
+
+    calculatePath();
+    window.addEventListener("resize", calculatePath);
+    setTimeout(calculatePath, 500);
+
+    return () => window.removeEventListener("resize", calculatePath);
+  }, []);
 
   return (
     <section
@@ -75,19 +130,28 @@ export default function ProcessFlow() {
         </div>
 
         <div className="relative">
-          {/* Central Line Container */}
-          <div className="absolute left-[20px] md:left-1/2 top-0 bottom-0 w-1 md:-translate-x-1/2 block">
-            {/* Background Line */}
-            <div className="w-full h-full bg-gray-200 rounded-full"></div>
-
-            {/* Animated Fill Line */}
-            <motion.div
-              className="absolute top-0 left-0 w-full bg-gold rounded-full origin-top"
-              style={{ height: "100%", scaleY: pathLength }}
-            />
+          {/* Animated SVG Path Layer */}
+          <div className="absolute inset-0 w-full h-full pointer-events-none z-0">
+            <svg className="w-full h-full overflow-visible">
+              <path
+                d={svgPath}
+                stroke="#E5E7EB"
+                strokeWidth="2"
+                fill="none"
+                strokeDasharray="4 4"
+              />
+              <motion.path
+                d={svgPath}
+                stroke="#ECAE16"
+                strokeWidth="4"
+                fill="none"
+                strokeLinecap="round"
+                style={{ pathLength }}
+              />
+            </svg>
           </div>
 
-          <div className="space-y-24">
+          <div className="space-y-24 relative z-10">
             {steps.map((step, index) => {
               const isEven = index % 2 === 0;
               return (
@@ -104,7 +168,7 @@ export default function ProcessFlow() {
                   {/* Content Side */}
                   <div className="ml-16 md:ml-0 md:w-1/2 md:px-12 mb-4 md:mb-0">
                     <div
-                      className={`bg-white p-8 rounded-3xl shadow-xl border border-gray-100 relative ${isEven ? "text-left" : "md:text-right"}`}
+                      className={`bg-white p-8 rounded-3xl shadow-xl border border-gray-100 relative group hover:-translate-y-2 transition-transform duration-300 ${isEven ? "text-left" : "md:text-right"}`}
                     >
                       <div
                         className={`text-6xl font-black text-gray-100 absolute -top-8 ${isEven ? "right-8" : "md:left-8 right-8"}`}
@@ -120,13 +184,21 @@ export default function ProcessFlow() {
                     </div>
                   </div>
 
-                  {/* Center Icon Node */}
-                  <div className="absolute left-0 md:left-1/2 top-0 md:-translate-x-1/2 flex items-center justify-center">
-                    <div className="w-10 h-10 bg-accent-dark rounded-full border-4 border-white shadow-lg flex items-center justify-center z-20 relative">
-                      <step.icon size={18} className="text-gold" />
-                      {/* Pulse Effect */}
-                      <div className="absolute inset-0 bg-gold rounded-full opacity-20 animate-ping"></div>
-                    </div>
+                  {/* Center Icon Node (Ref Target) */}
+                  <div
+                    className="absolute left-0 md:left-1/2 top-0 md:-translate-x-1/2 flex items-center justify-center"
+                    ref={(el) => {
+                      stepRefs.current[index] = el;
+                    }}
+                  >
+                    <motion.div
+                      className="w-12 h-12 bg-accent-dark rounded-full border-4 border-white shadow-lg flex items-center justify-center z-20 relative"
+                      whileInView={{ scale: [0, 1.2, 1] }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.5 }}
+                    >
+                      <step.icon size={20} className="text-gold" />
+                    </motion.div>
                   </div>
 
                   {/* Empty Side for Layout Balance */}
