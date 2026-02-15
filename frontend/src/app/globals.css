@@ -1,37 +1,48 @@
 @import "tailwindcss";
 
 :root {
-  /* Navy Blue Primary */
-  --background: #0a192f;
-  --foreground: #ffffff;
-
-  /* Gold Accents */
-  --color-gold-400: #d4af37;
-  --color-gold-500: #c5a47e;
-  --color-gold-600: #b08d55;
-
-  /* Navy Blue Shades */
-  --color-navy-800: #112240;
-  --color-navy-900: #0a192f;
-
+  /* Cream Light Background */
+  --background: #FDFCF8;
+  --foreground: #1A1A1A;
+  
+  /* Deep Navy/Black Accent */
+  --color-accent-dark: #0B1120;
+  
+  /* Gold/Mustard Accent from Reference */
+  --color-gold: #ECAE16;
+  --color-gold-hover: #D59B12;
+  
   /* Text Colors */
-  --color-text-light: #ccd6f6;
-  --color-text-dim: #8892b0;
+  --color-text-primary: #1A1A1A;
+  --color-text-secondary: #4A4A4A;
+  --color-text-light: #FDFCF8;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-gold: var(--color-gold-400);
-  --color-gold-dim: var(--color-gold-500);
-  --color-navy: var(--color-navy-900);
-  --color-navy-light: var(--color-navy-800);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-accent-dark: var(--color-accent-dark);
+  --color-gold: var(--color-gold);
+  --color-gold-hover: var(--color-gold-hover);
+  
+  --font-syne: var(--font-syne);
+  --font-outfit: var(--font-outfit);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  font-family: var(--font-outfit), sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-syne), sans-serif;
+}
+
+/* Custom Grid Background Utility */
+.bg-grid {
+  background-size: 100px 100px;
+  background-image:
+    linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
 }

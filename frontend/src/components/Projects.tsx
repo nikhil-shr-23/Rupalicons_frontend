@@ -4,6 +4,8 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { fetchProjects } from "../lib/api";
 import { Property } from "../types";
+import { motion } from "framer-motion";
+import { ArrowUpRight, Eye } from "lucide-react";
 
 export default function Projects() {
   const [projects, setProjects] = useState<Property[]>([]);
@@ -29,79 +31,107 @@ export default function Projects() {
     return (
       <section
         id="projects"
-        className="py-20 bg-gray-50 flex justify-center items-center"
+        className="py-24 bg-accent-dark flex justify-center items-center min-h-[500px]"
       >
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gold-400"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gold"></div>
       </section>
     );
   }
 
   return (
-    <section id="projects" className="py-20 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-navy-900 font-serif mb-4">
-            Our Premium Projects
-          </h2>
-          <div className="w-24 h-1 bg-gold-400 mx-auto rounded-full"></div>
-          <p className="mt-4 text-gray-600 max-w-2xl mx-auto">
-            Explore our portfolio of exceptional properties, designed with
-            precision and tailored for sophisticated living.
-          </p>
+    <section
+      id="projects"
+      className="py-24 bg-accent-dark text-white overflow-hidden relative"
+    >
+      {/* Background Grid Pattern for Dark Section */}
+      <div className="absolute inset-0 opacity-10 bg-[linear-gradient(rgba(255,255,255,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.1)_1px,transparent_1px)] bg-size-[50px_50px]"></div>
+
+      <div className="max-w-7xl mx-auto px-6 relative z-10">
+        <div className="grid lg:grid-cols-2 gap-16 items-end mb-20">
+          <div>
+            <h2 className="text-5xl md:text-6xl font-bold font-syne leading-tight">
+              Professional Interior <br />
+              <span className="text-gold">Made Simple</span>
+            </h2>
+            <div className="flex items-center gap-4 mt-8">
+              <div className="w-12 h-12 rounded-full border border-gray-600 flex items-center justify-center">
+                <Eye size={20} className="text-gray-400" />
+              </div>
+              <span className="text-sm font-medium tracking-wide uppercase">
+                Accentuate Vision
+              </span>
+            </div>
+          </div>
+
+          <div className="lg:pl-12">
+            <p className="text-xl text-gray-300 leading-relaxed mb-8">
+              Interior transforms spaces with creativity, precision, and
+              timeless elegance.
+              <span className="text-gold font-semibold">
+                {" "}
+                Our expert designers craft bespoke interiors tailored to your
+                style.
+              </span>
+            </p>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              className="flex items-center gap-2 bg-white text-accent-dark px-6 py-3 rounded-full font-bold"
+            >
+              <div className="w-8 h-8 rounded-full bg-gold flex items-center justify-center">
+                <ArrowUpRight size={16} />
+              </div>
+              More About
+            </motion.button>
+          </div>
         </div>
 
-        {projects.length === 0 ? (
-          <div className="text-center text-gray-500 py-10">
-            <p>No projects available at the moment. Please check back later.</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-            {projects.map((project) => (
-              <div
+        {/* Dynamic Project Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {projects.length > 0 ? (
+            projects.map((project, index) => (
+              <motion.div
                 key={project.propertiesId}
-                className="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300 border border-gray-100 group"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1, duration: 0.6 }}
+                viewport={{ once: true }}
+                className="group relative h-[400px] rounded-2xl overflow-hidden cursor-pointer"
               >
-                <div className="relative h-64 overflow-hidden bg-gray-200">
-                  {project.imageUrl ? (
-                    <Image
-                      src={project.imageUrl}
-                      alt={project.projectName}
-                      fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-110"
-                    />
-                  ) : (
-                    <div className="flex items-center justify-center h-full text-gray-400">
-                      No Image Available
-                    </div>
-                  )}
-                  <div className="absolute top-4 right-4 bg-navy-900/90 text-gold px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-sm backdrop-blur-sm">
-                    {project.projectStage.replace(/_/g, " ")}
+                {project.imageUrl ? (
+                  <Image
+                    src={project.imageUrl}
+                    alt={project.projectName}
+                    fill
+                    className="object-cover transition-transform duration-700 group-hover:scale-110"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gray-800 flex items-center justify-center text-gray-500">
+                    No Image
                   </div>
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-navy-900 mb-2 font-serif">
+                )}
+
+                {/* Overlay */}
+                <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity"></div>
+
+                <div className="absolute bottom-0 left-0 p-8 w-full translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                  <span className="text-gold text-xs font-bold uppercase tracking-widest mb-2 block">
+                    {project.projectType}
+                  </span>
+                  <h3 className="text-2xl font-bold font-syne mb-2">
                     {project.projectName}
                   </h3>
-                  <p className="text-gold-600 font-medium text-sm mb-4">
-                    {project.location}
-                  </p>
-                  <p className="text-gray-600 text-sm leading-relaxed mb-6 line-clamp-3">
-                    {project.Notes || "No description available."}
-                  </p>
-                  <div className="border-t border-gray-100 pt-4 flex justify-between items-center">
-                    <span className="text-xs font-semibold text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                      {project.projectType}
-                    </span>
-                    <button className="text-navy-900 font-semibold hover:text-gold transition-colors text-sm uppercase tracking-wide flex items-center gap-2">
-                      View Details
-                      <span className="text-lg">→</span>
-                    </button>
+                  <div className="h-0 group-hover:h-auto overflow-hidden transition-all duration-300">
+                    <p className="text-gray-300 text-sm line-clamp-2">
+                      {project.location}
+                    </p>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
+              </motion.div>
+            ))
+          ) : (
+            <p className="text-gray-500">No projects to display.</p>
+          )}
+        </div>
       </div>
     </section>
   );
