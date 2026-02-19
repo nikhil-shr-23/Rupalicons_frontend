@@ -7,25 +7,25 @@ import Image from "next/image";
 export default function Services() {
   const services = [
     {
-      title: "Legal & Documentation Support",
+      title: "Real Estate Services",
       description:
-        "Professional assistance with contracts, paperwork, and compliance.",
+        "Expert guidance for buying, selling, and renting properties in prime locations.",
       image:
-        "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", // Signing papers
+        "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
     },
     {
-      title: "Property Buying",
+      title: "Interior Design",
       description:
-        "Expert guidance to find your dream home in prime locations.",
+        "Bespoke interior design solutions to transform your space into a dream home.",
       image:
-        "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", // Handing keys
+        "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
     },
     {
-      title: "Property Selling",
+      title: "Legal & Documentation",
       description:
-        "Strategic marketing to sell your property at the best value.",
+        "Professional assistance with contracts, registry, and compliance paperwork.",
       image:
-        "https://images.unsplash.com/photo-1593696140826-c58b5e6368d6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", // For Sale sign (concept)
+        "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
     },
   ];
 
@@ -52,14 +52,13 @@ export default function Services() {
             className="max-w-lg"
           >
             <p className="text-gray-600 text-lg mb-8 leading-relaxed">
-              We offer a full range of real estate services designed to meet
-              your needs—from property buying and selling to expert
-              consultation.
+              We offer a complete suite of services—from finding your perfect
+              property to designing its interiors and handling all legal
+              formalities.
             </p>
             <p className="text-sm text-gray-500 mb-8">
-              We focus on transparency, efficiency, and results, providing
-              tailored solutions that help you make confident property
-              decisions.
+              Whether you are buying, selling, or renovating, we provide
+              tailored solutions to make your vision a reality.
             </p>
             <button className="bg-accent-dark text-white px-8 py-4 rounded-full font-bold flex items-center gap-2 hover:bg-black transition-colors group">
               Learn More

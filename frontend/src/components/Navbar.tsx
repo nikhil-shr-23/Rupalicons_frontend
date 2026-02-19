@@ -68,18 +68,18 @@ export default function Navbar() {
           >
             About
           </a>
-          <a
-            href="/#projects"
+          <Link
+            href="/buy"
             className="text-sm uppercase tracking-widest hover:text-gold transition-colors font-medium"
           >
-            Projects
-          </a>
-          <a
-            href="/#services"
+            Buy
+          </Link>
+          <Link
+            href="/rent"
             className="text-sm uppercase tracking-widest hover:text-gold transition-colors font-medium"
           >
-            Services
-          </a>
+            Rent
+          </Link>
           <Link
             href="/portfolio"
             className="text-sm uppercase tracking-widest hover:text-gold transition-colors font-medium"
@@ -132,20 +132,20 @@ export default function Navbar() {
             >
               About
             </a>
-            <a
-              href="/#projects"
+            <Link
+              href="/buy"
               onClick={() => setIsOpen(false)}
               className="text-2xl text-white font-syne hover:text-gold"
             >
-              Projects
-            </a>
-            <a
-              href="/#services"
+              Buy
+            </Link>
+            <Link
+              href="/rent"
               onClick={() => setIsOpen(false)}
               className="text-2xl text-white font-syne hover:text-gold"
             >
-              Services
-            </a>
+              Rent
+            </Link>
             <Link
               href="/portfolio"
               onClick={() => setIsOpen(false)}

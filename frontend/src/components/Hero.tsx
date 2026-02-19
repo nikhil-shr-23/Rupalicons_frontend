@@ -20,21 +20,19 @@ export default function Hero() {
           <div className="flex items-center gap-4 mb-6">
             <div className="w-12 h-[1px] bg-gold"></div>
             <span className="text-sm font-semibold tracking-widest uppercase text-gold">
-              Premium Living
+              Real Estate & Design
             </span>
           </div>
 
-          <h1 className="text-6xl md:text-8xl font-bold leading-[0.9] text-accent-dark mb-8 font-syne">
-            Inspired,
+          <h1 className="text-5xl md:text-7xl font-bold leading-[1.1] text-accent-dark mb-8 font-syne">
+            Find Your Home,
             <br />
-            Creative,
-            <br />
-            Functional
+            Design Your Space
           </h1>
 
           <p className="text-xl text-gray-600 max-w-md mb-10 font-light leading-relaxed">
-            People living in a home is a far greater need in design. We bring
-            interiors to life, understanding the person behind the space.
+            From finding the perfect property to crafting bespoke interiors, we
+            guide you through every step of your home journey.
           </p>
 
           <div className="flex flex-wrap gap-6 items-center">
