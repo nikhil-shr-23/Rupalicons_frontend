@@ -1,0 +1,23 @@
+package com.raghav.rupaliconstbackend.service;
+
+import com.raghav.rupaliconstbackend.DTO.PropertyCreateDTO;
+import com.raghav.rupaliconstbackend.DTO.PropertyResponseDTO;
+import com.raghav.rupaliconstbackend.DTO.PropertyUpdateDTO;
+import com.raghav.rupaliconstbackend.DTO.PurchaseRequestDTO;
+import com.raghav.rupaliconstbackend.DTO.PurchaseResponseDTO;
+import com.raghav.rupaliconstbackend.DTO.RentalRequestDTO;
+import com.raghav.rupaliconstbackend.DTO.RentalResponseDTO;
+
+import java.util.UUID;
+
+public interface AdminPropertyService {
+    PropertyResponseDTO createProperty(PropertyCreateDTO dto, String adminEmail);
+
+    PropertyResponseDTO updateProperty(Long id, PropertyUpdateDTO dto);
+
+    void deleteProperty(Long id);
+
+    PurchaseResponseDTO purchaseProperty(Long id, PurchaseRequestDTO dto, String adminEmail);
+
+    RentalResponseDTO rentProperty(Long id, RentalRequestDTO dto, String adminEmail);
+}
