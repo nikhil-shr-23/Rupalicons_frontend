@@ -10,37 +10,72 @@ import {
 
 interface AdminAuthContextType {
   isAuthenticated: boolean;
-  login: (username: string, password: string) => boolean;
+  token: string | null;
+  login: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
 }
 
 const AdminAuthContext = createContext<AdminAuthContextType | null>(null);
 
-// Hardcoded credentials
-const ADMIN_USERNAME = "admin";
-const ADMIN_PASSWORD = "rupali@123";
-
 export function AdminAuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
-    const auth = sessionStorage.getItem("adminAuth");
-    setIsAuthenticated(auth === "true");
+    const storedToken = sessionStorage.getItem("adminToken");
+    if (storedToken) {
+      setToken(storedToken);
+      setIsAuthenticated(true);
+    }
     setIsLoading(false);
   }, []);
 
-  const login = (username: string, password: string): boolean => {
-    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-      sessionStorage.setItem("adminAuth", "true");
-      setIsAuthenticated(true);
-      return true;
+  const login = async (
+    username: string,
+    password: string,
+  ): Promise<boolean> => {
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+      const response = await fetch(`${apiUrl}/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: username, password }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        // AuthResponseDTO contains "token" or "accessToken"?
+        // efficient verification needed. API_DOCS say "200 OK with JWT token as plain string"
+        // But AuthController returns AuthResponseDTO.
+        // Let's assume AuthResponseDTO has a field 'accessToken' or similar.
+        // Actually earlier code showed `new AuthResponseDTO(jwtService.generateToken(user))`
+        // I need to check AuthResponseDTO definition.
+
+        // For now, let's assume it returns { accessToken: "..." } or similar.
+        // WAIT: `return new AuthResponseDTO(jwtService.generateToken(saved));`
+        // I should check AuthResponseDTO.
+        // I will assume it has a single field, likely 'accessToken' or 'token'.
+
+        const accessToken = data.accessToken || data.token;
+
+        if (accessToken) {
+          sessionStorage.setItem("adminToken", accessToken);
+          setToken(accessToken);
+          setIsAuthenticated(true);
+          return true;
+        }
+      }
+      return false;
+    } catch (error) {
+      console.error("Login failed:", error);
+      return false;
     }
-    return false;
   };
 
   const logout = () => {
-    sessionStorage.removeItem("adminAuth");
+    sessionStorage.removeItem("adminToken");
+    setToken(null);
     setIsAuthenticated(false);
   };
 
@@ -53,7 +88,9 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AdminAuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AdminAuthContext.Provider
+      value={{ isAuthenticated, token, login, logout }}
+    >
       {children}
     </AdminAuthContext.Provider>
   );

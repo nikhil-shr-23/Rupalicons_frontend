@@ -1,52 +1,43 @@
-export enum ProjectType {
-  RESIDENTIAL = "RESIDENTIAL",
-  COMMERCIAL = "COMMERCIAL",
-  MIXED_USE = "MIXED_USE"
-}
-
-export enum ProjectStage {
-  PRE_LAUNCH = "PRE_LAUNCH",
-  UNDER_CONSTRUCTION = "UNDER_CONSTRUCTION",
-  COMPLETED = "COMPLETED"
-}
-
-export enum UnitType {
-  APARTMENT = "APARTMENT",
-  VILLA = "VILLA",
-  PENTHOUSE = "PENTHOUSE",
-  OFFICE = "OFFICE",
-  RETAIL = "RETAIL"
-}
-
-export enum DealType {
+export enum PropertyType {
   SALE = "SALE",
   RENT = "RENT",
-  LEASE = "LEASE"
+}
+
+export enum PropertyStatus {
+  AVAILABLE = "AVAILABLE",
+  SOLD = "SOLD",
+  RENTED = "RENTED",
+  HIDDEN = "HIDDEN",
 }
 
 export interface Property {
-  propertiesId?: number;
-  devName: string;
-  projectName: string;
-  projectType: ProjectType;
-  launchTime?: string;
-  launchPrice?: string;
-  unitType: UnitType;
-  projectStage: ProjectStage;
+  id?: number; // Long from backend
+  title: string;
+  description: string;
+  price?: number;
+  rentAmount?: number;
   location: string;
-  dealType: DealType;
-  unitSize?: number;
-  unitNumber?: number;
-  FloorNumber?: number;
-  OwnerName?: string;
-  OwnerAddress?: string;
-  CurrentPrice?: number;
-  AskingPrice?: number;
-  Notes?: string;
-  imageUrl?: string;
-  brochureUrl?: string;
+  size?: string;
+  type: PropertyType;
+  status: PropertyStatus;
+  createdBy?: number;
   createdAt?: string;
-  updatedAt?: string;
+  
+  // Frontend specific helper (backend doesn't send image URL in main DTO yet? 
+  // Wait, PropertyResponseDTO didn't list imageUrl. 
+  // I should keep it optional if I plan to add it or if it's missing)
+  imageUrl?: string; 
+  brochureUrl?: string;
+}
+
+// Buyer/Inquiry types are removed as backend doesn't support them yet.
+// Keeping a placeholder if needed for UI state but not for API.
+export interface ContactFormSubmission {
+  name: string;
+  phone: string;
+  email: string;
+  location: string;
+  message: string;
 }
 
 export interface Blog {
@@ -59,14 +50,4 @@ export interface Blog {
     imageName?: string;
     createdAt?: string;
     updatedAt?: string;
-}
-
-export interface Inquiry {
-    id?: number;
-    name: string;
-    phone?: string;
-    email?: string;
-    location?: string;
-    message?: string;
-    createdAt?: string;
 }

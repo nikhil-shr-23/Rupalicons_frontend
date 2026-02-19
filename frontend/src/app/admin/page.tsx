@@ -21,31 +21,23 @@ import {
   RefreshCw,
 } from "lucide-react";
 import Link from "next/link";
-import {
-  fetchProjects,
-  fetchBlogs,
-  deleteProject,
-  fetchInquiries,
-} from "@/lib/api";
-import { Property, Blog, Inquiry } from "@/types";
+import { fetchProperties, fetchBlogs, deleteProperty } from "@/lib/api";
+import { Property, Blog } from "@/types";
 
 export default function AdminDashboard() {
-  const [projects, setProjects] = useState<Property[]>([]);
+  const [properties, setProperties] = useState<Property[]>([]);
   const [blogs, setBlogs] = useState<Blog[]>([]);
-  const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [loading, setLoading] = useState(true);
-  const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const loadData = async () => {
     setLoading(true);
-    const [projectsRes, blogsRes, inquiriesRes] = await Promise.all([
-      fetchProjects(0, 100),
+    const [propertiesRes, blogsRes] = await Promise.all([
+      fetchProperties(0, 100),
       fetchBlogs(),
-      fetchInquiries(),
     ]);
-    setProjects(projectsRes.content || []);
+    setProperties(propertiesRes.content || []);
     setBlogs(blogsRes || []);
-    setInquiries(inquiriesRes || []);
     setLoading(false);
   };
 
@@ -53,25 +45,25 @@ export default function AdminDashboard() {
     loadData();
   }, []);
 
-  const handleDeleteProject = async (id: number) => {
-    if (!confirm("Are you sure you want to delete this project?")) return;
+  const handleDeleteProperty = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this property?")) return;
     setDeletingId(id);
-    const success = await deleteProject(id);
+    const success = await deleteProperty(id);
     if (success) {
-      setProjects((prev) => prev.filter((p) => p.propertiesId !== id));
+      setProperties((prev) => prev.filter((p) => p.id !== id));
     } else {
-      alert("Failed to delete project.");
+      alert("Failed to delete property.");
     }
     setDeletingId(null);
   };
 
   const statCards = [
     {
-      title: "Total Projects",
-      value: projects.length,
+      title: "Total Properties",
+      value: properties.length,
       icon: Building2,
       href: "/admin/projects",
-      actionLabel: "Manage Projects",
+      actionLabel: "Manage Properties",
     },
     {
       title: "Active Blogs",
@@ -82,7 +74,7 @@ export default function AdminDashboard() {
     },
     {
       title: "New Leads",
-      value: inquiries.length,
+      value: "—", // Backend doesn't support generic leads yet
       icon: Users,
       href: "/admin/leads",
       actionLabel: "View Leads",
@@ -119,8 +111,8 @@ export default function AdminDashboard() {
             <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
           </Button>
           <Link href="/admin/projects">
-            <Button className="gap-2 bg-accent-dark hover:bg-accent-dark/90">
-              <Plus size={16} /> Add Project
+            <Button className="gap-2 bg-accent-dark hover:bg-accent-dark/90 text-white">
+              <Plus size={16} /> Add Property
             </Button>
           </Link>
           <Link href="/admin/blogs/new">
@@ -162,14 +154,14 @@ export default function AdminDashboard() {
         ))}
       </div>
 
-      {/* Recent Projects with Delete */}
+      {/* Recent Properties with Delete */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <Card className="col-span-1">
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
-              <CardTitle>Recent Projects</CardTitle>
+              <CardTitle>Recent Properties</CardTitle>
               <CardDescription>
-                {projects.length} total projects
+                {properties.length} total properties
               </CardDescription>
             </div>
             <Link href="/admin/projects">
@@ -188,21 +180,21 @@ export default function AdminDashboard() {
                   />
                 ))}
               </div>
-            ) : projects.length === 0 ? (
+            ) : properties.length === 0 ? (
               <div className="text-center py-8 text-gray-400">
                 <Building2 className="h-10 w-10 mx-auto mb-2 opacity-40" />
-                <p className="text-sm">No projects yet.</p>
+                <p className="text-sm">No properties yet.</p>
                 <Link href="/admin/projects">
                   <Button size="sm" className="mt-3 gap-1">
-                    <Plus size={14} /> Add First Project
+                    <Plus size={14} /> Add First Property
                   </Button>
                 </Link>
               </div>
             ) : (
               <div className="space-y-3 max-h-[320px] overflow-y-auto pr-1">
-                {projects.slice(0, 8).map((project) => (
+                {properties.slice(0, 8).map((property) => (
                   <div
-                    key={project.propertiesId}
+                    key={property.id}
                     className="flex items-center justify-between p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors group"
                   >
                     <div className="flex items-center gap-3 min-w-0">
@@ -211,36 +203,33 @@ export default function AdminDashboard() {
                       </div>
                       <div className="min-w-0">
                         <p className="text-sm font-medium truncate">
-                          {project.projectName || "Untitled"}
+                          {property.title || "Untitled"}
                         </p>
                         <p className="text-xs text-gray-400 truncate">
-                          {project.location || "—"} • {project.projectType}
+                          {property.location || "—"} • {property.type}
                         </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
                       <span
                         className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
-                          project.projectStage === "COMPLETED"
+                          property.status === "AVAILABLE"
                             ? "bg-emerald-50 text-emerald-600"
-                            : project.projectStage === "UNDER_CONSTRUCTION"
-                              ? "bg-amber-50 text-amber-600"
-                              : "bg-blue-50 text-blue-600"
+                            : "bg-blue-50 text-blue-600"
                         }`}
                       >
-                        {project.projectStage?.replace("_", " ")}
+                        {property.status}
                       </span>
                       <Button
                         size="icon"
                         variant="ghost"
                         className="h-8 w-8 text-gray-400 hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-opacity"
                         onClick={() =>
-                          project.propertiesId &&
-                          handleDeleteProject(project.propertiesId)
+                          property.id && handleDeleteProperty(property.id)
                         }
-                        disabled={deletingId === project.propertiesId}
+                        disabled={deletingId === property.id}
                       >
-                        {deletingId === project.propertiesId ? (
+                        {deletingId === property.id ? (
                           <RefreshCw size={14} className="animate-spin" />
                         ) : (
                           <Trash2 size={14} />
@@ -334,7 +323,7 @@ export default function AdminDashboard() {
                 className="w-full justify-between group h-12"
               >
                 <span className="flex items-center gap-2">
-                  <Building2 size={16} /> Add New Project
+                  <Building2 size={16} /> Add New Property
                 </span>
                 <ArrowUpRight className="h-4 w-4 opacity-50 group-hover:opacity-100" />
               </Button>

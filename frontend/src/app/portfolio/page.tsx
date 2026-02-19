@@ -3,30 +3,30 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { fetchProjects } from "@/lib/api";
+import { fetchProperties } from "@/lib/api";
 import { Property } from "@/types";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { ArrowUpRight } from "lucide-react";
 
 export default function Portfolio() {
-  const [projects, setProjects] = useState<Property[]>([]);
+  const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function loadProjects() {
+    async function loadProperties() {
       try {
-        const data = await fetchProjects();
+        const data = await fetchProperties();
         if (data && data.content) {
-          setProjects(data.content);
+          setProperties(data.content);
         }
       } catch (error) {
-        console.error("Failed to load portfolio projects", error);
+        console.error("Failed to load portfolio properties", error);
       } finally {
         setLoading(false);
       }
     }
-    loadProjects();
+    loadProperties();
   }, []);
 
   return (
@@ -59,11 +59,11 @@ export default function Portfolio() {
           <div className="flex justify-center items-center py-20">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gold"></div>
           </div>
-        ) : projects.length > 0 ? (
+        ) : properties.length > 0 ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
-            {projects.map((project, index) => (
+            {properties.map((property, index) => (
               <motion.div
-                key={project.propertiesId}
+                key={property.id}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -71,10 +71,10 @@ export default function Portfolio() {
                 className="group relative rounded-2xl overflow-hidden bg-white shadow-lg border border-gray-100"
               >
                 <div className="relative h-80 overflow-hidden">
-                  {project.imageUrl ? (
+                  {property.imageUrl ? (
                     <Image
-                      src={project.imageUrl}
-                      alt={project.projectName}
+                      src={property.imageUrl}
+                      alt={property.title}
                       fill
                       className="object-cover group-hover:scale-110 transition-transform duration-700"
                     />
@@ -84,17 +84,17 @@ export default function Portfolio() {
                     </div>
                   )}
                   <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-accent-dark">
-                    {project.projectType}
+                    {property.type}
                   </div>
                 </div>
 
                 <div className="p-8">
                   <h3 className="text-2xl font-bold font-syne text-accent-dark mb-2 group-hover:text-gold transition-colors">
-                    {project.projectName}
+                    {property.title}
                   </h3>
                   <p className="text-gray-500 mb-6 flex items-center gap-2 text-sm">
                     <span className="w-2 h-2 rounded-full bg-gold"></span>
-                    {project.location}
+                    {property.location}
                   </p>
 
                   <button className="w-full py-3 bg-gray-50 hover:bg-accent-dark hover:text-white rounded-lg transition-colors font-bold text-accent-dark flex items-center justify-center gap-2 group-hover:shadow-md">

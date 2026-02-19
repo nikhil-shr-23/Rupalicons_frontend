@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { MapPin, Phone, Mail, Send, CheckCircle } from "lucide-react";
-import { createInquiry } from "@/lib/api";
+import { submitContactForm } from "@/lib/api";
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -30,7 +30,9 @@ export default function Contact() {
     setSubmitting(true);
     setError("");
 
-    const result = await createInquiry(formData);
+    // Use placeholder submission function
+    const result = await submitContactForm(formData);
+
     if (result) {
       setSubmitted(true);
       setFormData({

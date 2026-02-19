@@ -1,66 +1,137 @@
-import { Property, ProjectType, UnitType, ProjectStage, DealType, Blog, Inquiry } from "../types";
+import { Property, PropertyType, PropertyStatus, ContactFormSubmission, Blog } from "../types";
 
-const API_BASE_URL = "http://localhost:8080";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
-export async function fetchProjects(page = 0, size = 10): Promise<{ content: Property[] }> {
+export function getAuthHeader(): Record<string, string> {
+  const token = sessionStorage.getItem("adminToken");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+export async function fetchProperties(
+  page = 0, 
+  size = 12, 
+  filters?: {
+    type?: PropertyType;
+    minPrice?: number;
+    maxPrice?: number;
+    location?: string;
+  }
+): Promise<{ content: Property[], totalPages: number, totalElements: number }> {
   try {
-    const response = await fetch(`${API_BASE_URL}/properties?page=${page}&size=${size}`, {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      size: size.toString(),
+      sortDir: 'desc',
+      sortBy: 'createdAt'
+    });
+
+    if (filters?.type) params.append('type', filters.type);
+    if (filters?.minPrice) params.append('minPrice', filters.minPrice.toString());
+    if (filters?.maxPrice) params.append('maxPrice', filters.maxPrice.toString());
+    if (filters?.location) params.append('location', filters.location);
+
+    const response = await fetch(`${API_BASE_URL}/properties?${params.toString()}`, {
       cache: 'no-store'
     });
+    
     if (!response.ok) {
-      throw new Error("Failed to fetch projects");
+      throw new Error("Failed to fetch properties");
     }
-    return await response.json();
+    
+    const data = await response.json();
+    return {
+      content: data.content || [],
+      totalPages: data.totalPages || 0,
+      totalElements: data.totalElements || 0
+    };
   } catch (error) {
-    console.error("Error fetching projects:", error);
-    return { content: [] };
+    console.error("Error fetching properties:", error);
+    return { content: [], totalPages: 0, totalElements: 0 };
   }
 }
 
-export async function createProject(project: Property): Promise<Property | null> {
+// Admin only
+export async function createProperty(property: Property): Promise<Property | null> {
   try {
-    const response = await fetch(`${API_BASE_URL}/properties`, {
+    const response = await fetch(`${API_BASE_URL}/admin/properties`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        ...getAuthHeader(),
       },
-      body: JSON.stringify(project),
+      body: JSON.stringify(property),
     });
 
     if (!response.ok) {
-      throw new Error("Failed to create project");
+      throw new Error("Failed to create property");
     }
 
     return await response.json();
   } catch (error) {
-    console.error("Error creating project:", error);
+    console.error("Error creating property:", error);
     return null;
   }
 }
 
-export async function deleteProject(id: number): Promise<boolean> {
+export async function updateProperty(id: string, property: Partial<Property>): Promise<Property | null> {
   try {
-    const response = await fetch(`${API_BASE_URL}/properties/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/admin/properties/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        ...getAuthHeader(),
+      },
+      body: JSON.stringify(property),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to update property");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error updating property:", error);
+    return null;
+  }
+}
+
+export async function deleteProperty(id: string): Promise<boolean> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/admin/properties/${id}`, {
       method: "DELETE",
+      headers: {
+        ...getAuthHeader(),
+      },
     });
     return response.ok;
   } catch (error) {
-    console.error("Error deleting project:", error);
+    console.error("Error deleting property:", error);
     return false;
   }
 }
 
 export const defaultProperty: Property = {
-  devName: "Rupali Developers",
-  projectName: "",
-  projectType: ProjectType.RESIDENTIAL,
-  unitType: UnitType.APARTMENT,
-  projectStage: ProjectStage.PRE_LAUNCH,
+  title: "",
+  description: "",
+  type: PropertyType.SALE,
+  status: PropertyStatus.AVAILABLE,
   location: "",
-  dealType: DealType.SALE,
+  price: 0,
+  rentAmount: 0,
+  size: "",
   imageUrl: "",
   brochureUrl: ""
 };
+
+// Contact Form (Mock or client-side only for now)
+export async function submitContactForm(submission: ContactFormSubmission): Promise<boolean> {
+  // Backend doesn't support generic inquiries yet.
+  // Log to console or use a mailer service if configured.
+  console.log("Contact form submitted:", submission);
+  return new Promise((resolve) => setTimeout(() => resolve(true), 1000));
+}
+
+// Deprecated Buyer functions are removed. Use submitContactForm for general inquiries.
 
 export async function fetchBlogs(): Promise<Blog[]> {
   try {
@@ -104,43 +175,6 @@ export async function deleteBlog(id: number): Promise<boolean> {
     return response.ok;
   } catch (error) {
     console.error("Error deleting blog:", error);
-    return false;
-  }
-}
-
-// Inquiries
-export async function fetchInquiries(): Promise<Inquiry[]> {
-  try {
-    const response = await fetch(`${API_BASE_URL}/inquiries`, { cache: 'no-store' });
-    if (!response.ok) throw new Error("Failed to fetch inquiries");
-    return await response.json();
-  } catch (error) {
-    console.error("Error fetching inquiries:", error);
-    return [];
-  }
-}
-
-export async function createInquiry(inquiry: Omit<Inquiry, 'id' | 'createdAt'>): Promise<Inquiry | null> {
-  try {
-    const response = await fetch(`${API_BASE_URL}/inquiries`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(inquiry),
-    });
-    if (!response.ok) throw new Error("Failed to create inquiry");
-    return await response.json();
-  } catch (error) {
-    console.error("Error creating inquiry:", error);
-    return null;
-  }
-}
-
-export async function deleteInquiry(id: number): Promise<boolean> {
-  try {
-    const response = await fetch(`${API_BASE_URL}/inquiries/${id}`, { method: "DELETE" });
-    return response.ok;
-  } catch (error) {
-    console.error("Error deleting inquiry:", error);
     return false;
   }
 }

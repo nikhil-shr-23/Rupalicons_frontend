@@ -1,10 +1,12 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowUpRight, ArrowDown } from "lucide-react";
-import Image from "next/image";
 
 export default function Hero() {
+  const { scrollY } = useScroll();
+  const y = useTransform(scrollY, [0, 500], [0, 100]);
+
   return (
     <div className="relative min-h-[90vh] flex flex-col justify-center px-4 pt-20 overflow-hidden bg-grid">
       <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-12 items-center">
@@ -67,18 +69,21 @@ export default function Hero() {
 
         {/* Hero Image */}
         <motion.div
+          style={{ y }}
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1, delay: 0.2 }}
           className="relative h-[600px] flex items-center justify-center"
         >
-          {/* Main Chair Image Placeholder - Using a real Unsplash image for furniture */}
-          <div className="relative z-10 w-full h-full">
-            <Image
-              src="https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
-              alt="Modern Chair"
-              fill
-              className="object-contain drop-shadow-2xl"
+          {/* Main Hero Video */}
+          <div className="relative z-10 w-full h-full rounded-2xl overflow-hidden shadow-2xl">
+            <video
+              src="/video-house.mp4"
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="object-cover w-full h-full"
             />
           </div>
 
