@@ -144,6 +144,11 @@ export async function fetchProperties(
   };
 }
 
+export async function fetchPropertyById(id: string | number): Promise<Property | null> {
+  await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network
+  return mockProperties.find(p => p.id == id) || null;
+}
+
 // Admin only (Mock implementation)
 export async function createProperty(property: Property): Promise<Property | null> {
   const newProperty: Property = {

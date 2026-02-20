@@ -20,7 +20,7 @@ import confetti from "canvas-confetti";
 import { fetchPropertyById } from "@/lib/api";
 import { Property } from "@/types";
 
-export default function PropertyDetailsPage() {
+export default function RentPropertyDetailsPage() {
   const params = useParams();
   const id = params?.id;
   const [property, setProperty] = useState<Property | null>(null);
@@ -96,7 +96,7 @@ export default function PropertyDetailsPage() {
           Property Not Found
         </h2>
         <Link
-          href="/buy"
+          href="/rent"
           className="px-6 py-2 bg-accent-dark text-white rounded-full hover:bg-gold transition-colors"
         >
           Back to Listings
@@ -110,11 +110,11 @@ export default function PropertyDetailsPage() {
       {/* Navigation Breadcrumb */}
       <div className="max-w-7xl mx-auto px-6 mb-6">
         <Link
-          href="/buy"
+          href="/rent"
           className="inline-flex items-center text-gray-500 hover:text-gold transition-colors"
         >
           <ArrowLeft size={16} className="mr-2" />
-          Back to Search
+          Back to Rent Search
         </Link>
       </div>
 
@@ -159,9 +159,9 @@ export default function PropertyDetailsPage() {
                 </span>
               </div>
               <h1 className="text-4xl md:text-5xl font-bold font-syne text-accent-dark mb-2">
-                {property.price
-                  ? `₹${(property.price / 10000000).toFixed(2)} Cr`
-                  : `₹${(property.rentAmount! / 1000).toFixed(1)}k/mo`}
+                {property.rentAmount
+                  ? `₹${(property.rentAmount / 1000).toFixed(1)}k/mo`
+                  : `₹${(property.price! / 10000000).toFixed(2)} Cr`}
               </h1>
               <div className="flex items-center text-gray-500 text-lg">
                 <MapPin size={18} className="mr-2 text-gold" />
@@ -273,11 +273,10 @@ export default function PropertyDetailsPage() {
               {property.description}
             </p>
             <p className="text-gray-600 leading-relaxed text-lg mt-4">
-              Experience the pinnacle of luxury living with this exquisite
-              property. Featuring state-of-the-art amenities, premium finishes,
-              and a location that offers both privacy and connectivity. Every
-              corner is designed with meticulous attention to detail to ensure a
-              lifestyle of comfort and grandeur.
+              Experience premium rental living with this well-maintained
+              property. Enjoy modern amenities, a vibrant neighborhood, and a
+              home that suits your lifestyle. Contact us today to schedule a
+              viewing.
             </p>
           </div>
 
@@ -337,7 +336,7 @@ export default function PropertyDetailsPage() {
                 className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:border-gold transition-colors"
               />
               <textarea
-                placeholder="I am interested in this property..."
+                placeholder="I am interested in this rental property..."
                 className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:border-gold transition-colors h-32"
               ></textarea>
 
