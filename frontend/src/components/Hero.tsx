@@ -2,6 +2,7 @@
 
 import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
+import HeroSvgAnimation from "@/components/HeroSvgAnimation";
 
 export default function Hero() {
   const { scrollY } = useScroll();
@@ -10,6 +11,7 @@ export default function Hero() {
 
   return (
     <div className="relative min-h-[90vh] flex flex-col justify-center px-4 pt-20 overflow-hidden bg-grid">
+      <HeroSvgAnimation />
       <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-12 items-center">
         {/* Text Content */}
         <motion.div

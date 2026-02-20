@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { fetchProperties } from "@/lib/api";
 import { Property, PropertyType } from "@/types";
@@ -148,52 +149,54 @@ export default function RentPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                className="group relative rounded-2xl overflow-hidden bg-white shadow-lg border border-gray-100"
+                className="group relative rounded-2xl overflow-hidden bg-white shadow-lg border border-gray-100 transition-all hover:-translate-y-1 block"
               >
-                <div className="relative h-80 overflow-hidden">
-                  {property.imageUrl ? (
-                    <Image
-                      src={property.imageUrl}
-                      alt={property.title}
-                      fill
-                      className="object-cover group-hover:scale-110 transition-transform duration-700"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400">
-                      No Image
-                    </div>
-                  )}
-                  <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-accent-dark">
-                    FOR RENT
-                  </div>
-                </div>
-
-                <div className="p-8">
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-2xl font-bold font-syne text-accent-dark group-hover:text-gold transition-colors">
-                      {property.title}
-                    </h3>
-                    {property.rentAmount && (
-                      <span className="text-lg font-bold text-gold whitespace-nowrap">
-                        ₹{property.rentAmount.toLocaleString()}/mo
-                      </span>
+                <Link href={`/rent/${property.id}`} className="block h-full">
+                  <div className="relative h-80 overflow-hidden">
+                    {property.imageUrl ? (
+                      <Image
+                        src={property.imageUrl}
+                        alt={property.title}
+                        fill
+                        className="object-cover group-hover:scale-110 transition-transform duration-700"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400">
+                        No Image
+                      </div>
                     )}
+                    <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-accent-dark">
+                      FOR RENT
+                    </div>
                   </div>
 
-                  <p className="text-gray-500 mb-6 flex items-center gap-2 text-sm">
-                    <span className="w-2 h-2 rounded-full bg-gold"></span>
-                    {property.location}
-                  </p>
+                  <div className="p-8">
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="text-2xl font-bold font-syne text-accent-dark group-hover:text-gold transition-colors">
+                        {property.title}
+                      </h3>
+                      {property.rentAmount && (
+                        <span className="text-lg font-bold text-gold whitespace-nowrap">
+                          ₹{property.rentAmount.toLocaleString()}/mo
+                        </span>
+                      )}
+                    </div>
 
-                  <p className="text-gray-600 line-clamp-2 mb-6 text-sm">
-                    {property.description}
-                  </p>
+                    <p className="text-gray-500 mb-6 flex items-center gap-2 text-sm">
+                      <span className="w-2 h-2 rounded-full bg-gold"></span>
+                      {property.location}
+                    </p>
 
-                  <button className="w-full py-3 bg-gray-50 hover:bg-accent-dark hover:text-white rounded-lg transition-colors font-bold text-accent-dark flex items-center justify-center gap-2 group-hover:shadow-md">
-                    View Details
-                    <ArrowUpRight size={18} />
-                  </button>
-                </div>
+                    <p className="text-gray-600 line-clamp-2 mb-6 text-sm">
+                      {property.description}
+                    </p>
+
+                    <div className="w-full py-3 bg-gray-50 group-hover:bg-accent-dark group-hover:text-white rounded-lg transition-colors font-bold text-accent-dark flex items-center justify-center gap-2 shadow-sm group-hover:shadow-md">
+                      View Details
+                      <ArrowUpRight size={18} />
+                    </div>
+                  </div>
+                </Link>
               </motion.div>
             ))}
           </div>

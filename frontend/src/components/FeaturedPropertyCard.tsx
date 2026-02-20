@@ -4,6 +4,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { Heart } from "lucide-react";
 import { Property } from "@/types";
+import confetti from "canvas-confetti";
 
 interface FeaturedPropertyCardProps {
   property: Property;
@@ -32,7 +33,53 @@ export default function FeaturedPropertyCard({
           fill
           className="object-cover group-hover:scale-105 transition-transform duration-700"
         />
-        <div className="absolute top-4 right-4 bg-white/30 backdrop-blur-md p-2 rounded-full cursor-pointer hover:bg-white text-white hover:text-red-500 transition-colors z-10">
+        <div
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const duration = 3 * 1000;
+            const end = Date.now() + duration;
+
+            const frame = () => {
+              confetti({
+                particleCount: 5,
+                angle: 60,
+                spread: 55,
+                origin: { x: 0 },
+                colors: [
+                  "#26ccff",
+                  "#a25afd",
+                  "#ff5e7e",
+                  "#88ff5a",
+                  "#fcff42",
+                  "#ffa62d",
+                  "#ff36ff",
+                ],
+              });
+              confetti({
+                particleCount: 5,
+                angle: 120,
+                spread: 55,
+                origin: { x: 1 },
+                colors: [
+                  "#26ccff",
+                  "#a25afd",
+                  "#ff5e7e",
+                  "#88ff5a",
+                  "#fcff42",
+                  "#ffa62d",
+                  "#ff36ff",
+                ],
+              });
+
+              if (Date.now() < end) {
+                requestAnimationFrame(frame);
+              }
+            };
+            frame();
+          }}
+          className="absolute top-4 right-4 bg-white/30 backdrop-blur-md p-2 rounded-full cursor-pointer hover:bg-white text-white hover:text-red-500 transition-colors z-10"
+        >
           <Heart size={20} />
         </div>
       </div>

@@ -70,7 +70,7 @@ const InstagramReels = () => {
           setReels(mockReels);
         }
       } catch (err) {
-        console.error("Error fetching reels:", err);
+        // Silently fail and use mock data as per user request
         setReels(mockReels); // Fallback
       }
     };
