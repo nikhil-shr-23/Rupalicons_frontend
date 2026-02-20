@@ -237,6 +237,15 @@ export async function createBlog(formData: FormData): Promise<Blog | null> {
     return newBlog;
 }
 
+//always come back to this 
+export async function deleteBlog(id: number): Promise<boolean> {
+    const index = mockBlogs.findIndex(b => b.id === id);
+    if (index !== -1) {
+        mockBlogs.splice(index, 1);
+        return true;
+    }
+    return false;
+}
 
 // Mock Inquiries/Leads
 // Mock Inquiries/Leads

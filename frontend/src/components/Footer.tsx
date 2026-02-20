@@ -5,7 +5,7 @@ export default function Footer() {
   return (
     <footer
       id="contact"
-      className="bg-primary border-t border-gold-400/20 text-gray-300"
+      className="bg-secondary border-t border-gold-400/20 text-gray-600"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -14,7 +14,7 @@ export default function Footer() {
             <h3 className="text-2xl font-bold text-gold font-serif mb-4">
               RUPALI HOMES
             </h3>
-            <p className="mb-4 text-sm leading-relaxed">
+            <p className="mb-4 text-sm leading-relaxed text-gray-600">
               Building dreams into reality. We specialize in premium residential
               and commercial properties that redefine luxury living.
             </p>
@@ -22,7 +22,7 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-lg font-semibold text-white mb-4">
+            <h4 className="text-lg font-semibold text-primary mb-4">
               Quick Links
             </h4>
             <ul className="space-y-2">
@@ -55,7 +55,7 @@ export default function Footer() {
 
           {/* Contact Info */}
           <div>
-            <h4 className="text-lg font-semibold text-white mb-4">
+            <h4 className="text-lg font-semibold text-primary mb-4">
               Contact Us
             </h4>
             <ul className="space-y-3">
@@ -75,19 +75,22 @@ export default function Footer() {
             <div className="mt-6 flex space-x-4">
               <a
                 href="#"
-                className="text-gray-400 hover:text-gold transition-colors"
+                className="text-[#E1306C] hover:opacity-80 transition-opacity"
+                aria-label="Instagram"
               >
                 <Instagram className="h-6 w-6" />
               </a>
               <a
                 href="#"
-                className="text-gray-400 hover:text-gold transition-colors"
+                className="text-[#1877F2] hover:opacity-80 transition-opacity"
+                aria-label="Facebook"
               >
                 <Facebook className="h-6 w-6" />
               </a>
               <a
                 href="#"
-                className="text-gray-400 hover:text-gold transition-colors"
+                className="text-black hover:opacity-80 transition-opacity"
+                aria-label="X (Twitter)"
               >
                 <svg
                   viewBox="0 0 24 24"
@@ -100,7 +103,7 @@ export default function Footer() {
             </div>
           </div>
         </div>
-        <div className="border-t border-gray-800 mt-12 pt-8 text-center text-sm">
+        <div className="border-t border-gray-200 mt-12 pt-8 text-center text-sm text-gray-500">
           <p>
             &copy; {new Date().getFullYear()} Rupali Homes. All rights reserved.
           </p>
