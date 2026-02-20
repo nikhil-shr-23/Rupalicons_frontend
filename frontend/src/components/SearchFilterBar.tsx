@@ -5,7 +5,7 @@ import {
   Search,
   SlidersHorizontal,
   MapPin,
-  DollarSign,
+  IndianRupee,
   Home,
   Bed,
 } from "lucide-react";
@@ -78,7 +78,7 @@ export default function SearchFilterBar({ onSearch }: SearchFilterBarProps) {
       {/* Price Range */}
       <div className="flex-1 w-full md:w-auto px-6 py-2 border-b md:border-b-0 md:border-r border-gray-100 flex items-center gap-3">
         <div className="p-2 bg-gray-50 rounded-full text-gray-400">
-          <DollarSign size={18} />
+          <IndianRupee size={18} />
         </div>
         <div className="flex-1">
           <p className="text-xs text-gray-400 uppercase tracking-wider font-medium mb-1">
@@ -86,7 +86,7 @@ export default function SearchFilterBar({ onSearch }: SearchFilterBarProps) {
           </p>
           <input
             type="text"
-            placeholder="$2,000-$13,000"
+            placeholder="₹10,000-₹50,000"
             value={priceRange}
             onChange={(e) => setPriceRange(e.target.value)}
             className="w-full text-sm font-medium text-accent-dark placeholder-gray-300 focus:outline-none bg-transparent"

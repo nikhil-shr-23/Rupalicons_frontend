@@ -9,29 +9,53 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { ArrowUpRight } from "lucide-react";
 import BounceCards from "@/components/BouncyCards";
+import SearchFilterBar from "@/components/SearchFilterBar";
+
+interface FilterState {
+  location: string;
+  minPrice: string;
+  maxPrice: string;
+  propertyType?: string;
+  bedrooms?: string;
+  priceRange?: string;
+}
 
 export default function RentPage() {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<FilterState>({
     location: "",
     minPrice: "",
     maxPrice: "",
   });
 
-  const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFilters((prev) => ({ ...prev, [name]: value }));
-  };
-
   const applyFilters = useCallback(async () => {
     setLoading(true);
+
+    let minPrice: number | undefined = filters.minPrice
+      ? Number(filters.minPrice)
+      : undefined;
+    let maxPrice: number | undefined = filters.maxPrice
+      ? Number(filters.maxPrice)
+      : undefined;
+
+    if (filters.priceRange) {
+      const matches = filters.priceRange.match(/(\d[\d,]*)/g);
+      if (matches && matches.length >= 1) {
+        minPrice = Number(matches[0].replace(/,/g, ""));
+      }
+      if (matches && matches.length >= 2) {
+        maxPrice = Number(matches[1].replace(/,/g, ""));
+      }
+    }
+
     try {
       const data = await fetchProperties(0, 100, {
         type: PropertyType.RENT,
         location: filters.location || undefined,
-        minPrice: filters.minPrice ? Number(filters.minPrice) : undefined,
-        maxPrice: filters.maxPrice ? Number(filters.maxPrice) : undefined,
+        minPrice: minPrice,
+        maxPrice: maxPrice,
+        bedrooms: filters.bedrooms ? Number(filters.bedrooms) : undefined,
       });
       if (data && data.content) {
         setProperties(data.content);
@@ -99,42 +123,13 @@ export default function RentPage() {
       </section>
 
       {/* Filters Section */}
-      <section className="py-8 px-6 bg-gray-50 border-b border-gray-200">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-4 items-center justify-between">
-          <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto grow">
-            <input
-              type="text"
-              name="location"
-              placeholder="Location (e.g., Green Park)"
-              value={filters.location}
-              onChange={handleFilterChange}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold w-full md:max-w-xs"
-            />
-            <div className="flex gap-2 w-full md:w-auto">
-              <input
-                type="number"
-                name="minPrice"
-                placeholder="Min Rent (₹)"
-                value={filters.minPrice}
-                onChange={handleFilterChange}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold w-full md:w-32"
-              />
-              <input
-                type="number"
-                name="maxPrice"
-                placeholder="Max Rent (₹)"
-                value={filters.maxPrice}
-                onChange={handleFilterChange}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold w-full md:w-32"
-              />
-            </div>
-          </div>
-          <button
-            onClick={applyFilters}
-            className="w-full md:w-auto px-6 py-2 bg-navy-900 text-white font-medium rounded-lg hover:bg-navy-800 transition-colors"
-          >
-            Apply Filters
-          </button>
+      <section className="pt-8 px-6 sticky top-0 z-20">
+        <div className="max-w-7xl mx-auto">
+          <SearchFilterBar
+            onSearch={(newFilters) => {
+              setFilters((prev) => ({ ...prev, ...newFilters }));
+            }}
+          />
         </div>
       </section>
 
