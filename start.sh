@@ -17,7 +17,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 # Start backend
 echo -e "${CYAN}Starting Backend (Spring Boot) on port 8080...${NC}"
-cd "$SCRIPT_DIR/backend_new"
+cd "$SCRIPT_DIR/backend/RupaliConstBackend"
 chmod +x mvnw
 ./mvnw spring-boot:run > /tmp/rupali_backend.log 2>&1 &
 BACKEND_PID=$!

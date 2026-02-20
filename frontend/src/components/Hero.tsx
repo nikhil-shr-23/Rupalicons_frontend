@@ -1,17 +1,19 @@
 "use client";
 
 import { motion, useScroll, useTransform } from "framer-motion";
-import { ArrowUpRight, ArrowDown } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 
 export default function Hero() {
   const { scrollY } = useScroll();
-  const y = useTransform(scrollY, [0, 500], [0, 100]);
+  const y = useTransform(scrollY, [0, 500], [0, 150]); // Image moves down slower
+  const yText = useTransform(scrollY, [0, 500], [0, -50]); // Text moves up slightly faster
 
   return (
     <div className="relative min-h-[90vh] flex flex-col justify-center px-4 pt-20 overflow-hidden bg-grid">
       <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-12 items-center">
         {/* Text Content */}
         <motion.div
+          style={{ y: yText }}
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
@@ -31,7 +33,7 @@ export default function Hero() {
           </h1>
 
           <p className="text-xl text-gray-600 max-w-md mb-10 font-light leading-relaxed">
-            From finding the perfect property to crafting bespoke interiors, we
+            From finding the perfect property to securing the best deal, we
             guide you through every step of your home journey.
           </p>
 
@@ -47,7 +49,6 @@ export default function Hero() {
               </div>
               Explore Projects
             </motion.a>
-
             <div className="flex -space-x-4">
               {[1, 2, 3].map((i) => (
                 <div
@@ -73,40 +74,13 @@ export default function Hero() {
           transition={{ duration: 1, delay: 0.2 }}
           className="relative h-[600px] flex items-center justify-center"
         >
-          {/* Main Hero Video */}
-          <div className="relative z-10 w-full h-full rounded-2xl overflow-hidden shadow-2xl">
-            <video
-              src="/video-house.mp4"
-              autoPlay
-              loop
-              muted
-              playsInline
-              className="object-cover w-full h-full"
+          {/* Main Hero Image */}
+          <div className="relative z-10 w-[150%] h-full flex justify-center items-center translate-x-[10%]">
+            <img
+              src="/touse.png"
+              alt="Luxury Home"
+              className="object-contain w-full h-full scale-135"
             />
-          </div>
-
-          {/* Floating Elements (Menu items on the right side from reference) */}
-          <div className="absolute right-0 top-1/2 -translate-y-1/2 hidden md:flex flex-col gap-6 z-20">
-            <motion.button
-              whileHover={{ x: -10 }}
-              className="w-12 h-12 bg-white rounded-full shadow-md flex items-center justify-center text-gray-400 hover:text-accent-dark transition-colors"
-            >
-              <ArrowDown size={20} />
-            </motion.button>
-
-            {[1, 2, 3].map((i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.5 + i * 0.1 }}
-                className="w-12 h-12 bg-white rounded-full shadow-md overflow-hidden p-1 cursor-pointer hover:ring-2 hover:ring-gold"
-              >
-                <div
-                  className={`w-full h-full rounded-full ${i === 1 ? "bg-orange-100" : i === 2 ? "bg-gray-100" : "bg-purple-100"}`}
-                ></div>
-              </motion.div>
-            ))}
           </div>
         </motion.div>
       </div>

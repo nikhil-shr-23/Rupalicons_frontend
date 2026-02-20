@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Image from "next/image";
 
 const testimonials = [
   {
@@ -29,7 +28,7 @@ const testimonials = [
     quote:
       "The team's dedication to quality is evident in every corner of our house. Highly recommended for luxury projects.",
     name: "Sneha Gupta",
-    role: "Interior Designer",
+    role: "Real Estate Investor",
     image: "/avatars/avatar4.jpg",
   },
   {
@@ -50,7 +49,9 @@ const testimonials = [
 
 const TestimonialCard = ({ data }: { data: (typeof testimonials)[0] }) => (
   <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 mb-6 mx-4">
-    <p className="text-gray-600 italic mb-6 leading-relaxed">"{data.quote}"</p>
+    <p className="text-gray-600 italic mb-6 leading-relaxed">
+      &quot;{data.quote}&quot;
+    </p>
     <div className="flex items-center gap-4">
       <div className="w-12 h-12 bg-gray-200 rounded-full overflow-hidden relative">
         {/* Placeholder for now if image fails */}

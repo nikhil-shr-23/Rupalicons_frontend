@@ -23,12 +23,15 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
-    const storedToken = sessionStorage.getItem("adminToken");
-    if (storedToken) {
-      setToken(storedToken);
-      setIsAuthenticated(true);
-    }
-    setIsLoading(false);
+    const initAuth = () => {
+      const storedToken = sessionStorage.getItem("adminToken");
+      if (storedToken) {
+        setToken(storedToken);
+        setIsAuthenticated(true);
+      }
+      setIsLoading(false);
+    };
+    initAuth();
   }, []);
 
   const login = async (

@@ -8,6 +8,7 @@ import ProcessFlow from "../components/ProcessFlow";
 import Services from "../components/Services";
 import Testimonials from "../components/Testimonials";
 import Contact from "../components/Contact";
+import InstagramReels from "@/components/InstagramReels";
 import Footer from "../components/Footer";
 
 export default function Home() {
@@ -22,6 +23,7 @@ export default function Home() {
       <ProcessFlow />
       <Services />
       <Testimonials />
+      <InstagramReels />
       <Contact />
       <Footer />
     </main>

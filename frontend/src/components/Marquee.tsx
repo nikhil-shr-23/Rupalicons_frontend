@@ -41,7 +41,7 @@ const Marquee = () => {
                   <div className="relative w-48 h-16 rounded-full overflow-hidden border border-white/20 shrink-0">
                     <Image
                       src={images[idx % images.length]}
-                      alt="Interior Detail"
+                      alt="Property Detail"
                       fill
                       className="object-cover hover:scale-110 transition-transform duration-700"
                     />

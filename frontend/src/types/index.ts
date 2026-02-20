@@ -10,6 +10,41 @@ export enum PropertyStatus {
   HIDDEN = "HIDDEN",
 }
 
+// Backend Enums
+export enum ProjectType {
+  RESIDENTIAL = "RESIDENTIAL",
+  COMMERCIAL = "COMMERCIAL"
+}
+
+export enum ProjectStage {
+  UnderConstruction = "UnderConstruction",
+  RTMI = "RTMI",
+  pre_Leased = "pre_Leased",
+  NearToPossession = "NearToPossession"
+}
+
+export enum UnitType {
+  STUDIO_APARTMENT = "STUDIO_APARTMENT", // Display: Studio Apartment
+  TWO_BHK = "TWO_BHK",
+  TWO_POINT_FIVE_BHK = "TWO_POINT_FIVE_BHK",
+  THREE_BHK = "THREE_BHK",
+  THREE_POINT_FIVE_BHK = "THREE_POINT_FIVE_BHK",
+  FOUR_BHK = "FOUR_BHK",
+  FOUR_POINT_FIVE_BHK = "FOUR_POINT_FIVE_BHK",
+  FIVE_BHK = "FIVE_BHK",
+  PENTHOUSE = "PENTHOUSE",
+  DUPLEX_PENTHOUSE = "DUPLEX_PENTHOUSE",
+  TRIPLEX_PENTHOUSE = "TRIPLEX_PENTHOUSE",
+  VILLA = "VILLA",
+  DDJAY_PLOT = "DDJAY_PLOT",
+  PLOT = "PLOT"
+}
+
+export enum DealType {
+  FreshUnit = "FreshUnit",
+  ReSale = "ReSale"
+}
+
 export interface Property {
   id?: number; // Long from backend
   title: string;
@@ -20,18 +55,30 @@ export interface Property {
   size?: string;
   type: PropertyType;
   status: PropertyStatus;
-  createdBy?: number;
-  createdAt?: string;
   
-  // Frontend specific helper (backend doesn't send image URL in main DTO yet? 
-  // Wait, PropertyResponseDTO didn't list imageUrl. 
-  // I should keep it optional if I plan to add it or if it's missing)
+  // Detailed fields
+  bedrooms?: number;
+  bathrooms?: number;
+  sqft?: number;
+  
+  // New backend fields
+  devName?: string;
+  projectName?: string; // Align with add-brochure if needed, but title is preferred
+  projectType?: ProjectType;
+  projectStage?: ProjectStage;
+  unitType?: UnitType;
+  dealType?: DealType;
+  
   imageUrl?: string; 
   brochureUrl?: string;
+  
+  createdBy?: number;
+  createdAt?: string;
+
+  // Add signature index if needed for dynamic property access
+  [key: string]: unknown;
 }
 
-// Buyer/Inquiry types are removed as backend doesn't support them yet.
-// Keeping a placeholder if needed for UI state but not for API.
 export interface ContactFormSubmission {
   name: string;
   phone: string;
@@ -50,4 +97,10 @@ export interface Blog {
     imageName?: string;
     createdAt?: string;
     updatedAt?: string;
+}
+
+export interface Inquiry extends ContactFormSubmission {
+    id: number;
+    createdAt: string;
+    status: "NEW" | "CONTACTED" | "CLOSED";
 }

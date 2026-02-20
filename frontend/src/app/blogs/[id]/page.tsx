@@ -6,7 +6,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { fetchBlogById } from "@/lib/api";
 import { Blog } from "@/types";
-import { Calendar, User, Clock, ArrowLeft } from "lucide-react";
+import { Calendar, User, ArrowLeft } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";

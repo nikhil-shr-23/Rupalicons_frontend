@@ -68,12 +68,13 @@ export default function ProcessFlow() {
         const rect = step.getBoundingClientRect();
         const relativeY = rect.top - containerRect.top + rect.height / 2;
 
+        const prevStep = stepRefs.current[index - 1];
         const prevY =
           index === 0
             ? 0
-            : stepRefs.current[index - 1]?.getBoundingClientRect().top! -
+            : (prevStep?.getBoundingClientRect().top || 0) -
               containerRect.top +
-              stepRefs.current[index - 1]?.clientHeight! / 2;
+              (prevStep?.clientHeight || 0) / 2;
         const currentY = relativeY;
 
         // Use a smaller amplitude for a tighter, more cohesive premium feel
@@ -90,7 +91,6 @@ export default function ProcessFlow() {
       // Extend to bottom smoothly
       const lastStep = stepRefs.current[steps.length - 1];
       if (lastStep) {
-        const rect = lastStep.getBoundingClientRect();
         const bottomY = containerRect.height;
         pathBuilder += ` L ${centerX} ${bottomY}`;
       }
@@ -152,12 +152,12 @@ export default function ProcessFlow() {
               {/* Foreground Animated Line */}
               <motion.path
                 d={svgPath}
-                stroke="#ECAE16"
+                stroke="#C5A059"
                 strokeWidth="5"
                 fill="none"
                 strokeLinecap="round"
                 style={{ pathLength }}
-                filter="drop-shadow(0px 0px 4px rgba(236, 174, 22, 0.4))"
+                filter="drop-shadow(0px 0px 4px rgba(197, 160, 89, 0.4))"
               />
             </svg>
           </div>

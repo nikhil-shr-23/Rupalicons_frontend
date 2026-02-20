@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  /* Premium Interior Theme Colors */
-  --background: #FDFCF8;
+  /* Premium Real Estate Theme Colors */
+  --background: #fcfcf7;
   --foreground: #1A1A1A;
   
   --card: #FFFFFF;
@@ -20,7 +20,7 @@
   --muted: #F4F4F5;
   --muted-foreground: #71717A;
 
-  --accent: #ECAE16; /* Gold */
+  --accent: #C5A059; /* Gold */
   --accent-foreground: #FFFFFF;
 
   --destructive: #EF4444;
@@ -34,8 +34,8 @@
 
   /* Custom Variables */
   --color-accent-dark: #0B1120;
-  --color-gold: #ECAE16;
-  --color-gold-hover: #D59B12;
+  --color-gold: #C5A059;
+  --color-gold-hover: #B08D4C;
 }
 
 .dark {
@@ -57,7 +57,7 @@
   --muted: #1F2937;
   --muted-foreground: #A1A1AA;
 
-  --accent: #ECAE16;
+  --accent: #C5A059; /* Gold */
   --accent-foreground: #FFFFFF;
 
   --destructive: #7F1D1D;

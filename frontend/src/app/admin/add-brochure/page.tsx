@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Upload, X, ShieldCheck } from "lucide-react";
-import { createProject, defaultProperty } from "../../../lib/api";
+import { createProperty, defaultProperty } from "../../../lib/api";
 import {
   Property,
   ProjectType,
@@ -33,7 +33,7 @@ export default function AddBrochure() {
     setError("");
 
     try {
-      const result = await createProject(formData);
+      const result = await createProperty(formData);
       if (result) {
         alert("Project added successfully!");
         router.push("/admin");
@@ -68,9 +68,9 @@ export default function AddBrochure() {
               </label>
               <input
                 type="text"
-                name="projectName"
+                name="title"
                 required
-                value={formData.projectName}
+                value={formData.title}
                 onChange={handleChange}
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-gold-400 focus:border-gold-400"
                 placeholder="e.g. The Golden Heights"
@@ -98,7 +98,7 @@ export default function AddBrochure() {
               </label>
               <select
                 name="projectType"
-                value={formData.projectType}
+                value={formData.projectType || ProjectType.RESIDENTIAL}
                 onChange={handleChange}
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-gold-400 focus:border-gold-400"
               >
@@ -116,7 +116,7 @@ export default function AddBrochure() {
               </label>
               <select
                 name="projectStage"
-                value={formData.projectStage}
+                value={formData.projectStage || ProjectStage.UnderConstruction}
                 onChange={handleChange}
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-gold-400 focus:border-gold-400"
               >
@@ -134,7 +134,7 @@ export default function AddBrochure() {
               </label>
               <select
                 name="unitType"
-                value={formData.unitType}
+                value={formData.unitType || UnitType.PLOT}
                 onChange={handleChange}
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-gold-400 focus:border-gold-400"
               >
@@ -152,7 +152,7 @@ export default function AddBrochure() {
               </label>
               <select
                 name="dealType"
-                value={formData.dealType}
+                value={formData.dealType || DealType.FreshUnit}
                 onChange={handleChange}
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-gold-400 focus:border-gold-400"
               >
@@ -171,7 +171,7 @@ export default function AddBrochure() {
               <input
                 type="text"
                 name="devName"
-                value={formData.devName}
+                value={formData.devName || ""}
                 onChange={handleChange}
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-gold-400 focus:border-gold-400"
               />
@@ -183,9 +183,9 @@ export default function AddBrochure() {
               Description / Notes
             </label>
             <textarea
-              name="Notes"
+              name="description"
               rows={4}
-              value={formData.Notes || ""}
+              value={formData.description || ""}
               onChange={handleChange}
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-gold-400 focus:border-gold-400"
               placeholder="Describe the project details..."

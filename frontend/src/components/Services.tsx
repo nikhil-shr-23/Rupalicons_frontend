@@ -14,11 +14,11 @@ export default function Services() {
         "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
     },
     {
-      title: "Interior Design",
+      title: "Investment Consultancy",
       description:
-        "Bespoke interior design solutions to transform your space into a dream home.",
+        "Strategic advice to maximize returns on your real estate investments.",
       image:
-        "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
     },
     {
       title: "Legal & Documentation",
@@ -53,7 +53,7 @@ export default function Services() {
           >
             <p className="text-gray-600 text-lg mb-8 leading-relaxed">
               We offer a complete suite of services—from finding your perfect
-              property to designing its interiors and handling all legal
+              property to securing the best deal and handling all legal
               formalities.
             </p>
             <p className="text-sm text-gray-500 mb-8">

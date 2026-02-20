@@ -38,6 +38,16 @@ export default function LeadsPage() {
   };
 
   useEffect(() => {
+    const loadData = async () => {
+      try {
+        const data = await fetchContactSubmissions();
+        setLeads(data);
+      } catch (error) {
+        console.error("Failed to load leads", error);
+      } finally {
+        setLoading(false);
+      }
+    };
     loadData();
   }, []);
 
@@ -176,7 +186,7 @@ export default function LeadsPage() {
                           className="h-8 w-8 text-gray-400 hover:text-red-500 hover:bg-red-50"
                           onClick={(e) => {
                             e.stopPropagation();
-                            inq.id && handleDelete(inq.id);
+                            if (inq.id) handleDelete(inq.id);
                           }}
                           disabled={deletingId === inq.id}
                         >

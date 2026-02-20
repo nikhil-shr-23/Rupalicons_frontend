@@ -21,7 +21,7 @@ export default function About() {
             <div className="relative z-10 w-full h-[500px] rounded-2xl overflow-hidden shadow-2xl">
               <Image
                 src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
-                alt="Luxury Interior"
+                alt="Luxury Property"
                 fill
                 className="object-cover hover:scale-105 transition-transform duration-700"
               />
@@ -58,8 +58,8 @@ export default function About() {
             </h2>
 
             <p className="text-gray-600 text-lg leading-relaxed mb-6 font-light">
-              Rupali Homes isn't just about building structures; it's about
-              creating spaces where memories are made. We blend modern
+              Rupali Homes isn&apos;t just about building structures; it&apos;s
+              about creating spaces where memories are made. We blend modern
               aesthetics with functional design to deliver premium residential
               and commercial projects.
             </p>

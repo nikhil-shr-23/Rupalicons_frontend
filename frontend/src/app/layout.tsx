@@ -16,7 +16,7 @@ const outfit = Outfit({
 
 export const metadata: Metadata = {
   title: "Rupali Homes",
-  description: "Premium Real Estate & Interior Design",
+  description: "Premium Real Estate Consultancy",
 };
 
 export default function RootLayout({

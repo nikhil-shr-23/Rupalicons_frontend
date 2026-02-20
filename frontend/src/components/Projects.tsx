@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { fetchProperties } from "../lib/api";
-import { Property, PropertyType } from "../types";
+import { Property } from "../types";
 import { motion } from "framer-motion";
 import { ArrowUpRight, Eye } from "lucide-react";
 
@@ -50,7 +50,7 @@ export default function Projects() {
         <div className="grid lg:grid-cols-2 gap-16 items-end mb-20">
           <div>
             <h2 className="text-5xl md:text-6xl font-bold font-syne leading-tight">
-              Professional Interior <br />
+              Professional Realty <br />
               <span className="text-gold">Made Simple</span>
             </h2>
             <div className="flex items-center gap-4 mt-8">
@@ -65,12 +65,12 @@ export default function Projects() {
 
           <div className="lg:pl-12">
             <p className="text-xl text-gray-300 leading-relaxed mb-8">
-              Interior transforms spaces with creativity, precision, and
-              timeless elegance.
+              Rupali Homes connects you with premium properties that blend
+              luxury, comfort, and timeless elegance.
               <span className="text-gold font-semibold">
                 {" "}
-                Our expert designers craft bespoke interiors tailored to your
-                style.
+                Our expert consultants curate bespoke property solutions
+                tailored to your style.
               </span>
             </p>
             <motion.button

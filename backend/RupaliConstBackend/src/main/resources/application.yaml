@@ -3,9 +3,9 @@ spring:
     name: RupaliConstBackend
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/rupali
+    url: jdbc:postgresql://db.vnnfkxlajvneogytyrxe.supabase.co:5432/postgres?sslmode=require
     username: postgres
-    password: password
+    password: admin@rupali123
     driver-class-name: org.postgresql.Driver
   jmx:
     enabled: false

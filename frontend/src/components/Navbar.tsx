@@ -2,21 +2,12 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Menu, X, Phone, Instagram, Facebook } from "lucide-react";
 import { motion, AnimatePresence, Variants } from "framer-motion";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   const navVariants: Variants = {
     hidden: { y: -100, opacity: 0 },
@@ -32,11 +23,7 @@ export default function Navbar() {
       initial="hidden"
       animate="visible"
       variants={navVariants}
-      className={`fixed w-full z-50 transition-all duration-300 ${
-        scrolled
-          ? "bg-white/90 backdrop-blur-md shadow-sm py-4"
-          : "bg-transparent py-6"
-      }`}
+      className={`fixed w-full z-50 transition-all duration-300 bg-white/90 backdrop-blur-md shadow-sm py-4`}
     >
       <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
         <Link
@@ -52,22 +39,14 @@ export default function Navbar() {
           />
         </Link>
 
-        {/* Desktop Navigation */}
-        <div
-          className={`hidden md:flex items-center gap-8 ${scrolled ? "text-gray-800" : "text-white/90"}`}
-        >
+        <div className={`hidden md:flex items-center gap-8 text-gray-800`}>
           <Link
             href="/"
             className="text-sm uppercase tracking-widest hover:text-gold transition-colors font-medium"
           >
             Home
           </Link>
-          <a
-            href="/#about"
-            className="text-sm uppercase tracking-widest hover:text-gold transition-colors font-medium"
-          >
-            About
-          </a>
+
           <Link
             href="/buy"
             className="text-sm uppercase tracking-widest hover:text-gold transition-colors font-medium"
@@ -80,29 +59,24 @@ export default function Navbar() {
           >
             Rent
           </Link>
-          <Link
-            href="/portfolio"
-            className="text-sm uppercase tracking-widest hover:text-gold transition-colors font-medium"
-          >
-            Portfolio
-          </Link>
+
           <Link
             href="/blogs"
             className="text-sm uppercase tracking-widest hover:text-gold transition-colors font-medium"
           >
             Blogs
           </Link>
-          <a
+          <Link
             href="/#contact"
             className="px-6 py-2 bg-white text-accent-dark font-bold text-sm uppercase tracking-widest hover:bg-gold hover:text-white transition-all duration-300 rounded-full"
           >
             Contact
-          </a>
+          </Link>
         </div>
 
         {/* Mobile Menu Button */}
         <button
-          className={`md:hidden ${scrolled ? "text-accent-dark" : "text-white"}`}
+          className={`md:hidden text-accent-dark`}
           onClick={() => setIsOpen(!isOpen)}
         >
           {isOpen ? <X size={28} /> : <Menu size={28} />}
@@ -125,13 +99,7 @@ export default function Navbar() {
             >
               Home
             </Link>
-            <a
-              href="/#about"
-              onClick={() => setIsOpen(false)}
-              className="text-2xl text-white font-syne hover:text-gold"
-            >
-              About
-            </a>
+
             <Link
               href="/buy"
               onClick={() => setIsOpen(false)}
@@ -146,13 +114,7 @@ export default function Navbar() {
             >
               Rent
             </Link>
-            <Link
-              href="/portfolio"
-              onClick={() => setIsOpen(false)}
-              className="text-2xl text-white font-syne hover:text-gold"
-            >
-              Portfolio
-            </Link>
+
             <Link
               href="/blogs"
               onClick={() => setIsOpen(false)}
@@ -160,27 +122,29 @@ export default function Navbar() {
             >
               Blogs
             </Link>
-            <a
+            <Link
               href="/#contact"
               onClick={() => setIsOpen(false)}
               className="text-2xl text-white font-syne hover:text-gold"
             >
               Contact
-            </a>
+            </Link>
 
             <div className="flex gap-6 mt-8">
-              <a
-                href="#"
+              <Link
+                href="https://instagram.com"
+                target="_blank"
                 className="p-3 bg-white/10 rounded-full hover:bg-gold transition-colors"
               >
                 <Instagram className="text-white" />
-              </a>
-              <a
-                href="#"
+              </Link>
+              <Link
+                href="https://facebook.com"
+                target="_blank"
                 className="p-3 bg-white/10 rounded-full hover:bg-gold transition-colors"
               >
                 <Facebook className="text-white" />
-              </a>
+              </Link>
               <a
                 href="tel:+919876543210"
                 className="p-3 bg-white/10 rounded-full hover:bg-gold transition-colors"

@@ -21,12 +21,18 @@ import {
   RefreshCw,
 } from "lucide-react";
 import Link from "next/link";
-import { fetchProperties, fetchBlogs, deleteProperty } from "@/lib/api";
-import { Property, Blog } from "@/types";
+import {
+  fetchProperties,
+  fetchBlogs,
+  fetchContactSubmissions,
+  deleteProperty,
+} from "@/lib/api";
+import { Property, Blog, Inquiry } from "@/types";
 
 export default function AdminDashboard() {
   const [properties, setProperties] = useState<Property[]>([]);
   const [blogs, setBlogs] = useState<Blog[]>([]);
+  const [leads, setLeads] = useState<Inquiry[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
@@ -42,6 +48,20 @@ export default function AdminDashboard() {
   };
 
   useEffect(() => {
+    const loadData = async () => {
+      try {
+        const [props, submissions] = await Promise.all([
+          fetchProperties(0, 5),
+          fetchContactSubmissions(),
+        ]);
+        if (props && props.content) setProperties(props.content);
+        setLeads(submissions.slice(0, 5));
+      } catch (error) {
+        console.error("Failed to load dashboard data", error);
+      } finally {
+        setLoading(false);
+      }
+    };
     loadData();
   }, []);
 
@@ -74,7 +94,7 @@ export default function AdminDashboard() {
     },
     {
       title: "New Leads",
-      value: "—", // Backend doesn't support generic leads yet
+      value: leads.length,
       icon: Users,
       href: "/admin/leads",
       actionLabel: "View Leads",

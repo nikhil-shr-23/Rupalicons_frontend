@@ -1,57 +1,112 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { fetchProperties } from "@/lib/api";
 import { Property, PropertyType } from "@/types";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import FeaturedPropertyCard from "@/components/FeaturedPropertyCard";
+import SearchFilterBar from "@/components/SearchFilterBar";
 import { ArrowUpRight } from "lucide-react";
+
+interface FilterState {
+  location: string;
+  minPrice: string;
+  maxPrice: string;
+  propertyType: string;
+  bedrooms: string;
+  priceRange?: string;
+}
 
 export default function BuyPage() {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
+  const [filters, setFilters] = useState<FilterState>({
+    location: "",
+    minPrice: "",
+    maxPrice: "",
+    propertyType: "",
+    bedrooms: "",
+  });
 
-  useEffect(() => {
-    async function loadProperties() {
-      try {
-        // Fetch properties with type SALE
-        const data = await fetchProperties(0, 100, { type: PropertyType.SALE });
-        if (data && data.content) {
-          setProperties(data.content);
-        }
-      } catch (error) {
-        console.error("Failed to load properties for sale", error);
-      } finally {
-        setLoading(false);
+  const applyFilters = useCallback(async () => {
+    setLoading(true);
+    let minPrice: number | undefined = filters.minPrice
+      ? Number(filters.minPrice)
+      : undefined;
+    let maxPrice: number | undefined = filters.maxPrice
+      ? Number(filters.maxPrice)
+      : undefined;
+
+    // Parse priceRange from SearchFilterBar if present and min/max are not manually set (priority logic or override?)
+    // Actually SearchFilterBar sets `priceRange` string. existing inputs set min/max.
+    // Let's parse priceRange if available. Format "$2,000-$13,000" or simple numbers.
+    if (filters.priceRange) {
+      const matches = filters.priceRange.match(/(\d[\d,]*)/g);
+      if (matches && matches.length >= 1) {
+        minPrice = Number(matches[0].replace(/,/g, ""));
+      }
+      if (matches && matches.length >= 2) {
+        maxPrice = Number(matches[1].replace(/,/g, ""));
       }
     }
-    loadProperties();
-  }, []);
+
+    try {
+      const data = await fetchProperties(0, 100, {
+        type: PropertyType.SALE,
+        location: filters.location || undefined,
+        minPrice: minPrice,
+        maxPrice: maxPrice,
+        bedrooms: filters.bedrooms ? Number(filters.bedrooms) : undefined,
+      });
+      if (data && data.content) {
+        setProperties(data.content);
+      }
+    } catch (error) {
+      console.error("Failed to load properties", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [filters]);
+
+  useEffect(() => {
+    applyFilters();
+  }, [applyFilters]);
 
   return (
     <main className="min-h-screen bg-background flex flex-col">
       <Navbar />
 
-      {/* Hero Section */}
-      <section className="pt-40 pb-20 px-6 bg-accent-dark text-white text-center">
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-5xl md:text-7xl font-bold font-syne mb-6"
-        >
-          Properties for <span className="text-gold">Sale</span>
-        </motion.h1>
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="text-xl text-gray-300 max-w-2xl mx-auto"
-        >
-          Discover your dream home from our exclusive collection of premium
-          properties.
-        </motion.p>
+      {/* Featured & Search Section */}
+      <section className="pt-32 pb-12 px-6">
+        <div className="max-w-7xl mx-auto">
+          {/* Featured Property */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-12"
+          >
+            {/* If properties are loaded, show the first one as featured, otherwise show a placeholder/skeleton */}
+            {properties.length > 0 && (
+              <FeaturedPropertyCard property={properties[0]} />
+            )}
+          </motion.div>
+
+          {/* Search Bar */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <SearchFilterBar
+              onSearch={(newFilters) => {
+                setFilters((prev) => ({ ...prev, ...newFilters }));
+              }}
+            />
+          </motion.div>
+        </div>
       </section>
 
       {/* Properties Grid */}
@@ -120,7 +175,7 @@ export default function BuyPage() {
           </div>
         ) : (
           <div className="text-center py-20 text-gray-500 text-lg">
-            No properties currently listed for sale.
+            No properties found matching your criteria.
           </div>
         )}
       </section>
