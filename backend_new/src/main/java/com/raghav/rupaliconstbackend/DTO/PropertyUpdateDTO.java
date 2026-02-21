@@ -33,4 +33,29 @@ public class PropertyUpdateDTO {
 
     @NotNull
     private PropertyStatus status;
+
+    // Media
+    private String imageUrl;
+    private String brochureUrl;
+
+    // Room details
+    private Integer bedrooms;
+    private Integer bathrooms;
+    private Integer sqft;
+    private boolean featured = false;
+
+    // Extended real estate fields
+    private String buildingType;
+    private String propertyCategory;
+    private String city;
+    private String microMarket;
+    private String locality;
+    private String flooring;
+    private Integer floorNumber;
+    private Integer totalFloors;
+    private Integer unitNumber;
+    private String availableFrom;
+    private String tags;
+    private String furnishingDetails;
+    private String furnishingStatus;
 }

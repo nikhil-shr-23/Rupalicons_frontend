@@ -26,6 +26,7 @@ export default function RentPropertyDetailsPage() {
   const [property, setProperty] = useState<Property | null>(null);
   const [loading, setLoading] = useState(true);
   const [liked, setLiked] = useState(false);
+  const [hasFiredHeartConfetti, setHasFiredHeartConfetti] = useState(false);
   const [fireCount, setFireCount] = useState(0);
   const [showFireAnimation, setShowFireAnimation] = useState(false);
 
@@ -76,7 +77,8 @@ export default function RentPropertyDetailsPage() {
   };
 
   const triggerFireReaction = () => {
-    setFireCount((prev) => prev + 1);
+    if (fireCount > 0) return;
+    setFireCount(1);
     setShowFireAnimation(true);
     setTimeout(() => setShowFireAnimation(false), 1000);
   };
@@ -173,7 +175,51 @@ export default function RentPropertyDetailsPage() {
             <div className="flex items-center gap-4">
               <motion.button
                 whileTap={{ scale: 0.8 }}
-                onClick={() => setLiked(!liked)}
+                onClick={() => {
+                  if (!liked) {
+                    const duration = 3 * 1000;
+                    const end = Date.now() + duration;
+
+                    const frame = () => {
+                      confetti({
+                        particleCount: 5,
+                        angle: 60,
+                        spread: 55,
+                        origin: { x: 0 },
+                        colors: [
+                          "#26ccff",
+                          "#a25afd",
+                          "#ff5e7e",
+                          "#88ff5a",
+                          "#fcff42",
+                          "#ffa62d",
+                          "#ff36ff",
+                        ],
+                      });
+                      confetti({
+                        particleCount: 5,
+                        angle: 120,
+                        spread: 55,
+                        origin: { x: 1 },
+                        colors: [
+                          "#26ccff",
+                          "#a25afd",
+                          "#ff5e7e",
+                          "#88ff5a",
+                          "#fcff42",
+                          "#ffa62d",
+                          "#ff36ff",
+                        ],
+                      });
+
+                      if (Date.now() < end) {
+                        requestAnimationFrame(frame);
+                      }
+                    };
+                    frame();
+                  }
+                  setLiked(!liked);
+                }}
                 className={`p-4 rounded-full border-2 transition-colors relative ${liked ? "border-red-500 bg-red-50" : "border-gray-200 hover:border-red-300"}`}
               >
                 <Heart

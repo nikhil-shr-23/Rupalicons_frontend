@@ -19,58 +19,58 @@ import {
   Trash2,
   ExternalLink,
   RefreshCw,
+  IndianRupee,
+  TrendingUp,
 } from "lucide-react";
 import Link from "next/link";
 import {
   fetchProperties,
   fetchBlogs,
   fetchContactSubmissions,
+  fetchDashboardStats,
   deleteProperty,
 } from "@/lib/api";
-import { Property, Blog, Inquiry } from "@/types";
+import { Property, Blog, Inquiry, DashboardStats } from "@/types";
 
 export default function AdminDashboard() {
   const [properties, setProperties] = useState<Property[]>([]);
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [leads, setLeads] = useState<Inquiry[]>([]);
+  const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const loadData = async () => {
     setLoading(true);
-    const [propertiesRes, blogsRes] = await Promise.all([
-      fetchProperties(0, 100),
-      fetchBlogs(),
-    ]);
-    setProperties(propertiesRes.content || []);
-    setBlogs(blogsRes || []);
-    setLoading(false);
+    try {
+      const [propertiesRes, blogsRes, leadsRes, dashboardRes] =
+        await Promise.all([
+          fetchProperties(0, 100),
+          fetchBlogs(),
+          fetchContactSubmissions(),
+          fetchDashboardStats(),
+        ]);
+      setProperties(propertiesRes.content || []);
+      setBlogs(blogsRes || []);
+      setLeads(leadsRes || []);
+      setStats(dashboardRes);
+    } catch (error) {
+      console.error("Failed to load dashboard data", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        const [props, submissions] = await Promise.all([
-          fetchProperties(0, 5),
-          fetchContactSubmissions(),
-        ]);
-        if (props && props.content) setProperties(props.content);
-        setLeads(submissions.slice(0, 5));
-      } catch (error) {
-        console.error("Failed to load dashboard data", error);
-      } finally {
-        setLoading(false);
-      }
-    };
     loadData();
   }, []);
 
-  const handleDeleteProperty = async (id: string) => {
+  const handleDeleteProperty = async (id: string | number) => {
     if (!confirm("Are you sure you want to delete this property?")) return;
-    setDeletingId(id);
+    setDeletingId(String(id));
     const success = await deleteProperty(id);
     if (success) {
-      setProperties((prev) => prev.filter((p) => p.id !== id));
+      setProperties((prev) => prev.filter((p) => String(p.id) !== String(id)));
     } else {
       alert("Failed to delete property.");
     }
@@ -80,10 +80,24 @@ export default function AdminDashboard() {
   const statCards = [
     {
       title: "Total Properties",
-      value: properties.length,
+      value: stats ? stats.totalProperties : properties.length,
       icon: Building2,
       href: "/admin/projects",
       actionLabel: "Manage Properties",
+    },
+    {
+      title: "Sold Properties",
+      value: stats ? stats.totalSoldProperties : "—",
+      icon: TrendingUp,
+      href: "/admin/projects",
+      actionLabel: "View Sold",
+    },
+    {
+      title: "Rented Properties",
+      value: stats ? stats.totalRentedProperties : "—",
+      icon: IndianRupee,
+      href: "/admin/projects",
+      actionLabel: "View Rented",
     },
     {
       title: "Active Blogs",
@@ -100,11 +114,13 @@ export default function AdminDashboard() {
       actionLabel: "View Leads",
     },
     {
-      title: "Site Visits",
-      value: "—",
+      title: "Total Sales Revenue",
+      value: stats
+        ? `₹${(stats.totalSalesRevenue / 10000000).toFixed(1)}Cr`
+        : "—",
       icon: BarChart3,
       href: "#",
-      actionLabel: "View Analytics",
+      actionLabel: "Revenue",
     },
   ];
 
@@ -144,7 +160,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Stats Cards - Clickable */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {statCards.map((stat) => (
           <Link key={stat.title} href={stat.href}>
             <Card className="hover:shadow-lg transition-all duration-200 cursor-pointer group border-gray-200 hover:border-gray-300">
@@ -235,7 +251,9 @@ export default function AdminDashboard() {
                         className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
                           property.status === "AVAILABLE"
                             ? "bg-emerald-50 text-emerald-600"
-                            : "bg-blue-50 text-blue-600"
+                            : property.status === "SOLD"
+                              ? "bg-blue-50 text-blue-600"
+                              : "bg-orange-50 text-orange-600"
                         }`}
                       >
                         {property.status}
@@ -247,9 +265,9 @@ export default function AdminDashboard() {
                         onClick={() =>
                           property.id && handleDeleteProperty(property.id)
                         }
-                        disabled={deletingId === property.id}
+                        disabled={deletingId === String(property.id)}
                       >
-                        {deletingId === property.id ? (
+                        {deletingId === String(property.id) ? (
                           <RefreshCw size={14} className="animate-spin" />
                         ) : (
                           <Trash2 size={14} />

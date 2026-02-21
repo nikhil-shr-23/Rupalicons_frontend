@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { Heart } from "lucide-react";
@@ -13,6 +14,9 @@ interface FeaturedPropertyCardProps {
 export default function FeaturedPropertyCard({
   property,
 }: FeaturedPropertyCardProps) {
+  const [hasLiked, setHasLiked] = useState(false);
+  const [hasFiredConfetti, setHasFiredConfetti] = useState(false);
+
   // Use a fallback price if property.price is missing or 0, to avoid displaying "0"
   const price = property.price ? property.price.toLocaleString() : "1,650,000";
 
@@ -37,50 +41,58 @@ export default function FeaturedPropertyCard({
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            const duration = 3 * 1000;
-            const end = Date.now() + duration;
 
-            const frame = () => {
-              confetti({
-                particleCount: 5,
-                angle: 60,
-                spread: 55,
-                origin: { x: 0 },
-                colors: [
-                  "#26ccff",
-                  "#a25afd",
-                  "#ff5e7e",
-                  "#88ff5a",
-                  "#fcff42",
-                  "#ffa62d",
-                  "#ff36ff",
-                ],
-              });
-              confetti({
-                particleCount: 5,
-                angle: 120,
-                spread: 55,
-                origin: { x: 1 },
-                colors: [
-                  "#26ccff",
-                  "#a25afd",
-                  "#ff5e7e",
-                  "#88ff5a",
-                  "#fcff42",
-                  "#ffa62d",
-                  "#ff36ff",
-                ],
-              });
+            if (!hasLiked && !hasFiredConfetti) {
+              const duration = 3 * 1000;
+              const end = Date.now() + duration;
 
-              if (Date.now() < end) {
-                requestAnimationFrame(frame);
-              }
-            };
-            frame();
+              const frame = () => {
+                confetti({
+                  particleCount: 5,
+                  angle: 60,
+                  spread: 55,
+                  origin: { x: 0 },
+                  colors: [
+                    "#26ccff",
+                    "#a25afd",
+                    "#ff5e7e",
+                    "#88ff5a",
+                    "#fcff42",
+                    "#ffa62d",
+                    "#ff36ff",
+                  ],
+                });
+                confetti({
+                  particleCount: 5,
+                  angle: 120,
+                  spread: 55,
+                  origin: { x: 1 },
+                  colors: [
+                    "#26ccff",
+                    "#a25afd",
+                    "#ff5e7e",
+                    "#88ff5a",
+                    "#fcff42",
+                    "#ffa62d",
+                    "#ff36ff",
+                  ],
+                });
+
+                if (Date.now() < end) {
+                  requestAnimationFrame(frame);
+                }
+              };
+              frame();
+              setHasFiredConfetti(true);
+            }
+            setHasLiked(!hasLiked);
           }}
           className="absolute top-4 right-4 bg-white/30 backdrop-blur-md p-2 rounded-full cursor-pointer hover:bg-white text-white hover:text-red-500 transition-colors z-10"
         >
-          <Heart size={20} />
+          <Heart
+            size={20}
+            className={hasLiked ? "fill-red-500 text-red-500" : ""}
+          />
         </div>
       </div>
 

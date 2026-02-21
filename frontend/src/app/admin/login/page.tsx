@@ -22,14 +22,11 @@ export default function AdminLoginPage() {
     setError("");
     setLoading(true);
 
-    // Small delay for UX
-    await new Promise((r) => setTimeout(r, 500));
-
-    const success = login(username, password);
+    const success = await login(username, password);
     if (success) {
       router.push("/admin");
     } else {
-      setError("Invalid username or password.");
+      setError("Invalid email or password.");
     }
     setLoading(false);
   };
@@ -67,14 +64,14 @@ export default function AdminLoginPage() {
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
               <Label htmlFor="username" className="text-gray-300 text-sm">
-                Username
+                Email
               </Label>
               <Input
                 id="username"
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="Enter username"
+                placeholder="Enter email"
                 required
                 className="bg-white/10 border-white/20 text-white placeholder:text-gray-500 focus:border-white/40 focus:ring-white/20"
               />

@@ -38,16 +38,6 @@ export default function LeadsPage() {
   };
 
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        const data = await fetchContactSubmissions();
-        setLeads(data);
-      } catch (error) {
-        console.error("Failed to load leads", error);
-      } finally {
-        setLoading(false);
-      }
-    };
     loadData();
   }, []);
 

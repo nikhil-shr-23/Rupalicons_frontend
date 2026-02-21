@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.UUID;
 
 @Data
 @AllArgsConstructor
@@ -25,4 +24,29 @@ public class PropertyResponseDTO {
     private PropertyStatus status;
     private Long createdBy;
     private Instant createdAt;
+
+    // Media
+    private String imageUrl;
+    private String brochureUrl;
+
+    // Room details
+    private Integer bedrooms;
+    private Integer bathrooms;
+    private Integer sqft;
+    private boolean featured;
+
+    // Extended real estate fields
+    private String buildingType;
+    private String propertyCategory;
+    private String city;
+    private String microMarket;
+    private String locality;
+    private String flooring;
+    private Integer floorNumber;
+    private Integer totalFloors;
+    private Integer unitNumber;
+    private String availableFrom;
+    private String tags;
+    private String furnishingDetails;
+    private String furnishingStatus;
 }

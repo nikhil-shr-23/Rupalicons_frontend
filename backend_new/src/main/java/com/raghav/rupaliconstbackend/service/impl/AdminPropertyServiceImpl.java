@@ -24,7 +24,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -49,6 +48,28 @@ public class AdminPropertyServiceImpl implements AdminPropertyService {
         property.setType(dto.getType());
         property.setStatus(PropertyStatus.AVAILABLE);
         property.setCreatedBy(admin);
+        // Media
+        property.setImageUrl(dto.getImageUrl());
+        property.setBrochureUrl(dto.getBrochureUrl());
+        // Room details
+        property.setBedrooms(dto.getBedrooms());
+        property.setBathrooms(dto.getBathrooms());
+        property.setSqft(dto.getSqft());
+        property.setFeatured(dto.isFeatured());
+        // Extended fields
+        property.setBuildingType(dto.getBuildingType());
+        property.setPropertyCategory(dto.getPropertyCategory());
+        property.setCity(dto.getCity());
+        property.setMicroMarket(dto.getMicroMarket());
+        property.setLocality(dto.getLocality());
+        property.setFlooring(dto.getFlooring());
+        property.setFloorNumber(dto.getFloorNumber());
+        property.setTotalFloors(dto.getTotalFloors());
+        property.setUnitNumber(dto.getUnitNumber());
+        property.setAvailableFrom(dto.getAvailableFrom());
+        property.setTags(dto.getTags());
+        property.setFurnishingDetails(dto.getFurnishingDetails());
+        property.setFurnishingStatus(dto.getFurnishingStatus());
 
         return toDto(propertyRepository.save(property));
     }
@@ -66,6 +87,29 @@ public class AdminPropertyServiceImpl implements AdminPropertyService {
         property.setSize(dto.getSize());
         property.setType(dto.getType());
         property.setStatus(dto.getStatus());
+        // Media
+        property.setImageUrl(dto.getImageUrl());
+        property.setBrochureUrl(dto.getBrochureUrl());
+        // Room details
+        property.setBedrooms(dto.getBedrooms());
+        property.setBathrooms(dto.getBathrooms());
+        property.setSqft(dto.getSqft());
+        property.setFeatured(dto.isFeatured());
+        // Extended fields
+        property.setBuildingType(dto.getBuildingType());
+        property.setPropertyCategory(dto.getPropertyCategory());
+        property.setCity(dto.getCity());
+        property.setMicroMarket(dto.getMicroMarket());
+        property.setLocality(dto.getLocality());
+        property.setFlooring(dto.getFlooring());
+        property.setFloorNumber(dto.getFloorNumber());
+        property.setTotalFloors(dto.getTotalFloors());
+        property.setUnitNumber(dto.getUnitNumber());
+        property.setAvailableFrom(dto.getAvailableFrom());
+        property.setTags(dto.getTags());
+        property.setFurnishingDetails(dto.getFurnishingDetails());
+        property.setFurnishingStatus(dto.getFurnishingStatus());
+
         return toDto(propertyRepository.save(property));
     }
 
@@ -160,18 +204,37 @@ public class AdminPropertyServiceImpl implements AdminPropertyService {
     }
 
     private PropertyResponseDTO toDto(Property property) {
-        return new PropertyResponseDTO(
-                property.getId(),
-                property.getTitle(),
-                property.getDescription(),
-                property.getPrice(),
-                property.getRentAmount(),
-                property.getLocation(),
-                property.getSize(),
-                property.getType(),
-                property.getStatus(),
-                property.getCreatedBy().getId(),
-                property.getCreatedAt()
-        );
+        PropertyResponseDTO dto = new PropertyResponseDTO();
+        dto.setId(property.getId());
+        dto.setTitle(property.getTitle());
+        dto.setDescription(property.getDescription());
+        dto.setPrice(property.getPrice());
+        dto.setRentAmount(property.getRentAmount());
+        dto.setLocation(property.getLocation());
+        dto.setSize(property.getSize());
+        dto.setType(property.getType());
+        dto.setStatus(property.getStatus());
+        dto.setCreatedBy(property.getCreatedBy().getId());
+        dto.setCreatedAt(property.getCreatedAt());
+        dto.setImageUrl(property.getImageUrl());
+        dto.setBrochureUrl(property.getBrochureUrl());
+        dto.setBedrooms(property.getBedrooms());
+        dto.setBathrooms(property.getBathrooms());
+        dto.setSqft(property.getSqft());
+        dto.setFeatured(property.isFeatured());
+        dto.setBuildingType(property.getBuildingType());
+        dto.setPropertyCategory(property.getPropertyCategory());
+        dto.setCity(property.getCity());
+        dto.setMicroMarket(property.getMicroMarket());
+        dto.setLocality(property.getLocality());
+        dto.setFlooring(property.getFlooring());
+        dto.setFloorNumber(property.getFloorNumber());
+        dto.setTotalFloors(property.getTotalFloors());
+        dto.setUnitNumber(property.getUnitNumber());
+        dto.setAvailableFrom(property.getAvailableFrom());
+        dto.setTags(property.getTags());
+        dto.setFurnishingDetails(property.getFurnishingDetails());
+        dto.setFurnishingStatus(property.getFurnishingStatus());
+        return dto;
     }
 }

@@ -1,182 +1,215 @@
-import { Property, PropertyType, PropertyStatus, ContactFormSubmission, Blog, Inquiry } from "../types";
+import { Property, PropertyType, PropertyStatus, ContactFormSubmission, Blog, Inquiry, DashboardStats } from "../types";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
 export function getAuthHeader(): Record<string, string> {
-  return {};
+  if (typeof window === "undefined") return {};
+  const token = sessionStorage.getItem("adminToken");
+  if (!token) return {};
+  return { Authorization: `Bearer ${token}` };
 }
 
-// Mock Data
-export const mockProperties: Property[] = [
-  {
-    id: 1,
-    title: "Luxury Villa in Beverly Hills",
-    description: "A stunning 5-bedroom villa with a private pool and garden.",
-    type: PropertyType.SALE,
-    status: PropertyStatus.AVAILABLE,
-    location: "Beverly Hills",
-    price: 45000000,
-    size: "4500 sqft",
-    imageUrl: "https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&q=80&w=2670",
-    brochureUrl: "",
-    createdAt: new Date().toISOString(),
-    bedrooms: 5,
-    bathrooms: 6,
-    sqft: 4500
-  },
-  {
-    id: 2,
-    title: "Modern Apartment in City Center",
-    description: "3BHK apartment with panoramic city views.",
-    type: PropertyType.SALE,
-    status: PropertyStatus.AVAILABLE,
-    location: "City Center",
-    price: 12000000,
-    size: "1800 sqft",
-    imageUrl: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&q=80&w=2670",
-    brochureUrl: "",
-    createdAt: new Date().toISOString()
-  },
-  {
-    id: 3,
-    title: "Cozy Studio Near Park",
-    description: "Perfect for singles or couples, fully furnished.",
-    type: PropertyType.RENT,
-    status: PropertyStatus.AVAILABLE,
-    location: "Green Park",
-    rentAmount: 25000,
-    size: "600 sqft",
-    imageUrl: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=2670",
-    brochureUrl: "",
-    createdAt: new Date().toISOString()
-  },
-  {
-    id: 4,
-    title: "Spacious Office Space",
-    description: "Ready to move in office space for startups.",
-    type: PropertyType.RENT,
-    status: PropertyStatus.AVAILABLE,
-    location: "Business Hub",
-    rentAmount: 50000,
-    size: "1200 sqft",
-    imageUrl: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=2670",
-    brochureUrl: "",
-    createdAt: new Date().toISOString()
-  },
-  {
-    id: 5,
-    title: "Seaside Penthouse",
-    description: "Exclusive penthouse with ocean view.",
-    type: PropertyType.SALE,
-    status: PropertyStatus.AVAILABLE,
-    location: "Coastal Road",
-    price: 85000000,
-    size: "3200 sqft",
-    imageUrl: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=2670",
-    brochureUrl: "",
-    createdAt: new Date().toISOString()
-  },
-  {
-    id: 6,
-    title: "Suburban Family Home",
-    description: "4 bedrooms, large backyard, quiet neighborhood.",
-    type: PropertyType.SALE,
-    status: PropertyStatus.AVAILABLE,
-    location: "Suburbs",
-    price: 25000000,
-    size: "2800 sqft",
-    imageUrl: "https://images.unsplash.com/photo-1600596542815-e32898659994?auto=format&fit=crop&q=80&w=2670",
-    brochureUrl: "",
-    createdAt: new Date().toISOString()
-  }
-];
+// ─── Property API (Real Backend) ────────────────────────────────────────
 
 export async function fetchProperties(
-  page = 0, 
-  size = 12, 
+  page = 0,
+  size = 12,
   filters?: {
     type?: PropertyType;
     minPrice?: number;
     maxPrice?: number;
     location?: string;
-    bedrooms?: number;
   }
-): Promise<{ content: Property[], totalPages: number, totalElements: number }> {
-  
-  // Simulate network delay
-  await new Promise(resolve => setTimeout(resolve, 500));
+): Promise<{ content: Property[]; totalPages: number; totalElements: number }> {
+  try {
+    const params = new URLSearchParams();
+    params.set("page", String(page));
+    params.set("size", String(size));
+    if (filters?.type) params.set("type", filters.type);
+    if (filters?.minPrice !== undefined) params.set("minPrice", String(filters.minPrice));
+    if (filters?.maxPrice !== undefined) params.set("maxPrice", String(filters.maxPrice));
+    if (filters?.location) params.set("location", filters.location);
 
-  let filtered = [...mockProperties];
+    const res = await fetch(`${API_URL}/properties?${params.toString()}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
 
-  if (filters?.type) {
-    filtered = filtered.filter(p => p.type === filters.type);
+    const content: Property[] = (data.content || []).map(mapPropertyFromBackend);
+
+    return {
+      content,
+      totalPages: data.totalPages || 0,
+      totalElements: data.totalElements || 0,
+    };
+  } catch (error) {
+    console.error("Failed to fetch properties:", error);
+    return { content: [], totalPages: 0, totalElements: 0 };
   }
-
-  if (filters?.location) {
-    const loc = filters.location.toLowerCase();
-    filtered = filtered.filter(p => p.location.toLowerCase().includes(loc));
-  }
-
-  if (filters?.bedrooms) {
-    filtered = filtered.filter(p => (p.bedrooms || 0) >= (filters.bedrooms || 0));
-  }
-
-  if (filters?.minPrice !== undefined) {
-    filtered = filtered.filter(p => {
-      const price = p.type === PropertyType.SALE ? p.price : p.rentAmount;
-      return (price || 0) >= (filters.minPrice || 0);
-    });
-  }
-
-  if (filters?.maxPrice !== undefined) {
-    filtered = filtered.filter(p => {
-      const price = p.type === PropertyType.SALE ? p.price : p.rentAmount;
-      return (price || 0) <= (filters.maxPrice || 0);
-    });
-  }
-
-  const start = page * size;
-  const end = start + size;
-  const content = filtered.slice(start, end);
-
-  return {
-    content,
-    totalPages: Math.ceil(filtered.length / size),
-    totalElements: filtered.length
-  };
 }
 
 export async function fetchPropertyById(id: string | number): Promise<Property | null> {
-  await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network
-  return mockProperties.find(p => p.id == id) || null;
+  try {
+    const res = await fetch(`${API_URL}/properties/${id}`);
+    if (!res.ok) return null;
+    const data = await res.json();
+    return mapPropertyFromBackend(data);
+  } catch (error) {
+    console.error("Failed to fetch property:", error);
+    return null;
+  }
 }
 
-// Admin only (Mock implementation)
-export async function createProperty(property: Property): Promise<Property | null> {
-  const newProperty: Property = {
-    ...property,
-    id: Math.floor(Math.random() * 10000),
-    createdAt: new Date().toISOString()
-  };
-  mockProperties.push(newProperty);
-  return newProperty;
+// Admin: Create Property
+export async function createProperty(property: Partial<Property>): Promise<Property | null> {
+  try {
+    const res = await fetch(`${API_URL}/admin/properties`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...getAuthHeader(),
+      },
+      body: JSON.stringify(buildPropertyPayload(property)),
+    });
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error("Create property failed:", errorText);
+      return null;
+    }
+    const data = await res.json();
+    return mapPropertyFromBackend(data);
+  } catch (error) {
+    console.error("Failed to create property:", error);
+    return null;
+  }
 }
 
+// Admin: Update Property
 export async function updateProperty(id: string | number, property: Partial<Property>): Promise<Property | null> {
-  const index = mockProperties.findIndex(p => p.id == id);
-  if (index !== -1) {
-    mockProperties[index] = { ...mockProperties[index], ...property };
-    return mockProperties[index];
+  try {
+    const res = await fetch(`${API_URL}/admin/properties/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        ...getAuthHeader(),
+      },
+      body: JSON.stringify({
+        ...buildPropertyPayload(property),
+        status: property.status,
+      }),
+    });
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error("Update property failed:", errorText);
+      return null;
+    }
+    const data = await res.json();
+    return mapPropertyFromBackend(data);
+  } catch (error) {
+    console.error("Failed to update property:", error);
+    return null;
   }
-  return null;
 }
 
+// Admin: Delete Property
 export async function deleteProperty(id: string | number): Promise<boolean> {
-  const index = mockProperties.findIndex(p => p.id == id);
-  if (index !== -1) {
-    mockProperties.splice(index, 1);
-    return true;
+  try {
+    const res = await fetch(`${API_URL}/admin/properties/${id}`, {
+      method: "DELETE",
+      headers: { ...getAuthHeader() },
+    });
+    return res.ok || res.status === 204;
+  } catch (error) {
+    console.error("Failed to delete property:", error);
+    return false;
   }
-  return false;
 }
+
+// ─── Dashboard API (fixed: /admin/dashboard instead of /super-admin) ─
+
+export async function fetchDashboardStats(): Promise<DashboardStats | null> {
+  try {
+    const res = await fetch(`${API_URL}/admin/dashboard`, {
+      headers: { ...getAuthHeader() },
+    });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (error) {
+    console.error("Failed to fetch dashboard stats:", error);
+    return null;
+  }
+}
+
+// ─── Helper: Build property payload for create/update ────────────────
+
+function buildPropertyPayload(property: Partial<Property>) {
+  return {
+    title: property.title,
+    description: property.description,
+    price: property.price || 0,
+    rentAmount: property.rentAmount || 0,
+    location: property.location,
+    size: property.size || "",
+    type: property.type,
+    imageUrl: property.imageUrl || "",
+    brochureUrl: property.brochureUrl || "",
+    bedrooms: property.bedrooms || null,
+    bathrooms: property.bathrooms || null,
+    sqft: property.sqft || null,
+    featured: property.featured || false,
+    buildingType: property.buildingType || "",
+    propertyCategory: property.propertyCategory || "",
+    city: property.city || "",
+    microMarket: property.microMarket || "",
+    locality: property.locality || "",
+    flooring: property.flooring || "",
+    floorNumber: property.floorNumber || null,
+    totalFloors: property.totalFloors || null,
+    unitNumber: property.unitNumber || null,
+    availableFrom: property.availableFrom || "",
+    tags: property.tags || "",
+    furnishingDetails: property.furnishingDetails || "",
+    furnishingStatus: property.furnishingStatus || "",
+  };
+}
+
+// ─── Helper: Map backend DTO → frontend Property ────────────────────
+
+function mapPropertyFromBackend(dto: Record<string, unknown>): Property {
+  return {
+    id: dto.id as number,
+    title: (dto.title as string) || "",
+    description: (dto.description as string) || "",
+    price: dto.price ? Number(dto.price) : undefined,
+    rentAmount: dto.rentAmount ? Number(dto.rentAmount) : undefined,
+    location: (dto.location as string) || "",
+    size: (dto.size as string) || "",
+    type: (dto.type as PropertyType) || PropertyType.SALE,
+    status: (dto.status as PropertyStatus) || PropertyStatus.AVAILABLE,
+    createdBy: dto.createdBy ? Number(dto.createdBy) : undefined,
+    createdAt: dto.createdAt ? String(dto.createdAt) : undefined,
+    imageUrl: (dto.imageUrl as string) || undefined,
+    brochureUrl: (dto.brochureUrl as string) || undefined,
+    bedrooms: dto.bedrooms ? Number(dto.bedrooms) : undefined,
+    bathrooms: dto.bathrooms ? Number(dto.bathrooms) : undefined,
+    sqft: dto.sqft ? Number(dto.sqft) : undefined,
+    featured: (dto.featured as boolean) || false,
+    buildingType: (dto.buildingType as string) || undefined,
+    propertyCategory: (dto.propertyCategory as string) || undefined,
+    city: (dto.city as string) || undefined,
+    microMarket: (dto.microMarket as string) || undefined,
+    locality: (dto.locality as string) || undefined,
+    flooring: (dto.flooring as string) || undefined,
+    floorNumber: dto.floorNumber ? Number(dto.floorNumber) : undefined,
+    totalFloors: dto.totalFloors ? Number(dto.totalFloors) : undefined,
+    unitNumber: dto.unitNumber ? Number(dto.unitNumber) : undefined,
+    availableFrom: (dto.availableFrom as string) || undefined,
+    tags: (dto.tags as string) || undefined,
+    furnishingDetails: (dto.furnishingDetails as string) || undefined,
+    furnishingStatus: (dto.furnishingStatus as string) || undefined,
+  };
+}
+
+// ─── Default Property (for forms) ───────────────────────────────────────
 
 export const defaultProperty: Property = {
   title: "",
@@ -188,32 +221,35 @@ export const defaultProperty: Property = {
   rentAmount: 0,
   size: "",
   imageUrl: "",
-  brochureUrl: ""
+  brochureUrl: "",
 };
+
+// ─── Contact Form (no backend endpoint – frontend-only) ─────────────────
 
 export async function submitContactForm(submission: ContactFormSubmission): Promise<boolean> {
   console.log("Contact form submitted:", submission);
   return new Promise((resolve) => setTimeout(() => resolve(true), 1000));
 }
 
-// Mock Blogs
+// ─── Blog Mock Data (no backend endpoint yet) ───────────────────────────
+
 const mockBlogs: Blog[] = [
-    {
-        id: 1,
-        title: "Top 5 Emerging Property Hotspots 2024",
-        content: "Discover the latest emerging markets in real estate...",
-        author: "Jane Doe",
-        category: "Market Trends",
-        createdAt: new Date().toISOString()
-    },
-    {
-        id: 2,
-        title: "Investing in Real Estate: A Beginner's Guide",
-        content: "Learn how to start your real estate investment journey...",
-        author: "John Smith",
-        category: "Real Estate",
-        createdAt: new Date().toISOString()
-    }
+  {
+    id: 1,
+    title: "Top 5 Emerging Property Hotspots 2024",
+    content: "Discover the latest emerging markets in real estate...",
+    author: "Jane Doe",
+    category: "Market Trends",
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 2,
+    title: "Investing in Real Estate: A Beginner's Guide",
+    content: "Learn how to start your real estate investment journey...",
+    author: "John Smith",
+    category: "Real Estate",
+    createdAt: new Date().toISOString(),
+  },
 ];
 
 export async function fetchBlogs(): Promise<Blog[]> {
@@ -221,73 +257,69 @@ export async function fetchBlogs(): Promise<Blog[]> {
 }
 
 export async function fetchBlogById(id: number): Promise<Blog | null> {
-  return mockBlogs.find(b => b.id === id) || null;
+  return mockBlogs.find((b) => b.id === id) || null;
 }
 
 export async function createBlog(formData: FormData): Promise<Blog | null> {
-    const newBlog: Blog = {
-        id: Math.floor(Math.random() * 10000),
-        title: formData.get("title") as string,
-        content: formData.get("content") as string,
-        author: formData.get("author") as string,
-        category: formData.get("category") as string,
-        createdAt: new Date().toISOString(),
-    };
-    mockBlogs.push(newBlog);
-    return newBlog;
+  const newBlog: Blog = {
+    id: Math.floor(Math.random() * 10000),
+    title: formData.get("title") as string,
+    content: formData.get("content") as string,
+    author: formData.get("author") as string,
+    category: formData.get("category") as string,
+    createdAt: new Date().toISOString(),
+  };
+  mockBlogs.push(newBlog);
+  return newBlog;
 }
 
-//always come back to this 
 export async function deleteBlog(id: number): Promise<boolean> {
-    const index = mockBlogs.findIndex(b => b.id === id);
-    if (index !== -1) {
-        mockBlogs.splice(index, 1);
-        return true;
-    }
-    return false;
+  const index = mockBlogs.findIndex((b) => b.id === id);
+  if (index !== -1) {
+    mockBlogs.splice(index, 1);
+    return true;
+  }
+  return false;
 }
 
-// Mock Inquiries/Leads
-// Mock Inquiries/Leads
-// import { Inquiry } from "../types";
+// ─── Inquiry/Lead Mock Data (no backend endpoint yet) ───────────────────
 
 const mockInquiries: Inquiry[] = [
-    {
-        id: 1,
-        name: "Alice Johnson",
-        email: "alice@example.com",
-        phone: "1234567890",
-        location: "Mumbai",
-        message: "Interested in 3BHK",
-        createdAt: new Date().toISOString(),
-        status: "NEW"
-    },
-    {
-        id: 2,
-        name: "Bob Smith",
-        email: "bob@example.com",
-        phone: "9876543210",
-        location: "Delhi",
-        message: "Looking for commercial space",
-        createdAt: new Date(Date.now() - 86400000).toISOString(),
-        status: "CONTACTED"
-    }
+  {
+    id: 1,
+    name: "Alice Johnson",
+    email: "alice@example.com",
+    phone: "1234567890",
+    location: "Mumbai",
+    message: "Interested in 3BHK",
+    createdAt: new Date().toISOString(),
+    status: "NEW",
+  },
+  {
+    id: 2,
+    name: "Bob Smith",
+    email: "bob@example.com",
+    phone: "9876543210",
+    location: "Delhi",
+    message: "Looking for commercial space",
+    createdAt: new Date(Date.now() - 86400000).toISOString(),
+    status: "CONTACTED",
+  },
 ];
 
 export async function fetchContactSubmissions(): Promise<Inquiry[]> {
-    return mockInquiries;
+  return mockInquiries;
 }
 
 export async function fetchInquiries(): Promise<Inquiry[]> {
-    return mockInquiries;
+  return mockInquiries;
 }
 
 export async function deleteInquiry(id: number): Promise<boolean> {
-    const index = mockInquiries.findIndex(i => i.id === id);
-    if (index !== -1) {
-        mockInquiries.splice(index, 1);
-        return true;
-    }
-    return false;
+  const index = mockInquiries.findIndex((i) => i.id === id);
+  if (index !== -1) {
+    mockInquiries.splice(index, 1);
+    return true;
+  }
+  return false;
 }
-
