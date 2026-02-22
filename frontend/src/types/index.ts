@@ -10,6 +10,41 @@ export enum PropertyStatus {
   HIDDEN = "HIDDEN",
 }
 
+// Used by add-brochure page
+export enum ProjectType {
+  RESIDENTIAL = "RESIDENTIAL",
+  COMMERCIAL = "COMMERCIAL",
+}
+
+export enum UnitType {
+  STUDIO_APARTMENT = "STUDIO_APARTMENT",
+  TWO_BHK = "TWO_BHK",
+  TWO_POINT_FIVE_BHK = "TWO_POINT_FIVE_BHK",
+  THREE_BHK = "THREE_BHK",
+  THREE_POINT_FIVE_BHK = "THREE_POINT_FIVE_BHK",
+  FOUR_BHK = "FOUR_BHK",
+  FOUR_POINT_FIVE_BHK = "FOUR_POINT_FIVE_BHK",
+  FIVE_BHK = "FIVE_BHK",
+  PENTHOUSE = "PENTHOUSE",
+  DUPLEX_PENTHOUSE = "DUPLEX_PENTHOUSE",
+  TRIPLEX_PENTHOUSE = "TRIPLEX_PENTHOUSE",
+  VILLA = "VILLA",
+  DDJAY_PLOT = "DDJAY_PLOT",
+  PLOT = "PLOT",
+}
+
+export enum DealType {
+  FreshUnit = "FreshUnit",
+  ReSale = "ReSale",
+}
+
+export enum ProjectStage {
+  UnderConstruction = "UnderConstruction",
+  RTMI = "RTMI",
+  pre_Leased = "pre_Leased",
+  NearToPossession = "NearToPossession",
+}
+
 export interface Property {
   id?: number;
   title: string;

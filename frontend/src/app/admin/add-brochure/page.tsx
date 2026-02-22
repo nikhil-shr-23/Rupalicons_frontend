@@ -98,7 +98,9 @@ export default function AddBrochure() {
               </label>
               <select
                 name="projectType"
-                value={formData.projectType || ProjectType.RESIDENTIAL}
+                value={
+                  (formData.projectType as string) || ProjectType.RESIDENTIAL
+                }
                 onChange={handleChange}
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-gold-400 focus:border-gold-400"
               >
@@ -116,7 +118,10 @@ export default function AddBrochure() {
               </label>
               <select
                 name="projectStage"
-                value={formData.projectStage || ProjectStage.UnderConstruction}
+                value={
+                  (formData.projectStage as string) ||
+                  ProjectStage.UnderConstruction
+                }
                 onChange={handleChange}
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-gold-400 focus:border-gold-400"
               >
@@ -134,7 +139,7 @@ export default function AddBrochure() {
               </label>
               <select
                 name="unitType"
-                value={formData.unitType || UnitType.PLOT}
+                value={(formData.unitType as string) || UnitType.PLOT}
                 onChange={handleChange}
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-gold-400 focus:border-gold-400"
               >
@@ -152,7 +157,7 @@ export default function AddBrochure() {
               </label>
               <select
                 name="dealType"
-                value={formData.dealType || DealType.FreshUnit}
+                value={(formData.dealType as string) || DealType.FreshUnit}
                 onChange={handleChange}
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-gold-400 focus:border-gold-400"
               >
@@ -171,7 +176,7 @@ export default function AddBrochure() {
               <input
                 type="text"
                 name="devName"
-                value={formData.devName || ""}
+                value={(formData.devName as string) || ""}
                 onChange={handleChange}
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-gold-400 focus:border-gold-400"
               />

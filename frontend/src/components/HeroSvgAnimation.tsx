@@ -8,11 +8,10 @@ export default function HeroSvgAnimation() {
     visible: {
       pathLength: 1,
       opacity: 1,
-      fillOpacity: 0, // outline only
+      fillOpacity: 0,
       transition: {
-        pathLength: { duration: 2.5, ease: "easeInOut" },
+        pathLength: { duration: 2.5, ease: "easeInOut" as const },
         opacity: { duration: 0.1 },
-        // fillOpacity removed/disabled
       },
     },
   };

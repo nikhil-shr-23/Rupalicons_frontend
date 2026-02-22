@@ -19,6 +19,7 @@ export async function fetchProperties(
     minPrice?: number;
     maxPrice?: number;
     location?: string;
+    bedrooms?: number;
   }
 ): Promise<{ content: Property[]; totalPages: number; totalElements: number }> {
   try {
@@ -29,6 +30,7 @@ export async function fetchProperties(
     if (filters?.minPrice !== undefined) params.set("minPrice", String(filters.minPrice));
     if (filters?.maxPrice !== undefined) params.set("maxPrice", String(filters.maxPrice));
     if (filters?.location) params.set("location", filters.location);
+    if (filters?.bedrooms !== undefined) params.set("bedrooms", String(filters.bedrooms));
 
     const res = await fetch(`${API_URL}/properties?${params.toString()}`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
