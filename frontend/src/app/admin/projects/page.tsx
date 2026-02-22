@@ -84,6 +84,40 @@ export default function AdminProjects() {
   const [formFurnishingDetails, setFormFurnishingDetails] = useState("");
   const [formFurnishingStatus, setFormFurnishingStatus] = useState("");
 
+  // Form state — agent & amenities
+  const [formAgentName, setFormAgentName] = useState("");
+  const [formAgentPhotoUrl, setFormAgentPhotoUrl] = useState("");
+  const [formAmenities, setFormAmenities] = useState<string[]>([]);
+
+  const AMENITY_OPTIONS = [
+    "Swimming Pool",
+    "Gym",
+    "Parking",
+    "Lift",
+    "Power Backup",
+    "CCTV",
+    "Clubhouse",
+    "Garden",
+    "Intercom",
+    "Rainwater Harvesting",
+    "Children's Play Area",
+    "Security",
+    "Vastu Compliant",
+    "Gas Pipeline",
+    "Fire Safety",
+    "Sports Facility",
+    "Jogging Track",
+    "Shopping Centre",
+  ];
+
+  const toggleAmenity = (amenity: string) => {
+    setFormAmenities((prev) =>
+      prev.includes(amenity)
+        ? prev.filter((a) => a !== amenity)
+        : [...prev, amenity],
+    );
+  };
+
   const loadProperties = async () => {
     setLoading(true);
     try {
@@ -128,6 +162,9 @@ export default function AdminProjects() {
     setFormTags("");
     setFormFurnishingDetails("");
     setFormFurnishingStatus("");
+    setFormAgentName("");
+    setFormAgentPhotoUrl("");
+    setFormAmenities([]);
     setEditingProperty(null);
     setShowForm(false);
     setShowAdvanced(false);
@@ -167,6 +204,9 @@ export default function AdminProjects() {
     setFormTags(p.tags || "");
     setFormFurnishingDetails(p.furnishingDetails || "");
     setFormFurnishingStatus(p.furnishingStatus || "");
+    setFormAgentName(p.agentName || "");
+    setFormAgentPhotoUrl(p.agentPhotoUrl || "");
+    setFormAmenities(p.amenities ? p.amenities.split(",") : []);
     setShowForm(true);
     if (
       p.buildingType ||
@@ -213,6 +253,9 @@ export default function AdminProjects() {
       tags: formTags,
       furnishingDetails: formFurnishingDetails,
       furnishingStatus: formFurnishingStatus,
+      agentName: formAgentName,
+      agentPhotoUrl: formAgentPhotoUrl,
+      amenities: formAmenities.join(","),
     };
 
     const result = editingProperty?.id
@@ -670,6 +713,64 @@ export default function AdminProjects() {
                   placeholder="1 Fan, 1 Geyser, 1 Light, 1 Modular Kitchen, 1 Chimney, 1 Bed, 1 Wardrobe"
                   className="h-9 text-sm"
                 />
+              </div>
+
+              {/* Agent Info */}
+              <div className="mt-4 pt-4 border-t border-gray-100">
+                <Label className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3 block">
+                  Agent Info
+                </Label>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-medium text-gray-600">
+                      Agent Name
+                    </Label>
+                    <Input
+                      value={formAgentName}
+                      onChange={(e) => setFormAgentName(e.target.value)}
+                      placeholder="Rahul Sharma"
+                      className="h-9 text-sm"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-medium text-gray-600">
+                      Agent Photo URL
+                    </Label>
+                    <Input
+                      value={formAgentPhotoUrl}
+                      onChange={(e) => setFormAgentPhotoUrl(e.target.value)}
+                      placeholder="https://example.com/agent.jpg"
+                      className="h-9 text-sm"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Amenities Multi-Select */}
+              <div className="mt-4 pt-4 border-t border-gray-100">
+                <Label className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3 block">
+                  Amenities
+                </Label>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                  {AMENITY_OPTIONS.map((amenity) => (
+                    <label
+                      key={amenity}
+                      className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer text-sm transition-colors ${
+                        formAmenities.includes(amenity)
+                          ? "border-accent-dark bg-accent-dark/5 text-accent-dark font-medium"
+                          : "border-gray-200 text-gray-600 hover:border-gray-300"
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={formAmenities.includes(amenity)}
+                        onChange={() => toggleAmenity(amenity)}
+                        className="rounded border-gray-300 text-accent-dark focus:ring-accent-dark"
+                      />
+                      {amenity}
+                    </label>
+                  ))}
+                </div>
               </div>
             </div>
           )}

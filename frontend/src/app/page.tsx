@@ -17,9 +17,8 @@ export default function Home() {
       <Navbar />
       <HeroV2 />
       <Marquee />
-      <About />
       <Projects />
-      <WhyChooseUs />
+      <About />
       <ProcessFlow />
       <Services />
       <Testimonials />

@@ -71,14 +71,6 @@ export default function Projects() {
               <br />
               <span className="text-gold">Property</span>
             </h2>
-            <div className="flex items-center gap-4 mt-8">
-              <div className="w-12 h-12 rounded-full border border-gray-600 flex items-center justify-center">
-                <Eye size={20} className="text-gray-400" />
-              </div>
-              <span className="text-sm font-medium tracking-wide uppercase">
-                Explore Listings
-              </span>
-            </div>
           </div>
 
           <div className="lg:pl-12">

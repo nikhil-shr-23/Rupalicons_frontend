@@ -54,4 +54,9 @@ public class PropertyCreateDTO {
     private String tags;
     private String furnishingDetails;
     private String furnishingStatus;
+
+    // Agent & Amenities
+    private String agentName;
+    private String agentPhotoUrl;
+    private String amenities;
 }

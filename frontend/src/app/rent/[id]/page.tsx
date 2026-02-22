@@ -13,8 +13,29 @@ import {
   Maximize,
   Share2,
   ArrowLeft,
-  CheckCircle,
   Flame,
+  Layers,
+  Building,
+  Sofa,
+  CalendarDays,
+  Waves,
+  Dumbbell,
+  Car,
+  ArrowUpDown,
+  ShieldCheck,
+  Cctv,
+  TreePine,
+  Phone,
+  Droplets,
+  Baby,
+  Zap,
+  Compass,
+  Flame as FlameIcon,
+  Shield,
+  Medal,
+  Play,
+  Store,
+  User,
 } from "lucide-react";
 import confetti from "canvas-confetti";
 import { fetchPropertyById } from "@/lib/api";
@@ -29,6 +50,28 @@ export default function RentPropertyDetailsPage() {
   const [hasFiredHeartConfetti, setHasFiredHeartConfetti] = useState(false);
   const [fireCount, setFireCount] = useState(0);
   const [showFireAnimation, setShowFireAnimation] = useState(false);
+  const [showAllAmenities, setShowAllAmenities] = useState(false);
+
+  const amenityIconMap: Record<string, React.ElementType> = {
+    "Swimming Pool": Waves,
+    Gym: Dumbbell,
+    Parking: Car,
+    Lift: ArrowUpDown,
+    "Power Backup": Zap,
+    CCTV: Cctv,
+    Clubhouse: Building,
+    Garden: TreePine,
+    Intercom: Phone,
+    "Rainwater Harvesting": Droplets,
+    "Children's Play Area": Baby,
+    Security: ShieldCheck,
+    "Vastu Compliant": Compass,
+    "Gas Pipeline": FlameIcon,
+    "Fire Safety": Shield,
+    "Sports Facility": Medal,
+    "Jogging Track": Play,
+    "Shopping Centre": Store,
+  };
 
   useEffect(() => {
     async function loadProperty() {
@@ -326,37 +369,115 @@ export default function RentPropertyDetailsPage() {
             </p>
           </div>
 
-          {/* Amenities */}
+          {/* What this property offers — Airbnb-style */}
           <div>
             <h2 className="text-2xl font-bold font-syne text-accent-dark mb-6">
-              Facts & Features
+              What this property offers
             </h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {[
-                "Central Air",
-                "2 Garage Spaces",
-                "Swimming Pool",
-                "Hardwood Floors",
-                "Smart Home",
-                "Solar Panels",
-              ].map((item, i) => (
-                <div key={i} className="flex items-center gap-2 text-gray-600">
-                  <CheckCircle size={18} className="text-gold" />
-                  {item}
+            <div className="grid grid-cols-2 gap-y-5 gap-x-8">
+              {property.sqft && (
+                <div className="flex items-center gap-4">
+                  <Maximize size={24} className="text-gray-500" />
+                  <span className="text-gray-700">
+                    Carpet Area: {property.sqft} sq.ft
+                  </span>
                 </div>
-              ))}
+              )}
+              {property.flooring && (
+                <div className="flex items-center gap-4">
+                  <Layers size={24} className="text-gray-500" />
+                  <span className="text-gray-700">
+                    {property.flooring} Flooring
+                  </span>
+                </div>
+              )}
+              {property.floorNumber !== undefined && (
+                <div className="flex items-center gap-4">
+                  <Building size={24} className="text-gray-500" />
+                  <span className="text-gray-700">
+                    Floor {property.floorNumber}
+                    {property.totalFloors ? ` of ${property.totalFloors}` : ""}
+                  </span>
+                </div>
+              )}
+              {property.furnishingStatus && (
+                <div className="flex items-center gap-4">
+                  <Sofa size={24} className="text-gray-500" />
+                  <span className="text-gray-700">
+                    {property.furnishingStatus}
+                  </span>
+                </div>
+              )}
+              {property.availableFrom && (
+                <div className="flex items-center gap-4">
+                  <CalendarDays size={24} className="text-gray-500" />
+                  <span className="text-gray-700">
+                    Available: {property.availableFrom}
+                  </span>
+                </div>
+              )}
+              {property.amenities
+                ?.split(",")
+                .filter(Boolean)
+                .slice(0, showAllAmenities ? undefined : 5)
+                .map((amenity, i) => {
+                  const trimmed = amenity.trim();
+                  const Icon = amenityIconMap[trimmed] || ShieldCheck;
+                  return (
+                    <div key={i} className="flex items-center gap-4">
+                      <Icon size={24} className="text-gray-500" />
+                      <span className="text-gray-700">{trimmed}</span>
+                    </div>
+                  );
+                })}
             </div>
+            {property.amenities &&
+              property.amenities.split(",").filter(Boolean).length > 5 &&
+              !showAllAmenities && (
+                <button
+                  onClick={() => setShowAllAmenities(true)}
+                  className="mt-6 px-6 py-3 border-2 border-accent-dark text-accent-dark rounded-lg font-semibold text-sm hover:bg-accent-dark hover:text-white transition-colors"
+                >
+                  Show all{" "}
+                  {property.amenities.split(",").filter(Boolean).length}{" "}
+                  amenities
+                </button>
+              )}
           </div>
         </div>
 
         {/* Sidebar (Right Column) */}
         <div className="lg:col-span-1">
           <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-100 sticky top-24">
-            <div className="mb-8">
+            {/* Agent Card */}
+            <div className="flex items-center gap-4 mb-6 pb-6 border-b border-gray-100">
+              <div className="w-14 h-14 rounded-full bg-gray-100 overflow-hidden shrink-0">
+                {property.agentPhotoUrl ? (
+                  <Image
+                    src={property.agentPhotoUrl}
+                    alt={property.agentName || "Agent"}
+                    width={56}
+                    height={56}
+                    className="object-cover w-full h-full"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <User size={24} className="text-gray-400" />
+                  </div>
+                )}
+              </div>
+              <div>
+                <p className="font-bold text-accent-dark text-lg">
+                  {property.agentName || "Rupali Homes"}
+                </p>
+                <p className="text-gray-500 text-sm">Listing Agent</p>
+              </div>
+            </div>
+
+            <div className="mb-6">
               <h3 className="text-2xl font-bold font-syne text-accent-dark mb-2">
                 {property.title}
               </h3>
-              <p className="text-gray-500">Listed by Rupali Homes</p>
             </div>
 
             <form

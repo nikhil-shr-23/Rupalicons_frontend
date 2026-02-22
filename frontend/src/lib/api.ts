@@ -171,6 +171,9 @@ function buildPropertyPayload(property: Partial<Property>) {
     tags: property.tags || "",
     furnishingDetails: property.furnishingDetails || "",
     furnishingStatus: property.furnishingStatus || "",
+    agentName: property.agentName || "",
+    agentPhotoUrl: property.agentPhotoUrl || "",
+    amenities: property.amenities || "",
   };
 }
 
@@ -208,6 +211,9 @@ function mapPropertyFromBackend(dto: Record<string, unknown>): Property {
     tags: (dto.tags as string) || undefined,
     furnishingDetails: (dto.furnishingDetails as string) || undefined,
     furnishingStatus: (dto.furnishingStatus as string) || undefined,
+    agentName: (dto.agentName as string) || undefined,
+    agentPhotoUrl: (dto.agentPhotoUrl as string) || undefined,
+    amenities: (dto.amenities as string) || undefined,
   };
 }
 

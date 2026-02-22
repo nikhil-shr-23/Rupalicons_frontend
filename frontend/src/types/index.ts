@@ -81,6 +81,11 @@ export interface Property {
   furnishingDetails?: string; // e.g. "1 Fan, 1 Geyser, 1 Bed"
   furnishingStatus?: string;  // "Semi-Furnished", "Fully Furnished", "Unfurnished"
 
+  // Agent & Amenities
+  agentName?: string;
+  agentPhotoUrl?: string;
+  amenities?: string;         // comma-separated: "Swimming Pool,Gym,Parking"
+
   createdBy?: number;
   createdAt?: string;
 

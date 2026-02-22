@@ -86,6 +86,13 @@ public class Property {
     private String furnishingDetails;  // e.g. "1 Fan, 1 Geyser, 1 Modular Kitchen, 1 Bed"
     private String furnishingStatus;   // e.g. "Semi-Furnished", "Fully Furnished", "Unfurnished"
 
+    // ── Agent Info ───────────────────────────────────
+    private String agentName;           // e.g. "Rahul Sharma"
+    @Column(length = 1000)
+    private String agentPhotoUrl;       // URL to agent's photo
+    @Column(length = 2000)
+    private String amenities;           // comma-separated: "Swimming Pool,Gym,Parking,Lift"
+
     // ── Relations ────────────────────────────────────
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by_id", nullable = false)

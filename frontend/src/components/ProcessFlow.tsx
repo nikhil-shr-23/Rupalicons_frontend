@@ -7,33 +7,33 @@ import { MapPin, Search, FileCheck, Handshake, Key } from "lucide-react";
 const steps = [
   {
     icon: Search,
-    title: "Search & Shortlist",
+    title: "20k+ Properties Rented",
     description:
-      "Browse verified listings, filter by location, budget, and preferences to find your ideal property.",
+      "Successfully matched thousands of tenants with their ideal homes across top metropolitan cities.",
   },
   {
     icon: MapPin,
-    title: "Site Visit & Inspection",
+    title: "5k+ Homes Sold",
     description:
-      "Schedule guided property visits with our expert advisors for a thorough evaluation.",
+      "Guided families and investors to close their dream deals with complete transparency.",
   },
   {
     icon: FileCheck,
-    title: "Legal Verification",
+    title: "15k+ Happy Families",
     description:
-      "We handle title verification, document checks, and ensure complete legal compliance.",
+      "Built a thriving community of satisfied homeowners and tenants through dedicated service.",
   },
   {
     icon: Handshake,
-    title: "Negotiation & Deal Closure",
+    title: "₹500Cr+ Sales Volume",
     description:
-      "Our experts negotiate the best price and guide you through the agreement process.",
+      "Trusted by buyers and sellers nationwide for high-value real estate transactions.",
   },
   {
     icon: Key,
-    title: "Possession & Handover",
+    title: "100% Verified Listings",
     description:
-      "Final inspection, registration assistance, and seamless key handover — your property, your way.",
+      "Every property undergoes rigorous legal and physical verification for your absolute peace of mind.",
   },
 ];
 
@@ -128,8 +128,8 @@ export default function ProcessFlow() {
             viewport={{ once: true }}
             className="text-5xl md:text-6xl font-bold font-syne text-accent-dark mb-6"
           >
-            How We Help You Find Your{" "}
-            <span className="text-gold">Dream Property</span>
+            India's Most Trusted{" "}
+            <span className="text-gold">Real Estate Platform</span>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -138,8 +138,8 @@ export default function ProcessFlow() {
             transition={{ delay: 0.2 }}
             className="text-gray-600 text-lg max-w-2xl mx-auto"
           >
-            A simple, transparent 5-step process from search to possession —
-            designed to give you complete confidence in your property decision.
+            Numbers that speak for our commitment to excellence, transparency,
+            and customer satisfaction across every transaction.
           </motion.p>
         </div>
 
