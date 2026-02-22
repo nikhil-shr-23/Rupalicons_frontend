@@ -5,12 +5,12 @@ import Image from "next/image";
 
 const Marquee = () => {
   const messages = [
-    "150+ Premium Homes Built",
-    "20+ Years in Gurgaon",
-    "98% Client Satisfaction",
-    "10 Year Structural Warranty",
-    "Turnkey Design & Construction",
-    "Premium Plot Development",
+    "500+ Verified Listings",
+    "15+ Years of Expertise",
+    "1200+ Happy Clients",
+    "Buy • Sell • Rent",
+    "Premium Properties Across India",
+    "Expert Property Advisory",
   ];
 
   const images = ["/formarquee1.jpeg", "/formarquee2.jpg", "/formarquee3.jpg"];

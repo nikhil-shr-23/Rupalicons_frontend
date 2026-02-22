@@ -7,26 +7,26 @@ export default function WhyChooseUs() {
   const features = [
     {
       icon: Home,
-      value: "150",
-      label: "Premium Homes Built",
+      value: "500+",
+      label: "Properties Listed",
       delay: 0.1,
     },
     {
       icon: Clock,
-      value: "20",
-      label: "Years in Gurgaon",
+      value: "15+",
+      label: "Years of Expertise",
       delay: 0.2,
     },
     {
       icon: CheckCircle,
-      value: "98",
-      label: "% Client Satisfaction",
+      value: "1200+",
+      label: "Happy Clients",
       delay: 0.3,
     },
     {
       icon: Shield,
-      value: "10 Yr",
-      label: "Structural Warranty",
+      value: "100%",
+      label: "Verified Listings",
       delay: 0.4,
     },
   ];
@@ -44,7 +44,7 @@ export default function WhyChooseUs() {
             viewport={{ once: true }}
             className="text-4xl md:text-5xl font-bold font-syne text-accent-dark mb-6"
           >
-            Why Choose <span className="text-gold">Rupali Construction</span>
+            Why Choose <span className="text-gold">Rupali Homes</span>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -53,8 +53,8 @@ export default function WhyChooseUs() {
             transition={{ delay: 0.1 }}
             className="text-gray-600 text-lg"
           >
-            Two decades of trust, transparency, and exceptional craftsmanship in
-            Gurgaon&apos;s premium residential sector.
+            Your trusted partner in real estate — connecting buyers, sellers,
+            and renters with the right property at the right price.
           </motion.p>
         </div>
 

@@ -6,6 +6,7 @@ import { fetchProperties } from "../lib/api";
 import { Property } from "../types";
 import { motion } from "framer-motion";
 import { ArrowUpRight, Eye } from "lucide-react";
+import { AnimateSvg } from "./AnimateSvg";
 
 export default function Projects() {
   const [properties, setProperties] = useState<Property[]>([]);
@@ -50,27 +51,45 @@ export default function Projects() {
         <div className="grid lg:grid-cols-2 gap-16 items-end mb-20">
           <div>
             <h2 className="text-5xl md:text-6xl font-bold font-syne leading-tight">
-              Professional Realty <br />
-              <span className="text-gold">Made Simple</span>
+              Find Your{" "}
+              <span className="relative inline-block">
+                <span className="text-gold">Dream</span>
+                <AnimateSvg
+                  width="100%"
+                  height="12"
+                  viewBox="0 0 200 12"
+                  className="absolute -bottom-2 left-0 w-full"
+                  path="M2 8 C50 2, 100 2, 198 8"
+                  strokeColor="#C5A059"
+                  strokeWidth={3}
+                  animationDuration={1.5}
+                  animationDelay={0.5}
+                  enableHoverAnimation={true}
+                  hoverAnimationType="redraw"
+                />
+              </span>
+              <br />
+              <span className="text-gold">Property</span>
             </h2>
             <div className="flex items-center gap-4 mt-8">
               <div className="w-12 h-12 rounded-full border border-gray-600 flex items-center justify-center">
                 <Eye size={20} className="text-gray-400" />
               </div>
               <span className="text-sm font-medium tracking-wide uppercase">
-                Accentuate Vision
+                Explore Listings
               </span>
             </div>
           </div>
 
           <div className="lg:pl-12">
             <p className="text-xl text-gray-300 leading-relaxed mb-8">
-              Rupali Homes connects you with premium properties that blend
-              luxury, comfort, and timeless elegance.
+              Browse verified properties across India&apos;s top cities —
+              handpicked for value, location, and potential.
               <span className="text-gold font-semibold">
                 {" "}
-                Our expert consultants curate bespoke property solutions
-                tailored to your style.
+                Whether you&apos;re buying your first home, investing in
+                commercial real estate, or finding the perfect rental — we make
+                it seamless.
               </span>
             </p>
             <motion.button
@@ -80,7 +99,7 @@ export default function Projects() {
               <div className="w-8 h-8 rounded-full bg-gold flex items-center justify-center">
                 <ArrowUpRight size={16} />
               </div>
-              More About
+              View All Properties
             </motion.button>
           </div>
         </div>

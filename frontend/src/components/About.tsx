@@ -53,21 +53,21 @@ export default function About() {
               Our Story
             </span>
             <h2 className="text-5xl font-bold text-accent-dark font-syne mb-8 leading-tight">
-              Designing Spaces <br /> that{" "}
-              <span className="text-gold italic">Inspire</span>
+              Your Property Journey <br /> Starts{" "}
+              <span className="text-gold italic">Here</span>
             </h2>
 
             <p className="text-gray-600 text-lg leading-relaxed mb-6 font-light">
-              Rupali Homes isn&apos;t just about building structures; it&apos;s
-              about creating spaces where memories are made. We blend modern
-              aesthetics with functional design to deliver premium residential
-              and commercial projects.
+              Rupali Homes is more than a real estate platform — it&apos;s your
+              trusted partner in finding the perfect property. From first-time
+              home buyers to seasoned investors, we simplify every step of
+              buying, selling, and renting.
             </p>
 
             <p className="text-gray-600 text-lg leading-relaxed mb-10 font-light">
-              Our vision is to transform the skyline with architectural marvels
-              that stand the test of time, driven by a passion for quality and
-              innovation.
+              With verified listings, expert market insights, and dedicated
+              property advisors, we help you make informed decisions in
+              India&apos;s most sought-after locations.
             </p>
 
             <Link

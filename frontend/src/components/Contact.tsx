@@ -61,7 +61,8 @@ export default function Contact() {
             Get In <span className="text-gold">Touch</span>
           </h2>
           <p className="text-gray-400 text-lg">
-            Have questions? Our team is here to help you plan your dream home.
+            Have questions about a property? Our team is here to help you find
+            your dream home.
           </p>
         </div>
 
@@ -233,9 +234,7 @@ export default function Contact() {
                     <p className="text-gray-400 text-sm uppercase tracking-wider mb-1">
                       Email Address
                     </p>
-                    <p className="text-white text-lg">
-                      info@rupaliconstruction.com
-                    </p>
+                    <p className="text-white text-lg">info@rupalihomes.com</p>
                   </div>
                 </div>
               </div>

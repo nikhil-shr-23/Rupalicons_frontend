@@ -1,42 +1,149 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Search, ChevronDown, MapPin, Mic, Crosshair } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
+import { Search, ChevronDown } from "lucide-react";
+import { useRouter } from "next/navigation";
+
+const cities = [
+  "All Cities",
+  "Gurgaon",
+  "Delhi",
+  "Noida",
+  "Mumbai",
+  "Bangalore",
+  "Hyderabad",
+  "Pune",
+  "Chennai",
+  "Kolkata",
+];
+
+const budgetRanges = {
+  buy: [
+    "Under ₹50 Lac",
+    "₹50 Lac - ₹1 Cr",
+    "₹1 Cr - ₹2 Cr",
+    "₹2 Cr - ₹5 Cr",
+    "₹5 Cr+",
+  ],
+  rent: [
+    "Under ₹10,000",
+    "₹10,000 - ₹25,000",
+    "₹25,000 - ₹50,000",
+    "₹50,000 - ₹1,00,000",
+    "₹1,00,000+",
+  ],
+};
+
+const propertyTypes = [
+  "Apartment",
+  "Villa",
+  "Builder Floor",
+  "Penthouse",
+  "Office Space",
+  "Shop",
+];
+
+const possessionStatuses = [
+  "Ready to Move",
+  "Within 1 Year",
+  "Within 3 Years",
+  "Under Construction",
+];
 
 export default function HeroSearch() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<
-    "buy" | "rent" | "projects" | "pg" | "plot" | "commercial"
+    "buy" | "rent" | "projects" | "plot" | "commercial"
   >("buy");
+  const [selectedCity, setSelectedCity] = useState("All Cities");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedBudget, setSelectedBudget] = useState("");
+  const [selectedPropertyType, setSelectedPropertyType] = useState("");
+  const [selectedPossession, setSelectedPossession] = useState("");
+
+  // Dropdown visibility
+  const [showCityDropdown, setShowCityDropdown] = useState(false);
   const [showBudgetDropdown, setShowBudgetDropdown] = useState(false);
   const [showPropertyTypeDropdown, setShowPropertyTypeDropdown] =
     useState(false);
+  const [showPossessionDropdown, setShowPossessionDropdown] = useState(false);
 
-  // Placeholder Animation Logic
+  // Refs for closing dropdowns on outside click
+  const cityRef = useRef<HTMLDivElement>(null);
+  const budgetRef = useRef<HTMLDivElement>(null);
+  const propertyTypeRef = useRef<HTMLDivElement>(null);
+  const possessionRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdowns on outside click
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (cityRef.current && !cityRef.current.contains(e.target as Node))
+        setShowCityDropdown(false);
+      if (budgetRef.current && !budgetRef.current.contains(e.target as Node))
+        setShowBudgetDropdown(false);
+      if (
+        propertyTypeRef.current &&
+        !propertyTypeRef.current.contains(e.target as Node)
+      )
+        setShowPropertyTypeDropdown(false);
+      if (
+        possessionRef.current &&
+        !possessionRef.current.contains(e.target as Node)
+      )
+        setShowPossessionDropdown(false);
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Placeholder Animation
   const placeholders = [
     "Search by Project...",
     "Search by Locality...",
     "Search by Landmark...",
-    "Search by Builder...",
+    "Search by City...",
   ];
   const [currentPlaceholderIndex, setCurrentPlaceholderIndex] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentPlaceholderIndex((prev) => (prev + 1) % placeholders.length);
-    }, 3000); // Change every 3 seconds
-
+    }, 3000);
     return () => clearInterval(interval);
   }, []);
 
   const tabs = [
-    { id: "buy", label: "Buy", icon: "🏠" },
-    { id: "rent", label: "Rental", icon: "🏷️" },
-    { id: "projects", label: "Projects", icon: "🏢" },
-    { id: "pg", label: "PG / Hostels", icon: "🛏️" },
-    { id: "plot", label: "Plot & Land", icon: "📍" },
-    { id: "commercial", label: "Commercial", icon: "🏪" },
+    { id: "buy", label: "Buy" },
+    { id: "rent", label: "Rent" },
+    { id: "projects", label: "Projects" },
+    { id: "plot", label: "Plot & Land" },
+    { id: "commercial", label: "Commercial" },
   ];
+
+  // Reset filters when switching tabs
+  useEffect(() => {
+    setSelectedBudget("");
+    setSelectedPropertyType("");
+    setSelectedPossession("");
+  }, [activeTab]);
+
+  const handleSearch = () => {
+    // Navigate to buy or rent page with filters
+    const target = activeTab === "rent" ? "/rent" : "/buy";
+    const params = new URLSearchParams();
+    if (searchQuery) params.set("q", searchQuery);
+    if (selectedCity !== "All Cities") params.set("city", selectedCity);
+    if (selectedBudget) params.set("budget", selectedBudget);
+    if (selectedPropertyType) params.set("propertyType", selectedPropertyType);
+    if (selectedPossession) params.set("possession", selectedPossession);
+
+    const queryString = params.toString();
+    router.push(queryString ? `${target}?${queryString}` : target);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") handleSearch();
+  };
 
   return (
     <div className="w-full max-w-5xl mt-8 relative z-20">
@@ -45,14 +152,13 @@ export default function HeroSearch() {
         {tabs.map((tab) => (
           <button
             key={tab.id}
-            onClick={() => setActiveTab(tab.id as any)}
+            onClick={() => setActiveTab(tab.id as typeof activeTab)}
             className={`flex items-center gap-2 px-6 py-4 text-sm font-medium transition-colors whitespace-nowrap ${
               activeTab === tab.id
                 ? "bg-white text-slate-900"
                 : "text-gray-300 hover:text-white hover:bg-white/10"
             }`}
           >
-            {/* You can use icons here if needed, keeping it simple for now */}
             <span>{tab.label}</span>
           </button>
         ))}
@@ -60,16 +166,42 @@ export default function HeroSearch() {
 
       {/* Search Bar Container */}
       <div className="bg-white rounded-b-xl rounded-tr-xl shadow-2xl p-2 flex flex-col md:flex-row items-center gap-2">
-        {/* Location / City Selector */}
-        <div className="relative w-full md:w-auto min-w-[140px] border-b md:border-b-0 md:border-r border-gray-200 px-4 py-3 cursor-pointer hover:bg-gray-50 rounded-lg group">
+        {/* City Selector Dropdown */}
+        <div
+          ref={cityRef}
+          className="relative w-full md:w-auto min-w-[160px] border-b md:border-b-0 md:border-r border-gray-200 px-4 py-3 cursor-pointer hover:bg-gray-50 rounded-lg group"
+          onClick={() => setShowCityDropdown(!showCityDropdown)}
+        >
           <div className="flex items-center justify-between text-gray-700 font-bold text-sm">
-            Select City{" "}
+            {selectedCity}
             <ChevronDown
               size={16}
-              className="text-gray-400 group-hover:text-accent-dark transition-transform group-hover:rotate-180"
+              className={`text-gray-400 transition-transform ${showCityDropdown ? "rotate-180" : ""}`}
             />
           </div>
-          {/* Dropdown would go here */}
+
+          {/* City Dropdown */}
+          {showCityDropdown && (
+            <div className="absolute top-full left-0 mt-2 w-48 bg-white border border-gray-200 rounded-xl shadow-2xl z-50 py-2 max-h-64 overflow-y-auto">
+              {cities.map((city) => (
+                <button
+                  key={city}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedCity(city);
+                    setShowCityDropdown(false);
+                  }}
+                  className={`w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors ${
+                    selectedCity === city
+                      ? "text-gold font-semibold bg-gold/5"
+                      : "text-gray-700"
+                  }`}
+                >
+                  {city}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Main Search Input */}
@@ -77,41 +209,139 @@ export default function HeroSearch() {
           <Search className="text-gray-400 w-5 h-5 absolute left-4" />
           <input
             type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={handleKeyDown}
             placeholder={placeholders[currentPlaceholderIndex]}
             className="w-full pl-12 pr-4 py-3 outline-none text-gray-700 placeholder-gray-400 text-ellipsis transition-all duration-500"
           />
-          <div className="absolute right-4 flex items-center gap-2">
-            <button
-              className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 text-gray-600 transition-colors"
-              aria-label="Use current location"
-            >
-              <Crosshair size={18} />
-            </button>
-            <button
-              className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 text-gray-600 transition-colors"
-              aria-label="Voice search"
-            >
-              <Mic size={18} />
-            </button>
-          </div>
         </div>
 
         {/* Search Button */}
-        <button className="w-full md:w-auto bg-gold hover:bg-yellow-400 text-accent-dark font-bold px-8 py-4 rounded-lg transition-colors shadow-md uppercase tracking-wider text-sm">
+        <button
+          onClick={handleSearch}
+          className="w-full md:w-auto bg-gold hover:bg-gold-hover text-accent-dark font-bold px-8 py-4 rounded-lg transition-colors shadow-md uppercase tracking-wider text-sm"
+        >
           Search
         </button>
       </div>
 
-      {/* Secondary Filters Row (Floating below) */}
-      <div className="flex gap-4 mt-4 px-2">
-        {["Budget", "Property Type", "Possession Status"].map((filter) => (
+      {/* Secondary Filters Row */}
+      <div className="flex gap-4 mt-4 px-2 flex-wrap">
+        {/* Budget Dropdown */}
+        <div ref={budgetRef} className="relative">
           <button
-            key={filter}
+            onClick={() => setShowBudgetDropdown(!showBudgetDropdown)}
             className="bg-white px-6 py-3 rounded-lg shadow-lg text-sm font-medium text-gray-700 flex items-center gap-2 hover:bg-gray-50 transition-colors"
           >
-            {filter} <ChevronDown size={14} className="text-gray-400" />
+            {selectedBudget || "Budget"}
+            <ChevronDown
+              size={14}
+              className={`text-gray-400 transition-transform ${showBudgetDropdown ? "rotate-180" : ""}`}
+            />
           </button>
-        ))}
+          {showBudgetDropdown && (
+            <div className="absolute bottom-full left-0 mb-2 w-52 bg-white border border-gray-200 rounded-xl shadow-2xl z-50 py-2">
+              {(activeTab === "rent"
+                ? budgetRanges.rent
+                : budgetRanges.buy
+              ).map((range) => (
+                <button
+                  key={range}
+                  onClick={() => {
+                    setSelectedBudget(selectedBudget === range ? "" : range);
+                    setShowBudgetDropdown(false);
+                  }}
+                  className={`w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors ${
+                    selectedBudget === range
+                      ? "text-gold font-semibold bg-gold/5"
+                      : "text-gray-700"
+                  }`}
+                >
+                  {range}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Property Type Dropdown - Hidden for Plot & Land */}
+        {activeTab !== "plot" && (
+          <div ref={propertyTypeRef} className="relative">
+            <button
+              onClick={() =>
+                setShowPropertyTypeDropdown(!showPropertyTypeDropdown)
+              }
+              className="bg-white px-6 py-3 rounded-lg shadow-lg text-sm font-medium text-gray-700 flex items-center gap-2 hover:bg-gray-50 transition-colors"
+            >
+              {selectedPropertyType || "Property Type"}
+              <ChevronDown
+                size={14}
+                className={`text-gray-400 transition-transform ${showPropertyTypeDropdown ? "rotate-180" : ""}`}
+              />
+            </button>
+            {showPropertyTypeDropdown && (
+              <div className="absolute bottom-full left-0 mb-2 w-48 bg-white border border-gray-200 rounded-xl shadow-2xl z-50 py-2">
+                {propertyTypes.map((type) => (
+                  <button
+                    key={type}
+                    onClick={() => {
+                      setSelectedPropertyType(
+                        selectedPropertyType === type ? "" : type,
+                      );
+                      setShowPropertyTypeDropdown(false);
+                    }}
+                    className={`w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors ${
+                      selectedPropertyType === type
+                        ? "text-gold font-semibold bg-gold/5"
+                        : "text-gray-700"
+                    }`}
+                  >
+                    {type}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Possession Status Dropdown - Hidden when Rent tab is active */}
+        {activeTab !== "rent" && (
+          <div ref={possessionRef} className="relative">
+            <button
+              onClick={() => setShowPossessionDropdown(!showPossessionDropdown)}
+              className="bg-white px-6 py-3 rounded-lg shadow-lg text-sm font-medium text-gray-700 flex items-center gap-2 hover:bg-gray-50 transition-colors"
+            >
+              {selectedPossession || "Possession Status"}
+              <ChevronDown
+                size={14}
+                className={`text-gray-400 transition-transform ${showPossessionDropdown ? "rotate-180" : ""}`}
+              />
+            </button>
+            {showPossessionDropdown && (
+              <div className="absolute bottom-full left-0 mb-2 w-52 bg-white border border-gray-200 rounded-xl shadow-2xl z-50 py-2">
+                {possessionStatuses.map((status) => (
+                  <button
+                    key={status}
+                    onClick={() => {
+                      setSelectedPossession(
+                        selectedPossession === status ? "" : status,
+                      );
+                      setShowPossessionDropdown(false);
+                    }}
+                    className={`w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors ${
+                      selectedPossession === status
+                        ? "text-gold font-semibold bg-gold/5"
+                        : "text-gray-700"
+                    }`}
+                  >
+                    {status}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

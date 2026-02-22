@@ -2,38 +2,38 @@
 
 import { motion, useScroll, useSpring } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
-import { MapPin, PencilRuler, FileCheck, HardHat, Key } from "lucide-react";
+import { MapPin, Search, FileCheck, Handshake, Key } from "lucide-react";
 
 const steps = [
   {
-    icon: MapPin,
-    title: "Consultation & Plot Study",
+    icon: Search,
+    title: "Search & Shortlist",
     description:
-      "Free site visit, understanding your vision, and preliminary feasibility assessment.",
+      "Browse verified listings, filter by location, budget, and preferences to find your ideal property.",
   },
   {
-    icon: PencilRuler,
-    title: "Concept Design & Budget",
+    icon: MapPin,
+    title: "Site Visit & Inspection",
     description:
-      "Architectural concepts, 3D visualization, and detailed cost estimation with fixed pricing.",
+      "Schedule guided property visits with our expert advisors for a thorough evaluation.",
   },
   {
     icon: FileCheck,
-    title: "Approvals & Documentation",
+    title: "Legal Verification",
     description:
-      "We handle all municipal approvals, permits, and legal documentation.",
+      "We handle title verification, document checks, and ensure complete legal compliance.",
   },
   {
-    icon: HardHat,
-    title: "Quality Checks",
+    icon: Handshake,
+    title: "Negotiation & Deal Closure",
     description:
-      "Milestone-based construction with regular updates and quality inspections.",
+      "Our experts negotiate the best price and guide you through the agreement process.",
   },
   {
     icon: Key,
-    title: "Handover & Warranty",
+    title: "Possession & Handover",
     description:
-      "Final inspection, documentation handover, and 10-year structural warranty.",
+      "Final inspection, registration assistance, and seamless key handover — your property, your way.",
   },
 ];
 
@@ -128,7 +128,8 @@ export default function ProcessFlow() {
             viewport={{ once: true }}
             className="text-5xl md:text-6xl font-bold font-syne text-accent-dark mb-6"
           >
-            How We Build Your <span className="text-gold">Dream Home</span>
+            How We Help You Find Your{" "}
+            <span className="text-gold">Dream Property</span>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -137,8 +138,8 @@ export default function ProcessFlow() {
             transition={{ delay: 0.2 }}
             className="text-gray-600 text-lg max-w-2xl mx-auto"
           >
-            A structured, transparent 5-step process designed to give you
-            complete control and peace of mind.
+            A simple, transparent 5-step process from search to possession —
+            designed to give you complete confidence in your property decision.
           </motion.p>
         </div>
 

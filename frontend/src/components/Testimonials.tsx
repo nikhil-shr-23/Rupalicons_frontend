@@ -5,44 +5,44 @@ import { motion } from "framer-motion";
 const testimonials = [
   {
     quote:
-      "Rupali Homes transformed our vision into a reality that exceeded our expectations. The attention to detail is unmatched.",
+      "Rupali Homes helped us find our dream 3BHK in just two weeks. Their market knowledge and negotiation skills saved us lakhs!",
     name: "Aditya Khurana",
-    role: "CEO, TechFlow",
-    image: "/avatars/avatar1.jpg", // Placeholder or generic
+    role: "Home Buyer, Gurgaon",
+    image: "/avatars/avatar1.jpg",
   },
   {
     quote:
-      "Living in a home designed by them feels like a perpetual vacation. The blend of aesthetics and functionality is perfect.",
+      "Selling my property was stress-free with Rupali Homes. They handled everything from valuation to legal paperwork seamlessly.",
     name: "Meera Reddy",
-    role: "Architect",
+    role: "Property Seller, Delhi",
     image: "/avatars/avatar2.jpg",
   },
   {
     quote:
-      "Professional, transparent, and incredibly talented. They delivered exactly what was promised, on time.",
+      "Transparent dealings, verified listings, and genuine advice. They truly put the client first — not just commissions.",
     name: "Rajesh Verma",
-    role: "Business Owner",
+    role: "Investor, Noida",
     image: "/avatars/avatar3.jpg",
   },
   {
     quote:
-      "The team's dedication to quality is evident in every corner of our house. Highly recommended for luxury projects.",
+      "As a first-time buyer, I had so many questions. The team patiently guided me through every step, from loan to registration.",
     name: "Sneha Gupta",
-    role: "Real Estate Investor",
+    role: "First-Time Buyer, Gurgaon",
     image: "/avatars/avatar4.jpg",
   },
   {
     quote:
-      "From the initial sketch to the final handover, the journey was seamless. They truly build dream homes.",
+      "Found the perfect commercial space for my startup through Rupali Homes. Their portfolio of verified properties is impressive.",
     name: "Vikram Singh",
-    role: "Doctor",
+    role: "Startup Founder, Noida",
     image: "/avatars/avatar5.jpg",
   },
   {
     quote:
-      "An absolute pleasure to work with. Their modern approach to traditional design is refreshing.",
+      "I've worked with many agents before, but Rupali Homes stands out for their honesty and deep knowledge of the local market.",
     name: "Ananya Das",
-    role: "Artist",
+    role: "NRI Investor, Bangalore",
     image: "/avatars/avatar6.jpg",
   },
 ];
