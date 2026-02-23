@@ -44,7 +44,7 @@ export default function Navbar() {
           className="relative h-12 w-48 transition-opacity hover:opacity-80"
         >
           <Image
-            src="/logo.png"
+            src="/logo_rupali.png"
             alt="Rupali Homes"
             fill
             className="object-contain object-left"
