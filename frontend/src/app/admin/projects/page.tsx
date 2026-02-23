@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   Table,
   TableBody,
@@ -38,6 +38,13 @@ import {
   createProperty,
   updateProperty,
 } from "@/lib/api";
+import {
+  AMENITY_OPTIONS,
+  getAmenityIcon,
+  ICON_PICKER_OPTIONS,
+  AMENITY_ICON_MAP,
+} from "@/lib/amenities";
+import type { LucideIcon } from "lucide-react";
 import { Property, PropertyType, PropertyStatus } from "@/types";
 import Image from "next/image";
 
@@ -89,26 +96,14 @@ export default function AdminProjects() {
   const [formAgentPhotoUrl, setFormAgentPhotoUrl] = useState("");
   const [formAmenities, setFormAmenities] = useState<string[]>([]);
 
-  const AMENITY_OPTIONS = [
-    "Swimming Pool",
-    "Gym",
-    "Parking",
-    "Lift",
-    "Power Backup",
-    "CCTV",
-    "Clubhouse",
-    "Garden",
-    "Intercom",
-    "Rainwater Harvesting",
-    "Children's Play Area",
-    "Security",
-    "Vastu Compliant",
-    "Gas Pipeline",
-    "Fire Safety",
-    "Sports Facility",
-    "Jogging Track",
-    "Shopping Centre",
-  ];
+  // Custom amenity state
+  const [customAmenityName, setCustomAmenityName] = useState("");
+  const [customAmenityIcon, setCustomAmenityIcon] = useState("ShieldCheck");
+  const [showIconPicker, setShowIconPicker] = useState(false);
+  const [customAmenityIcons, setCustomAmenityIcons] = useState<
+    Record<string, string>
+  >({});
+  const iconPickerRef = useRef<HTMLDivElement>(null);
 
   const toggleAmenity = (amenity: string) => {
     setFormAmenities((prev) =>
@@ -116,6 +111,26 @@ export default function AdminProjects() {
         ? prev.filter((a) => a !== amenity)
         : [...prev, amenity],
     );
+  };
+
+  const addCustomAmenity = () => {
+    const name = customAmenityName.trim();
+    if (!name) return;
+    if (!formAmenities.includes(name)) {
+      setFormAmenities((prev) => [...prev, name]);
+      setCustomAmenityIcons((prev) => ({ ...prev, [name]: customAmenityIcon }));
+    }
+    setCustomAmenityName("");
+    setCustomAmenityIcon("ShieldCheck");
+  };
+
+  const removeAmenity = (amenity: string) => {
+    setFormAmenities((prev) => prev.filter((a) => a !== amenity));
+    setCustomAmenityIcons((prev) => {
+      const copy = { ...prev };
+      delete copy[amenity];
+      return copy;
+    });
   };
 
   const loadProperties = async () => {
@@ -751,25 +766,130 @@ export default function AdminProjects() {
                 <Label className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3 block">
                   Amenities
                 </Label>
+
+                {/* Selected amenities as icon chips */}
+                {formAmenities.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {formAmenities.map((amenity) => {
+                      const Icon = getAmenityIcon(amenity);
+                      return (
+                        <span
+                          key={amenity}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent-dark/10 text-accent-dark text-sm font-medium border border-accent-dark/20"
+                        >
+                          <Icon size={14} />
+                          {amenity}
+                          <button
+                            type="button"
+                            onClick={() => removeAmenity(amenity)}
+                            className="ml-1 hover:text-red-500 transition-colors"
+                          >
+                            <X size={14} />
+                          </button>
+                        </span>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* Default amenity grid */}
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                  {AMENITY_OPTIONS.map((amenity) => (
-                    <label
-                      key={amenity}
-                      className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer text-sm transition-colors ${
-                        formAmenities.includes(amenity)
-                          ? "border-accent-dark bg-accent-dark/5 text-accent-dark font-medium"
-                          : "border-gray-200 text-gray-600 hover:border-gray-300"
-                      }`}
+                  {AMENITY_OPTIONS.map((amenity) => {
+                    const Icon = getAmenityIcon(amenity);
+                    return (
+                      <label
+                        key={amenity}
+                        className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer text-sm transition-colors ${
+                          formAmenities.includes(amenity)
+                            ? "border-accent-dark bg-accent-dark/5 text-accent-dark font-medium"
+                            : "border-gray-200 text-gray-600 hover:border-gray-300"
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={formAmenities.includes(amenity)}
+                          onChange={() => toggleAmenity(amenity)}
+                          className="rounded border-gray-300 text-accent-dark focus:ring-accent-dark hidden"
+                        />
+                        <Icon size={16} className="flex-shrink-0" />
+                        {amenity}
+                      </label>
+                    );
+                  })}
+                </div>
+
+                {/* Add Custom Amenity */}
+                <div className="mt-4 pt-4 border-t border-dashed border-gray-200">
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-2">
+                    Add Custom Amenity
+                  </p>
+                  <div className="flex items-center gap-2">
+                    {/* Icon picker button */}
+                    <div className="relative" ref={iconPickerRef}>
+                      <button
+                        type="button"
+                        onClick={() => setShowIconPicker(!showIconPicker)}
+                        className="h-9 w-9 flex items-center justify-center rounded-lg border border-gray-300 hover:border-accent-dark transition-colors bg-white"
+                        title="Pick an icon"
+                      >
+                        {(() => {
+                          const PickedIcon = ICON_PICKER_OPTIONS.find(
+                            (o) => o.name === customAmenityIcon,
+                          )?.icon;
+                          return PickedIcon ? <PickedIcon size={16} /> : null;
+                        })()}
+                      </button>
+                      {showIconPicker && (
+                        <div className="absolute left-0 top-11 z-50 bg-white rounded-xl shadow-xl border border-gray-200 p-3 w-72 max-h-60 overflow-y-auto">
+                          <p className="text-xs text-gray-400 mb-2 font-medium">
+                            Choose an icon
+                          </p>
+                          <div className="grid grid-cols-7 gap-1">
+                            {ICON_PICKER_OPTIONS.map((opt) => (
+                              <button
+                                key={opt.name}
+                                type="button"
+                                onClick={() => {
+                                  setCustomAmenityIcon(opt.name);
+                                  setShowIconPicker(false);
+                                }}
+                                className={`p-2 rounded-lg hover:bg-accent-dark/10 transition-colors ${
+                                  customAmenityIcon === opt.name
+                                    ? "bg-accent-dark/15 text-accent-dark"
+                                    : "text-gray-500"
+                                }`}
+                                title={opt.name}
+                              >
+                                <opt.icon size={16} />
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    <Input
+                      value={customAmenityName}
+                      onChange={(e) => setCustomAmenityName(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          addCustomAmenity();
+                        }
+                      }}
+                      placeholder="e.g. Rooftop Lounge"
+                      className="h-9 text-sm flex-1"
+                    />
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={addCustomAmenity}
+                      disabled={!customAmenityName.trim()}
+                      className="h-9 px-4"
                     >
-                      <input
-                        type="checkbox"
-                        checked={formAmenities.includes(amenity)}
-                        onChange={() => toggleAmenity(amenity)}
-                        className="rounded border-gray-300 text-accent-dark focus:ring-accent-dark"
-                      />
-                      {amenity}
-                    </label>
-                  ))}
+                      <Plus size={14} className="mr-1" /> Add
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>

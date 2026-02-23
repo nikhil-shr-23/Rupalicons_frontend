@@ -18,25 +18,9 @@ import {
   Building,
   Sofa,
   CalendarDays,
-  Waves,
-  Dumbbell,
-  Car,
-  ArrowUpDown,
-  ShieldCheck,
-  Cctv,
-  TreePine,
-  Phone,
-  Droplets,
-  Baby,
-  Zap,
-  Compass,
-  Flame as FlameIcon,
-  Shield,
-  Medal,
-  Play,
-  Store,
   User,
 } from "lucide-react";
+import { getAmenityIcon } from "@/lib/amenities";
 import confetti from "canvas-confetti";
 import {
   fetchPropertyById,
@@ -56,27 +40,6 @@ export default function PropertyDetailsPage() {
   const [fireCount, setFireCount] = useState(0);
   const [showFireAnimation, setShowFireAnimation] = useState(false);
   const [showAllAmenities, setShowAllAmenities] = useState(false);
-
-  const amenityIconMap: Record<string, React.ElementType> = {
-    "Swimming Pool": Waves,
-    Gym: Dumbbell,
-    Parking: Car,
-    Lift: ArrowUpDown,
-    "Power Backup": Zap,
-    CCTV: Cctv,
-    Clubhouse: Building,
-    Garden: TreePine,
-    Intercom: Phone,
-    "Rainwater Harvesting": Droplets,
-    "Children's Play Area": Baby,
-    Security: ShieldCheck,
-    "Vastu Compliant": Compass,
-    "Gas Pipeline": FlameIcon,
-    "Fire Safety": Shield,
-    "Sports Facility": Medal,
-    "Jogging Track": Play,
-    "Shopping Centre": Store,
-  };
 
   useEffect(() => {
     async function loadProperty() {
@@ -434,7 +397,7 @@ export default function PropertyDetailsPage() {
                 .slice(0, showAllAmenities ? undefined : 5)
                 .map((amenity, i) => {
                   const trimmed = amenity.trim();
-                  const Icon = amenityIconMap[trimmed] || ShieldCheck;
+                  const Icon = getAmenityIcon(trimmed);
                   return (
                     <div key={i} className="flex items-center gap-4">
                       <Icon size={24} className="text-gray-500" />
