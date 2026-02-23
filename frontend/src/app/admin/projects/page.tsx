@@ -33,6 +33,7 @@ import {
   Layers,
 } from "lucide-react";
 import {
+  fetchProperties,
   deleteProperty,
   createProperty,
   updateProperty,
