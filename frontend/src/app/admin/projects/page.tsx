@@ -281,6 +281,7 @@ export default function AdminProjects() {
       alert("Title, description, and location are required.");
       return;
     }
+    if (!confirm("Are you sure you want to save this property?")) return;
     setSaving(true);
     const propertyData: Partial<Property> = {
       title: formTitle,
@@ -343,6 +344,10 @@ export default function AdminProjects() {
     property: Property,
     newStatus: PropertyStatus,
   ) => {
+    if (
+      !confirm(`Are you sure you want to mark this property as ${newStatus}?`)
+    )
+      return;
     const ok = await updateProperty(Number(property.id), {
       ...property,
       status: newStatus,
