@@ -7,12 +7,14 @@ import {
   useSpring,
   useMotionValue,
 } from "framer-motion";
-import { useEffect } from "react";
+import { useEffect, useState, useRef } from "react";
+import gsap from "gsap";
 import HeroSvgAnimation from "@/components/HeroSvgAnimation";
 import HeroSearch from "@/components/HeroSearch";
 import { AnimateSvg } from "@/components/AnimateSvg";
 
 export default function HeroV2() {
+  const [activeTab, setActiveTab] = useState("buy");
   const { scrollY } = useScroll();
   const y = useTransform(scrollY, [0, 500], [0, 150]);
   const yText = useTransform(scrollY, [0, 500], [0, -50]);
@@ -39,6 +41,35 @@ export default function HeroV2() {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, [mouseX, mouseY]);
 
+  const headings = {
+    buy: { prefix: "Find Your", highlight: "Dream", suffix: "Property Today" },
+    rent: { prefix: "Rent Your", highlight: "Perfect", suffix: "Space" },
+    projects: { prefix: "Discover", highlight: "New", suffix: "Projects" },
+    plot: { prefix: "Land Your", highlight: "Prime", suffix: "Plot Today" },
+    commercial: {
+      prefix: "Secure",
+      highlight: "Premium",
+      suffix: "Workspaces",
+    },
+  };
+
+  const currentHeading =
+    headings[activeTab as keyof typeof headings] || headings.buy;
+
+  const headingRef = useRef<HTMLHeadingElement>(null);
+
+  useEffect(() => {
+    if (headingRef.current) {
+      // Optional: Split text or just animate the container.
+      // We will do a simple smooth container pop-up with GSAP
+      gsap.fromTo(
+        headingRef.current,
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" },
+      );
+    }
+  }, [activeTab]);
+
   return (
     <div className="relative min-h-[90vh] flex flex-col justify-center px-4 pt-20 overflow-hidden bg-grid">
       <HeroSvgAnimation />
@@ -59,30 +90,38 @@ export default function HeroV2() {
             </span>
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-bold leading-[1.1] text-accent-dark mb-8 font-syne relative">
-            Find Your{" "}
+          <h1
+            ref={headingRef}
+            className="text-5xl md:text-7xl font-bold leading-[1.1] text-accent-dark mb-8 font-syne relative"
+          >
+            {currentHeading.prefix}{" "}
             <span className="relative inline-block">
-              <span className="text-gold">Dream</span>
+              <span className="text-gold">{currentHeading.highlight}</span>
               <AnimateSvg
-                width="110%"
-                height="30"
-                viewBox="0 0 230 45"
-                className="absolute -bottom-3 -left-[5%]"
-                path="M222.462 12.8345C177.074 10.0328 132.077 4.80881 86.6062 3.64623C60.4691 2.97796 -17.6945 1.02174 8.17755 4.79475C50.7028 10.9964 94.6534 10.7971 137.47 14.9675C154.059 16.5834 170.516 18.7493 187.021 21.0384C193.373 21.9193 198.334 23.4078 188.17 22.8432C142.806 20.323 97.6784 14.7225 52.3141 12.0141C47.4732 11.7251 33.1304 11.5843 37.7934 12.9165C54.8856 17.8 73.2224 19.7239 90.7081 22.433C111.764 25.6952 133.161 27.7326 154.042 32.0315C161.542 33.5757 171.588 34.0575 178.571 37.1999C190.929 42.7607 151.511 39.3406 137.962 39.0868C115.414 38.6643 92.8916 37.3627 70.3626 36.4616"
+                width="100%"
+                height="100%"
+                viewBox="0 0 240 100"
+                className="absolute -bottom-1 -left-1 w-[105%] h-12"
+                path="M0.00 50.00 C24.01 46.41, 40.79 59.65, 60.79 49.65 C84.34 47.59, 100.79 59.65, 120.00 50.00 C141.72 49.35, 160.00 60.00, 180.00 50.00 C203.51 48.47, 220.00 60.00, 240.00 50.00"
                 strokeColor="#C5A059"
-                strokeWidth={2}
-                animationDuration={2}
-                animationDelay={0.6}
+                strokeWidth={2.5}
+                strokeLinecap="round"
+                animationDuration={3.7}
+                animationDelay={0.3}
+                animationBounce={0.3}
+                reverseAnimation={false}
                 enableHoverAnimation={true}
                 hoverAnimationType="redraw"
               />
             </span>
             <br />
-            <span className="relative inline-block">Property Today</span>
+            <span className="relative inline-block mt-2">
+              {currentHeading.suffix}
+            </span>
           </h1>
 
           <div className="w-full relative z-20 mt-20">
-            <HeroSearch />
+            <HeroSearch onTabChange={setActiveTab} />
           </div>
         </motion.div>
 
@@ -103,7 +142,13 @@ export default function HeroV2() {
             {/* Added translate-x-20 to move further right */}
             {/* Reduced scale from 1.35 to 1.1 */}
             <motion.img
-              src="/touse.png"
+              src={
+                activeTab === "commercial"
+                  ? "/commercial.png"
+                  : activeTab === "interior"
+                    ? "/interior.png"
+                    : "/touse.png"
+              }
               alt="Luxury Home"
               className="object-contain w-full h-full scale-110 drop-shadow-2xl"
               style={{

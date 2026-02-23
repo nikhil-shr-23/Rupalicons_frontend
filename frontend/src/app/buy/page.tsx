@@ -13,11 +13,12 @@ import {
 import { Property, PropertyType } from "@/types";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import FeaturedPropertyCard from "@/components/FeaturedPropertyCard";
+
 import SearchFilterBar from "@/components/SearchFilterBar";
 import StickyCTA from "@/components/StickyCTA";
 import { ArrowUpRight, Heart } from "lucide-react";
 import confetti from "canvas-confetti";
+import SwipeablePropertyCard from "@/components/SwipeablePropertyCard";
 
 interface FilterState {
   location: string;
@@ -39,6 +40,9 @@ export default function BuyPage() {
     propertyType: "",
     bedrooms: "",
   });
+
+  // Swipe State Tracking
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
     fetchLikedPropertyIds().then((ids) => setLikedIds(new Set(ids)));
@@ -88,6 +92,51 @@ export default function BuyPage() {
     applyFilters();
   }, [applyFilters]);
 
+  // Handle Swipe Actions
+  const handleSwipeLeft = useCallback((id: number) => {
+    setCurrentIndex((prev) => prev + 1);
+  }, []);
+
+  const handleSwipeRight = useCallback(
+    async (id: number) => {
+      const isLiked = likedIds.has(id);
+
+      // Only fire API if they haven't liked it before
+      if (!isLiked) {
+        const newLiked = new Set(likedIds);
+        newLiked.add(id);
+        setLikedIds(newLiked);
+
+        const duration = 2 * 1000;
+        const end = Date.now() + duration;
+        const frame = () => {
+          confetti({
+            particleCount: 3,
+            angle: 60,
+            spread: 55,
+            origin: { x: 0 },
+            colors: ["#ff0000", "#ff69b4", "#C5A059"],
+          });
+          confetti({
+            particleCount: 3,
+            angle: 120,
+            spread: 55,
+            origin: { x: 1 },
+            colors: ["#ff0000", "#ff69b4", "#C5A059"],
+          });
+          if (Date.now() < end) requestAnimationFrame(frame);
+        };
+        frame();
+
+        await likeProperty(id);
+        window.dispatchEvent(new Event("likedPropertiesChanged"));
+      }
+
+      setCurrentIndex((prev) => prev + 1);
+    },
+    [likedIds],
+  );
+
   return (
     <main className="min-h-screen bg-background flex flex-col">
       <Navbar />
@@ -95,18 +144,6 @@ export default function BuyPage() {
       {/* Featured & Search Section */}
       <section className="pt-32 pb-12 px-6">
         <div className="max-w-7xl mx-auto">
-          {/* Featured Property */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-12"
-          >
-            {/* If properties are loaded, show the first one as featured, otherwise show a placeholder/skeleton */}
-            {properties.length > 0 && (
-              <FeaturedPropertyCard property={properties[0]} />
-            )}
-          </motion.div>
-
           {/* Search Bar */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -122,159 +159,74 @@ export default function BuyPage() {
         </div>
       </section>
 
-      {/* Properties Grid */}
-      <section className="py-24 px-6 max-w-7xl mx-auto w-full grow">
+      {/* Properties Swipe Container */}
+      <section className="py-24 px-6 max-w-7xl mx-auto w-full grow flex flex-col items-center justify-center">
         {loading ? (
-          <div className="flex justify-center items-center py-20">
+          <div className="flex justify-center items-center py-20 min-h-[500px]">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gold"></div>
           </div>
-        ) : properties.length > 0 ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
-            {properties.map((property, index) => (
-              <motion.div
-                key={property.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className="group relative rounded-2xl overflow-hidden bg-white shadow-lg border border-gray-100 transition-all hover:-translate-y-1 block"
-              >
-                <Link href={`/buy/${property.id}`} className="block h-full">
-                  <div className="relative h-80 overflow-hidden">
-                    {property.imageUrl ? (
-                      <Image
-                        src={property.imageUrl}
-                        alt={property.title}
-                        fill
-                        className="object-cover group-hover:scale-110 transition-transform duration-700"
+        ) : properties.length > 0 && currentIndex < properties.length ? (
+          <div className="relative w-full max-w-md h-[650px] perspective-1000 mt-8 mb-[100px]">
+            {/* Render active and next card for smooth overlap depth performance */}
+            {[...properties]
+              .slice(currentIndex, currentIndex + 2)
+              .reverse()
+              .map((property, idx, array) => {
+                // The top card in the visual stack is actually the last one rendered right now due to DOM flow overlap
+                // "array.length - 1 - idx" gives us 0 for the top visual card, 1 for the one underneath.
+                const isTopCard = idx === array.length - 1;
+                const scale = isTopCard ? 1 : 0.95;
+                const yOffset = isTopCard ? 0 : 20;
+                const zIndex = isTopCard ? 10 : 0;
+                const opacity = isTopCard ? 1 : 0.6;
+
+                return (
+                  <motion.div
+                    key={property.id}
+                    className="absolute inset-0 pointer-events-none"
+                    initial={{ scale, y: yOffset, opacity }}
+                    animate={{ scale, y: yOffset, opacity }}
+                    transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                    style={{ zIndex }}
+                  >
+                    <div className="w-full h-full pointer-events-auto">
+                      {/* Only the top card is fully interactive with the swipe hook */}
+                      <SwipeablePropertyCard
+                        property={property}
+                        onSwipeLeft={isTopCard ? handleSwipeLeft : () => {}}
+                        onSwipeRight={isTopCard ? handleSwipeRight : () => {}}
                       />
-                    ) : (
-                      <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400">
-                        No Image
-                      </div>
-                    )}
-                    <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-accent-dark">
-                      FOR SALE
                     </div>
-                    {/* Reaction Icon */}
-                    <div
-                      onClick={async (e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        if (!property.id) return;
-                        const isLiked = likedIds.has(property.id);
-
-                        if (!isLiked) {
-                          // Like
-                          const newLiked = new Set(likedIds);
-                          newLiked.add(property.id);
-                          setLikedIds(newLiked);
-                          const newProps = [...properties];
-                          newProps[index] = {
-                            ...newProps[index],
-                            reactionsCount:
-                              (newProps[index].reactionsCount || 0) + 1,
-                          };
-                          setProperties(newProps);
-
-                          // Confetti
-                          const duration = 2 * 1000;
-                          const end = Date.now() + duration;
-                          const frame = () => {
-                            confetti({
-                              particleCount: 3,
-                              angle: 60,
-                              spread: 55,
-                              origin: { x: 0 },
-                              colors: ["#ff0000", "#ff69b4", "#ff1493"],
-                            });
-                            confetti({
-                              particleCount: 3,
-                              angle: 120,
-                              spread: 55,
-                              origin: { x: 1 },
-                              colors: ["#ff0000", "#ff69b4", "#ff1493"],
-                            });
-                            if (Date.now() < end) requestAnimationFrame(frame);
-                          };
-                          frame();
-
-                          await likeProperty(property.id);
-                          window.dispatchEvent(
-                            new Event("likedPropertiesChanged"),
-                          );
-                        } else {
-                          // Unlike
-                          const newLiked = new Set(likedIds);
-                          newLiked.delete(property.id);
-                          setLikedIds(newLiked);
-                          const newProps = [...properties];
-                          newProps[index] = {
-                            ...newProps[index],
-                            reactionsCount: Math.max(
-                              0,
-                              (newProps[index].reactionsCount || 0) - 1,
-                            ),
-                          };
-                          setProperties(newProps);
-
-                          await unlikeProperty(property.id);
-                          window.dispatchEvent(
-                            new Event("likedPropertiesChanged"),
-                          );
-                        }
-                      }}
-                      className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm p-2 rounded-full cursor-pointer hover:bg-white text-gray-400 hover:text-red-500 transition-colors z-10 flex items-center gap-1.5 shadow-sm"
-                    >
-                      <Heart
-                        size={18}
-                        className={
-                          property.id && likedIds.has(property.id)
-                            ? "fill-red-500 text-red-500"
-                            : ""
-                        }
-                      />
-                      <span
-                        className={`text-xs font-bold ${property.id && likedIds.has(property.id) ? "text-red-500" : "text-gray-600"}`}
-                      >
-                        {property.reactionsCount || 0}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="p-8">
-                    <div className="flex justify-between items-start mb-2">
-                      <h3 className="text-2xl font-bold font-syne text-accent-dark group-hover:text-gold transition-colors">
-                        {property.title}
-                      </h3>
-                      {property.price && (
-                        <span className="text-lg font-bold text-gold whitespace-nowrap">
-                          ₹{property.price.toLocaleString()}
-                        </span>
-                      )}
-                    </div>
-
-                    <p className="text-gray-500 mb-6 flex items-center gap-2 text-sm">
-                      <span className="w-2 h-2 rounded-full bg-gold"></span>
-                      {property.location}
-                    </p>
-
-                    <p className="text-gray-600 line-clamp-2 mb-6 text-sm">
-                      {property.description}
-                    </p>
-
-                    <div className="w-full py-3 bg-gray-50 group-hover:bg-accent-dark group-hover:text-white rounded-lg transition-colors font-bold text-accent-dark flex items-center justify-center gap-2 shadow-sm group-hover:shadow-md">
-                      View Details
-                      <ArrowUpRight size={18} />
-                    </div>
-                  </div>
-                </Link>
-              </motion.div>
-            ))}
+                  </motion.div>
+                );
+              })}
           </div>
         ) : (
-          <div className="text-center py-20 text-gray-500 text-lg">
-            No properties found matching your criteria.
+          <div className="text-center py-32 flex flex-col mx-auto bg-white max-w-md rounded-3xl items-center border border-gray-100 shadow-xl px-10">
+            <span className="text-6xl mb-6 shadow-sm">🏠</span>
+            <h3 className="text-3xl font-bold font-syne text-accent-dark mb-3">
+              You've seen them all!
+            </h3>
+            <p className="text-gray-500 mb-8 max-w-[280px]">
+              You've swiped through all available properties matching your
+              criteria in this area.
+            </p>
+            <button
+              onClick={() => {
+                setFilters({
+                  location: "",
+                  minPrice: "",
+                  maxPrice: "",
+                  propertyType: "",
+                  bedrooms: "",
+                });
+                setCurrentIndex(0);
+                applyFilters();
+              }}
+              className="bg-gold text-white font-bold py-3.5 px-8 rounded-full shadow-lg hover:bg-yellow-600 hover:-translate-y-1 transition-all"
+            >
+              Reset Filters
+            </button>
           </div>
         )}
       </section>

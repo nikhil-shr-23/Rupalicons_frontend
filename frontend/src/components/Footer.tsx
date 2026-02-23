@@ -9,7 +9,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
           {/* Column 1: Brand & About */}
           <div className="space-y-6">
-            <Link href="/" className="inline-block relative h-12 w-48">
+            <Link href="/" className="inline-block relative h-16 w-64">
               <Image
                 src="/logo_rupali.png"
                 alt="Rupali Homes"

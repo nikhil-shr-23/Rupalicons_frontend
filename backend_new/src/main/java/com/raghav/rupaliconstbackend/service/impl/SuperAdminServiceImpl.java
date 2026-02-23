@@ -66,7 +66,9 @@ public class SuperAdminServiceImpl implements SuperAdminService {
         long totalRented = propertyRepository.countByStatus(PropertyStatus.RENTED);
         BigDecimal totalSalesRevenue = purchaseRepository.sumRevenue();
         BigDecimal totalRentalIncome = rentalRepository.sumMonthlyRent();
-        return new DashboardDTO(totalUsers, totalProperties, totalSold, totalRented, totalSalesRevenue, totalRentalIncome);
+        Long totalReactionsNullable = propertyRepository.sumTotalReactions();
+        long totalReactions = totalReactionsNullable != null ? totalReactionsNullable : 0L;
+        return new DashboardDTO(totalUsers, totalProperties, totalSold, totalRented, totalSalesRevenue, totalRentalIncome, totalReactions);
     }
 
     private AdminResponseDTO toDto(User user) {

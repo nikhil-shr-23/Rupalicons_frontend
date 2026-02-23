@@ -127,4 +127,5 @@ export interface DashboardStats {
     totalRentedProperties: number;
     totalSalesRevenue: number;
     totalRentalIncome: number;
+    totalReactions: number;
 }

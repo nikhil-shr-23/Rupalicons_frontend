@@ -50,7 +50,11 @@ const possessionStatuses = [
   "Under Construction",
 ];
 
-export default function HeroSearch() {
+export default function HeroSearch({
+  onTabChange,
+}: {
+  onTabChange?: (tab: string) => void;
+}) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<
     "buy" | "rent" | "projects" | "plot" | "commercial"
@@ -60,6 +64,13 @@ export default function HeroSearch() {
   const [selectedBudget, setSelectedBudget] = useState("");
   const [selectedPropertyType, setSelectedPropertyType] = useState("");
   const [selectedPossession, setSelectedPossession] = useState("");
+
+  // Notify parent of tab changes
+  useEffect(() => {
+    if (onTabChange) {
+      onTabChange(activeTab);
+    }
+  }, [activeTab, onTabChange]);
 
   // Dropdown visibility
   const [showCityDropdown, setShowCityDropdown] = useState(false);

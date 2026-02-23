@@ -38,6 +38,7 @@ import {
   createProperty,
   updateProperty,
   uploadImage,
+  fetchDashboardStats,
 } from "@/lib/api";
 import {
   AMENITY_OPTIONS,
@@ -46,7 +47,12 @@ import {
   AMENITY_ICON_MAP,
 } from "@/lib/amenities";
 import type { LucideIcon } from "lucide-react";
-import { Property, PropertyType, PropertyStatus } from "@/types";
+import {
+  Property,
+  PropertyType,
+  PropertyStatus,
+  DashboardStats,
+} from "@/types";
 import Image from "next/image";
 
 export default function AdminProjects() {
@@ -58,6 +64,9 @@ export default function AdminProjects() {
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [filterType, setFilterType] = useState<string>("ALL");
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [dashboardStats, setDashboardStats] = useState<DashboardStats | null>(
+    null,
+  );
 
   // Upload state
   const [uploadingMain, setUploadingMain] = useState(false);
@@ -144,10 +153,14 @@ export default function AdminProjects() {
   const loadProperties = async () => {
     setLoading(true);
     try {
-      const data = await fetchProperties(0, 100);
+      const [data, stats] = await Promise.all([
+        fetchProperties(0, 100),
+        fetchDashboardStats(),
+      ]);
       if (data && data.content) setProperties(data.content);
+      if (stats) setDashboardStats(stats);
     } catch (error) {
-      console.error("Failed to load properties", error);
+      console.error("Failed to load properties or stats", error);
     } finally {
       setLoading(false);
     }
@@ -419,6 +432,72 @@ export default function AdminProjects() {
           </Button>
         </div>
       </div>
+
+      {/* Dashboard Stats */}
+      {dashboardStats && (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="p-4 rounded-xl border border-gray-100 bg-white shadow-sm flex items-center justify-between">
+            <div>
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
+                Total Properties
+              </p>
+              <h3 className="text-2xl font-bold text-accent-dark">
+                {dashboardStats.totalProperties}
+              </h3>
+            </div>
+            <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
+              <Building2 size={20} />
+            </div>
+          </div>
+          <div className="p-4 rounded-xl border border-gray-100 bg-white shadow-sm flex items-center justify-between">
+            <div>
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
+                Total Sold
+              </p>
+              <h3 className="text-2xl font-bold text-accent-dark">
+                {dashboardStats.totalSoldProperties}
+              </h3>
+            </div>
+            <div className="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center text-green-600">
+              <CheckCircle size={20} />
+            </div>
+          </div>
+          <div className="p-4 rounded-xl border border-gray-100 bg-white shadow-sm flex items-center justify-between">
+            <div>
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
+                Total Rented
+              </p>
+              <h3 className="text-2xl font-bold text-accent-dark">
+                {dashboardStats.totalRentedProperties}
+              </h3>
+            </div>
+            <div className="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center text-orange-600">
+              <Building2 size={20} />
+            </div>
+          </div>
+          <div className="p-4 rounded-xl border border-accent-dark/20 bg-[#F7F6F2] shadow-sm flex items-center justify-between">
+            <div>
+              <p className="text-xs font-semibold text-accent-dark/70 uppercase tracking-wider mb-1">
+                Total Reactions
+              </p>
+              <h3 className="text-2xl font-bold text-accent-dark">
+                {dashboardStats.totalReactions || 0}
+              </h3>
+            </div>
+            <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-500">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Filter Tabs */}
       <div className="flex gap-2">
@@ -1123,6 +1202,20 @@ export default function AdminProjects() {
                           className="text-yellow-500 fill-yellow-500 shrink-0"
                         />
                       )}
+
+                      {/* Heart Icon for Reactions */}
+                      <span className="flex items-center gap-1 ml-2 px-1.5 py-[2px] rounded border border-red-100 bg-red-50 text-[10px] whitespace-nowrap text-red-600">
+                        <svg
+                          width="10"
+                          height="10"
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                        </svg>
+                        {property.reactionsCount || 0}
+                      </span>
                     </div>
                     {property.tags && (
                       <div className="flex flex-wrap gap-1 mt-1">

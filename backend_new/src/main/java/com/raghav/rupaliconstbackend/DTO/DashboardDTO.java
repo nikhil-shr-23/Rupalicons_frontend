@@ -14,4 +14,5 @@ public class DashboardDTO {
     private long totalRentedProperties;
     private BigDecimal totalSalesRevenue;
     private BigDecimal totalRentalIncome;
+    private long totalReactions;
 }

@@ -12,4 +12,7 @@ public interface PropertyRepository extends JpaRepository<Property, Long>, JpaSp
     Optional<Property> findByIdAndStatus(Long id, PropertyStatus status);
 
     long countByStatus(PropertyStatus status);
+
+    @org.springframework.data.jpa.repository.Query("SELECT SUM(p.reactionsCount) FROM Property p")
+    Long sumTotalReactions();
 }
