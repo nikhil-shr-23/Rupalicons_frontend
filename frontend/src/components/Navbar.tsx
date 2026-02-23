@@ -54,13 +54,6 @@ export default function Navbar() {
 
         <div className={`hidden md:flex items-center gap-8 text-gray-800`}>
           <Link
-            href="/"
-            className="text-sm uppercase tracking-widest hover:text-gold transition-colors font-medium"
-          >
-            Home
-          </Link>
-
-          <Link
             href="/buy"
             className="text-sm uppercase tracking-widest hover:text-gold transition-colors font-medium"
           >

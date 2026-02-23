@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Heart,
@@ -24,22 +24,26 @@ import { getAmenityIcon } from "@/lib/amenities";
 import confetti from "canvas-confetti";
 import {
   fetchPropertyById,
+  fetchProperties,
   likeProperty,
   unlikeProperty,
   fetchLikedPropertyIds,
 } from "@/lib/api";
-import { Property } from "@/types";
+import { Property, PropertyType } from "@/types";
 
 export default function RentPropertyDetailsPage() {
   const params = useParams();
+  const router = useRouter();
   const id = params?.id;
   const [property, setProperty] = useState<Property | null>(null);
   const [loading, setLoading] = useState(true);
   const [liked, setLiked] = useState(false);
   const [hasFiredHeartConfetti, setHasFiredHeartConfetti] = useState(false);
   const [fireCount, setFireCount] = useState(0);
+  const [fired, setFired] = useState(false);
   const [showFireAnimation, setShowFireAnimation] = useState(false);
   const [showAllAmenities, setShowAllAmenities] = useState(false);
+  const [otherProperties, setOtherProperties] = useState<Property[]>([]);
 
   useEffect(() => {
     async function loadProperty() {
@@ -48,6 +52,17 @@ export default function RentPropertyDetailsPage() {
         const data = await fetchPropertyById(id.toString());
         if (data) {
           setProperty(data);
+        }
+        // Load other properties for the carousel
+        const allProps = await fetchProperties(0, 20, {
+          type: PropertyType.RENT,
+        });
+        if (allProps?.content) {
+          setOtherProperties(
+            allProps.content.filter(
+              (p: Property) => String(p.id) !== String(id),
+            ),
+          );
         }
       } catch (error) {
         console.error("Failed to load property", error);
@@ -96,10 +111,15 @@ export default function RentPropertyDetailsPage() {
   };
 
   const triggerFireReaction = () => {
-    if (fireCount > 0) return;
-    setFireCount(1);
-    setShowFireAnimation(true);
-    setTimeout(() => setShowFireAnimation(false), 1000);
+    if (!fired) {
+      setFired(true);
+      setFireCount(1);
+      setShowFireAnimation(true);
+      setTimeout(() => setShowFireAnimation(false), 1000);
+    } else {
+      setFired(false);
+      setFireCount(0);
+    }
   };
 
   if (loading) {
@@ -248,11 +268,11 @@ export default function RentPropertyDetailsPage() {
                 <motion.button
                   whileTap={{ scale: 0.9 }}
                   onClick={triggerFireReaction}
-                  className="p-4 rounded-full border-2 border-gray-200 hover:border-orange-300 bg-orange-50 group transition-colors"
+                  className={`p-4 rounded-full border-2 transition-colors group ${fired ? "border-orange-400 bg-orange-100" : "border-gray-200 hover:border-orange-300 bg-orange-50"}`}
                 >
                   <Flame
                     size={24}
-                    className="text-orange-500 group-hover:fill-orange-500 transition-colors"
+                    className={`transition-colors ${fired ? "fill-orange-500 text-orange-500" : "text-orange-500 group-hover:fill-orange-500"}`}
                   />
                   {fireCount > 0 && (
                     <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center">
@@ -492,6 +512,50 @@ export default function RentPropertyDetailsPage() {
           </div>
         </div>
       </div>
+
+      {/* Other Properties Carousel */}
+      {otherProperties.length > 0 && (
+        <div className="max-w-7xl mx-auto px-6 mt-16">
+          <h2 className="text-3xl font-bold font-syne text-accent-dark mb-8">
+            Other Rentals
+          </h2>
+          <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory">
+            {otherProperties.slice(0, 8).map((p) => (
+              <Link
+                key={p.id}
+                href={`/rent/${p.id}`}
+                className="min-w-[300px] max-w-[300px] snap-start group rounded-2xl overflow-hidden bg-white shadow-md border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all shrink-0"
+              >
+                <div className="relative h-48 w-full overflow-hidden">
+                  {p.imageUrl ? (
+                    <Image
+                      src={p.imageUrl}
+                      alt={p.title}
+                      fill
+                      className="object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400">
+                      No Image
+                    </div>
+                  )}
+                </div>
+                <div className="p-4">
+                  <h3 className="font-bold font-syne text-accent-dark group-hover:text-gold transition-colors line-clamp-1">
+                    {p.title}
+                  </h3>
+                  <p className="text-sm text-gray-500 mt-1 line-clamp-1">
+                    {p.location}
+                  </p>
+                  <p className="text-gold font-bold mt-2">
+                    {p.rentAmount ? `₹${p.rentAmount.toLocaleString()}/mo` : ""}
+                  </p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
