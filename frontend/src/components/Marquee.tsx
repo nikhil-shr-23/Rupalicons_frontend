@@ -1,19 +1,24 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Image from "next/image";
+import {
+  ShieldCheck,
+  Award,
+  Users,
+  Key,
+  Building2,
+  TrendingUp,
+} from "lucide-react";
 
 const Marquee = () => {
-  const messages = [
-    "500+ Verified Listings",
-    "15+ Years of Expertise",
-    "1200+ Happy Clients",
-    "Buy • Sell • Rent",
-    "Premium Properties Across India",
-    "Expert Property Advisory",
+  const items = [
+    { text: "500+ Verified Listings", Icon: ShieldCheck },
+    { text: "15+ Years of Expertise", Icon: Award },
+    { text: "1200+ Happy Clients", Icon: Users },
+    { text: "Buy • Sell • Rent", Icon: Key },
+    { text: "Premium Properties Across India", Icon: Building2 },
+    { text: "Expert Property Advisory", Icon: TrendingUp },
   ];
-
-  const images = ["/formarquee1.jpeg", "/formarquee2.jpg", "/formarquee3.jpg"];
 
   return (
     <div className="bg-accent-dark py-2 overflow-hidden border-y border-white/10 mt-32">
@@ -31,21 +36,13 @@ const Marquee = () => {
           {/* Duplicate content enough times to ensure smooth loop */}
           {[...Array(2)].map((_, i) => (
             <div key={i} className="flex gap-16 items-center">
-              {messages.map((msg, idx) => (
+              {items.map((item, idx) => (
                 <div key={idx} className="flex items-center gap-16">
                   <span className="text-white/90 font-syne text-2xl tracking-wider uppercase font-light">
-                    {msg}
+                    {item.text}
                   </span>
 
-                  {/* Image Pill */}
-                  <div className="relative w-48 h-16 rounded-full overflow-hidden border border-white/20 shrink-0">
-                    <Image
-                      src={images[idx % images.length]}
-                      alt="Property Detail"
-                      fill
-                      className="object-cover hover:scale-110 transition-transform duration-700"
-                    />
-                  </div>
+                  <item.Icon className="text-gold w-6 h-6 shrink-0" />
                 </div>
               ))}
             </div>

@@ -128,7 +128,7 @@ export default function ProcessFlow() {
             viewport={{ once: true }}
             className="text-5xl md:text-6xl font-bold font-syne text-accent-dark mb-6"
           >
-            India's Most Trusted{" "}
+            India&apos;s Most Trusted{" "}
             <span className="text-gold">Real Estate Platform</span>
           </motion.h2>
           <motion.p

@@ -239,6 +239,30 @@ export async function submitContactForm(submission: ContactFormSubmission): Prom
   return new Promise((resolve) => setTimeout(() => resolve(true), 1000));
 }
 
+export async function submitInquiry(inquiry: {
+  name: string;
+  phone: string;
+  email?: string;
+  type: string;
+  city?: string;
+  propertyType?: string;
+  message?: string;
+}): Promise<boolean> {
+  try {
+    const res = await fetch(`${API_URL}/inquiries`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(inquiry),
+    });
+    return res.ok;
+  } catch (error) {
+    console.error("Failed to submit inquiry:", error);
+    return false;
+  }
+}
+
 // ─── Blog Mock Data (no backend endpoint yet) ───────────────────────────
 
 const mockBlogs: Blog[] = [

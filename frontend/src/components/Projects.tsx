@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { fetchProperties } from "../lib/api";
 import { Property } from "../types";
 import { motion } from "framer-motion";
-import { ArrowUpRight, Eye } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { AnimateSvg } from "./AnimateSvg";
 
 export default function Projects() {

@@ -67,8 +67,14 @@ export default function Navbar() {
             Blogs
           </Link>
           <Link
+            href="/sell"
+            className="px-6 py-2 bg-gold/10 text-gold border border-gold font-bold text-sm uppercase tracking-widest hover:bg-gold hover:text-white transition-all duration-300 rounded-full ml-2"
+          >
+            Sell Property
+          </Link>
+          <Link
             href="/#contact"
-            className="px-6 py-2 bg-white text-accent-dark font-bold text-sm uppercase tracking-widest hover:bg-gold hover:text-white transition-all duration-300 rounded-full"
+            className="px-6 py-2 bg-accent-dark text-white font-bold text-sm uppercase tracking-widest hover:bg-gold transition-all duration-300 rounded-full"
           >
             Contact
           </Link>
@@ -121,6 +127,13 @@ export default function Navbar() {
               className="text-2xl text-white font-syne hover:text-gold"
             >
               Blogs
+            </Link>
+            <Link
+              href="/sell"
+              onClick={() => setIsOpen(false)}
+              className="text-2xl text-gold font-syne font-bold border border-gold px-8 py-3 rounded-full"
+            >
+              Sell Property
             </Link>
             <Link
               href="/#contact"
