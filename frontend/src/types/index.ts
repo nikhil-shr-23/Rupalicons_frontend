@@ -85,6 +85,7 @@ export interface Property {
   agentName?: string;
   agentPhotoUrl?: string;
   amenities?: string;         // comma-separated: "Swimming Pool,Gym,Parking"
+  reactionsCount?: number;
 
   createdBy?: number;
   createdAt?: string;

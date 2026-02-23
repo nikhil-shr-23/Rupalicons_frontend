@@ -54,4 +54,7 @@ public class PropertyResponseDTO {
     private String agentName;
     private String agentPhotoUrl;
     private String amenities;
+    
+    // Reactions
+    private Integer reactionsCount;
 }

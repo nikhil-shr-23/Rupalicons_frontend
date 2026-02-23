@@ -18,6 +18,7 @@ public interface PropertyService {
             BigDecimal maxRent,
             String location
     );
-
     PropertyResponseDTO getAvailableProperty(Long id);
+
+    void reactToProperty(Long id);
 }

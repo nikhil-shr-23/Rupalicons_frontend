@@ -4,14 +4,20 @@ import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { fetchProperties } from "@/lib/api";
+import {
+  fetchProperties,
+  likeProperty,
+  unlikeProperty,
+  fetchLikedPropertyIds,
+} from "@/lib/api";
 import { Property, PropertyType } from "@/types";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import FeaturedPropertyCard from "@/components/FeaturedPropertyCard";
 import SearchFilterBar from "@/components/SearchFilterBar";
 import StickyCTA from "@/components/StickyCTA";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Heart } from "lucide-react";
+import confetti from "canvas-confetti";
 
 interface FilterState {
   location: string;
@@ -25,6 +31,7 @@ interface FilterState {
 export default function BuyPage() {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
+  const [likedIds, setLikedIds] = useState<Set<number>>(new Set());
   const [filters, setFilters] = useState<FilterState>({
     location: "",
     minPrice: "",
@@ -32,6 +39,10 @@ export default function BuyPage() {
     propertyType: "",
     bedrooms: "",
   });
+
+  useEffect(() => {
+    fetchLikedPropertyIds().then((ids) => setLikedIds(new Set(ids)));
+  }, []);
 
   const applyFilters = useCallback(async () => {
     setLoading(true);
@@ -144,6 +155,90 @@ export default function BuyPage() {
                     )}
                     <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-accent-dark">
                       FOR SALE
+                    </div>
+                    {/* Reaction Icon */}
+                    <div
+                      onClick={async (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (!property.id) return;
+                        const isLiked = likedIds.has(property.id);
+
+                        if (!isLiked) {
+                          // Like
+                          const newLiked = new Set(likedIds);
+                          newLiked.add(property.id);
+                          setLikedIds(newLiked);
+                          const newProps = [...properties];
+                          newProps[index] = {
+                            ...newProps[index],
+                            reactionsCount:
+                              (newProps[index].reactionsCount || 0) + 1,
+                          };
+                          setProperties(newProps);
+
+                          // Confetti
+                          const duration = 2 * 1000;
+                          const end = Date.now() + duration;
+                          const frame = () => {
+                            confetti({
+                              particleCount: 3,
+                              angle: 60,
+                              spread: 55,
+                              origin: { x: 0 },
+                              colors: ["#ff0000", "#ff69b4", "#ff1493"],
+                            });
+                            confetti({
+                              particleCount: 3,
+                              angle: 120,
+                              spread: 55,
+                              origin: { x: 1 },
+                              colors: ["#ff0000", "#ff69b4", "#ff1493"],
+                            });
+                            if (Date.now() < end) requestAnimationFrame(frame);
+                          };
+                          frame();
+
+                          await likeProperty(property.id);
+                          window.dispatchEvent(
+                            new Event("likedPropertiesChanged"),
+                          );
+                        } else {
+                          // Unlike
+                          const newLiked = new Set(likedIds);
+                          newLiked.delete(property.id);
+                          setLikedIds(newLiked);
+                          const newProps = [...properties];
+                          newProps[index] = {
+                            ...newProps[index],
+                            reactionsCount: Math.max(
+                              0,
+                              (newProps[index].reactionsCount || 0) - 1,
+                            ),
+                          };
+                          setProperties(newProps);
+
+                          await unlikeProperty(property.id);
+                          window.dispatchEvent(
+                            new Event("likedPropertiesChanged"),
+                          );
+                        }
+                      }}
+                      className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm p-2 rounded-full cursor-pointer hover:bg-white text-gray-400 hover:text-red-500 transition-colors z-10 flex items-center gap-1.5 shadow-sm"
+                    >
+                      <Heart
+                        size={18}
+                        className={
+                          property.id && likedIds.has(property.id)
+                            ? "fill-red-500 text-red-500"
+                            : ""
+                        }
+                      />
+                      <span
+                        className={`text-xs font-bold ${property.id && likedIds.has(property.id) ? "text-red-500" : "text-gray-600"}`}
+                      >
+                        {property.reactionsCount || 0}
+                      </span>
                     </div>
                   </div>
 

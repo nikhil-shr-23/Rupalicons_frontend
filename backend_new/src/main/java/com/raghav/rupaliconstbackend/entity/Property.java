@@ -93,6 +93,10 @@ public class Property {
     @Column(length = 2000)
     private String amenities;           // comma-separated: "Swimming Pool,Gym,Parking,Lift"
 
+    // ── Reactions ────────────────────────────────────
+    @Column(columnDefinition = "integer default 0")
+    private Integer reactionsCount = 0;
+
     // ── Relations ────────────────────────────────────
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by_id", nullable = false)

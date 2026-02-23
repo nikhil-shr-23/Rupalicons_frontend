@@ -50,4 +50,10 @@ public class PropertyController {
     public ResponseEntity<PropertyResponseDTO> getAvailableProperty(@PathVariable Long id) {
         return ResponseEntity.ok(propertyService.getAvailableProperty(id));
     }
+
+    @org.springframework.web.bind.annotation.PostMapping("/{id}/react")
+    public ResponseEntity<Void> reactToProperty(@PathVariable Long id) {
+        propertyService.reactToProperty(id);
+        return ResponseEntity.ok().build();
+    }
 }

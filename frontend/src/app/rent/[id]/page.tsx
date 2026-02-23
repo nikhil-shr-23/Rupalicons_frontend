@@ -38,7 +38,12 @@ import {
   User,
 } from "lucide-react";
 import confetti from "canvas-confetti";
-import { fetchPropertyById } from "@/lib/api";
+import {
+  fetchPropertyById,
+  likeProperty,
+  unlikeProperty,
+  fetchLikedPropertyIds,
+} from "@/lib/api";
 import { Property } from "@/types";
 
 export default function RentPropertyDetailsPage() {
@@ -89,6 +94,14 @@ export default function RentPropertyDetailsPage() {
     }
     loadProperty();
   }, [id]);
+
+  useEffect(() => {
+    if (property?.id) {
+      fetchLikedPropertyIds().then((ids) => {
+        setLiked(ids.includes(property.id!));
+      });
+    }
+  }, [property?.id]);
 
   const handleConfetti = () => {
     const duration = 3 * 1000;
@@ -218,52 +231,42 @@ export default function RentPropertyDetailsPage() {
             <div className="flex items-center gap-4">
               <motion.button
                 whileTap={{ scale: 0.8 }}
-                onClick={() => {
+                onClick={async () => {
                   if (!liked) {
-                    const duration = 3 * 1000;
-                    const end = Date.now() + duration;
-
-                    const frame = () => {
-                      confetti({
-                        particleCount: 5,
-                        angle: 60,
-                        spread: 55,
-                        origin: { x: 0 },
-                        colors: [
-                          "#26ccff",
-                          "#a25afd",
-                          "#ff5e7e",
-                          "#88ff5a",
-                          "#fcff42",
-                          "#ffa62d",
-                          "#ff36ff",
-                        ],
-                      });
-                      confetti({
-                        particleCount: 5,
-                        angle: 120,
-                        spread: 55,
-                        origin: { x: 1 },
-                        colors: [
-                          "#26ccff",
-                          "#a25afd",
-                          "#ff5e7e",
-                          "#88ff5a",
-                          "#fcff42",
-                          "#ffa62d",
-                          "#ff36ff",
-                        ],
-                      });
-
-                      if (Date.now() < end) {
-                        requestAnimationFrame(frame);
-                      }
-                    };
-                    frame();
+                    setLiked(true);
+                    setProperty((prev) =>
+                      prev
+                        ? {
+                            ...prev,
+                            reactionsCount: (prev.reactionsCount || 0) + 1,
+                          }
+                        : prev,
+                    );
+                    handleConfetti();
+                    if (property.id) {
+                      await likeProperty(property.id);
+                      window.dispatchEvent(new Event("likedPropertiesChanged"));
+                    }
+                  } else {
+                    setLiked(false);
+                    setProperty((prev) =>
+                      prev
+                        ? {
+                            ...prev,
+                            reactionsCount: Math.max(
+                              0,
+                              (prev.reactionsCount || 0) - 1,
+                            ),
+                          }
+                        : prev,
+                    );
+                    if (property.id) {
+                      await unlikeProperty(property.id);
+                      window.dispatchEvent(new Event("likedPropertiesChanged"));
+                    }
                   }
-                  setLiked(!liked);
                 }}
-                className={`p-4 rounded-full border-2 transition-colors relative ${liked ? "border-red-500 bg-red-50" : "border-gray-200 hover:border-red-300"}`}
+                className={`px-6 py-3 rounded-full border-2 transition-colors relative flex items-center gap-3 ${liked ? "border-red-500 bg-red-50" : "border-gray-200 hover:border-red-200"}`}
               >
                 <Heart
                   size={24}
@@ -271,6 +274,11 @@ export default function RentPropertyDetailsPage() {
                     liked ? "fill-red-500 text-red-500" : "text-gray-400"
                   }
                 />
+                <span
+                  className={`text-lg font-bold ${liked ? "text-red-500" : "text-gray-500"}`}
+                >
+                  {property.reactionsCount || 0}
+                </span>
               </motion.button>
 
               <div className="relative">

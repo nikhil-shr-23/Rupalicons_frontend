@@ -235,6 +235,10 @@ public class AdminPropertyServiceImpl implements AdminPropertyService {
         dto.setTags(property.getTags());
         dto.setFurnishingDetails(property.getFurnishingDetails());
         dto.setFurnishingStatus(property.getFurnishingStatus());
+        dto.setAgentName(property.getAgentName());
+        dto.setAgentPhotoUrl(property.getAgentPhotoUrl());
+        dto.setAmenities(property.getAmenities());
+        dto.setReactionsCount(property.getReactionsCount());
         return dto;
     }
 }

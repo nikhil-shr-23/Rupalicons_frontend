@@ -263,6 +263,71 @@ export async function submitInquiry(inquiry: {
   }
 }
 
+// ─── Visitor Identity (stored in localStorage as an identifier only) ─────
+
+export function getVisitorId(): string {
+  if (typeof window === "undefined") return "";
+  let id = localStorage.getItem("visitorId");
+  if (!id) {
+    id = crypto.randomUUID();
+    localStorage.setItem("visitorId", id);
+  }
+  return id;
+}
+
+// ─── Like System (DB-backed) ─────────────────────────────────────────────
+
+export async function likeProperty(propertyId: string | number): Promise<boolean> {
+  try {
+    const visitorId = getVisitorId();
+    const res = await fetch(`${API_URL}/likes/${propertyId}?visitorId=${visitorId}`, {
+      method: "POST",
+    });
+    return res.ok;
+  } catch (error) {
+    console.error("Failed to like property:", error);
+    return false;
+  }
+}
+
+export async function unlikeProperty(propertyId: string | number): Promise<boolean> {
+  try {
+    const visitorId = getVisitorId();
+    const res = await fetch(`${API_URL}/likes/${propertyId}?visitorId=${visitorId}`, {
+      method: "DELETE",
+    });
+    return res.ok;
+  } catch (error) {
+    console.error("Failed to unlike property:", error);
+    return false;
+  }
+}
+
+export async function fetchLikedPropertyIds(): Promise<number[]> {
+  try {
+    const visitorId = getVisitorId();
+    const res = await fetch(`${API_URL}/likes?visitorId=${visitorId}`);
+    if (!res.ok) return [];
+    return await res.json();
+  } catch (error) {
+    console.error("Failed to fetch liked IDs:", error);
+    return [];
+  }
+}
+
+export async function fetchLikedProperties(): Promise<Property[]> {
+  try {
+    const visitorId = getVisitorId();
+    const res = await fetch(`${API_URL}/likes/properties?visitorId=${visitorId}`);
+    if (!res.ok) return [];
+    const data = await res.json();
+    return (data || []).map(mapPropertyFromBackend);
+  } catch (error) {
+    console.error("Failed to fetch liked properties:", error);
+    return [];
+  }
+}
+
 // ─── Blog Mock Data (no backend endpoint yet) ───────────────────────────
 
 const mockBlogs: Blog[] = [

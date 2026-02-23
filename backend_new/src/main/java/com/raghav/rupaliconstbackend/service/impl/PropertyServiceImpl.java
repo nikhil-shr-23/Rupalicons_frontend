@@ -58,6 +58,17 @@ public class PropertyServiceImpl implements PropertyService {
         return toDto(property);
     }
 
+    @Override
+    public void reactToProperty(Long id) {
+        Property property = propertyRepository.findByIdAndStatus(id, PropertyStatus.AVAILABLE)
+                .orElseThrow(() -> new ResourceNotFoundException("Property not found"));
+        
+        Integer current = property.getReactionsCount();
+        if (current == null) current = 0;
+        property.setReactionsCount(current + 1);
+        propertyRepository.save(property);
+    }
+
     private PropertyResponseDTO toDto(Property property) {
         PropertyResponseDTO dto = new PropertyResponseDTO();
         dto.setId(property.getId());
@@ -90,6 +101,10 @@ public class PropertyServiceImpl implements PropertyService {
         dto.setTags(property.getTags());
         dto.setFurnishingDetails(property.getFurnishingDetails());
         dto.setFurnishingStatus(property.getFurnishingStatus());
+        dto.setAgentName(property.getAgentName());
+        dto.setAgentPhotoUrl(property.getAgentPhotoUrl());
+        dto.setAmenities(property.getAmenities());
+        dto.setReactionsCount(property.getReactionsCount());
         return dto;
     }
 }

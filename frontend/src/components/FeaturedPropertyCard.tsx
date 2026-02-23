@@ -1,21 +1,31 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { Heart } from "lucide-react";
 import { Property } from "@/types";
 import confetti from "canvas-confetti";
+import { likeProperty, unlikeProperty, fetchLikedPropertyIds } from "@/lib/api";
 
 interface FeaturedPropertyCardProps {
   property: Property;
 }
 
 export default function FeaturedPropertyCard({
-  property,
+  property: initialProperty,
 }: FeaturedPropertyCardProps) {
+  const [property, setProperty] = useState(initialProperty);
   const [hasLiked, setHasLiked] = useState(false);
   const [hasFiredConfetti, setHasFiredConfetti] = useState(false);
+
+  useEffect(() => {
+    if (initialProperty.id) {
+      fetchLikedPropertyIds().then((ids) => {
+        setHasLiked(ids.includes(initialProperty.id!));
+      });
+    }
+  }, [initialProperty.id]);
 
   // Use a fallback price if property.price is missing or 0, to avoid displaying "0"
   const price = property.price ? property.price.toLocaleString() : "1,650,000";
@@ -38,61 +48,83 @@ export default function FeaturedPropertyCard({
           className="object-cover group-hover:scale-105 transition-transform duration-700"
         />
         <div
-          onClick={(e) => {
+          onClick={async (e) => {
             e.preventDefault();
             e.stopPropagation();
 
-            if (!hasLiked && !hasFiredConfetti) {
-              const duration = 3 * 1000;
-              const end = Date.now() + duration;
+            if (!hasLiked) {
+              if (!hasFiredConfetti) {
+                const duration = 3 * 1000;
+                const end = Date.now() + duration;
+                const frame = () => {
+                  confetti({
+                    particleCount: 5,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    colors: [
+                      "#26ccff",
+                      "#a25afd",
+                      "#ff5e7e",
+                      "#88ff5a",
+                      "#fcff42",
+                      "#ffa62d",
+                      "#ff36ff",
+                    ],
+                  });
+                  confetti({
+                    particleCount: 5,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    colors: [
+                      "#26ccff",
+                      "#a25afd",
+                      "#ff5e7e",
+                      "#88ff5a",
+                      "#fcff42",
+                      "#ffa62d",
+                      "#ff36ff",
+                    ],
+                  });
+                  if (Date.now() < end) requestAnimationFrame(frame);
+                };
+                frame();
+                setHasFiredConfetti(true);
+              }
 
-              const frame = () => {
-                confetti({
-                  particleCount: 5,
-                  angle: 60,
-                  spread: 55,
-                  origin: { x: 0 },
-                  colors: [
-                    "#26ccff",
-                    "#a25afd",
-                    "#ff5e7e",
-                    "#88ff5a",
-                    "#fcff42",
-                    "#ffa62d",
-                    "#ff36ff",
-                  ],
-                });
-                confetti({
-                  particleCount: 5,
-                  angle: 120,
-                  spread: 55,
-                  origin: { x: 1 },
-                  colors: [
-                    "#26ccff",
-                    "#a25afd",
-                    "#ff5e7e",
-                    "#88ff5a",
-                    "#fcff42",
-                    "#ffa62d",
-                    "#ff36ff",
-                  ],
-                });
-
-                if (Date.now() < end) {
-                  requestAnimationFrame(frame);
-                }
-              };
-              frame();
-              setHasFiredConfetti(true);
+              setHasLiked(true);
+              setProperty((prev) => ({
+                ...prev,
+                reactionsCount: (prev.reactionsCount || 0) + 1,
+              }));
+              if (property.id) {
+                await likeProperty(property.id);
+                window.dispatchEvent(new Event("likedPropertiesChanged"));
+              }
+            } else {
+              setHasLiked(false);
+              setProperty((prev) => ({
+                ...prev,
+                reactionsCount: Math.max(0, (prev.reactionsCount || 0) - 1),
+              }));
+              if (property.id) {
+                await unlikeProperty(property.id);
+                window.dispatchEvent(new Event("likedPropertiesChanged"));
+              }
             }
-            setHasLiked(!hasLiked);
           }}
-          className="absolute top-4 right-4 bg-white/30 backdrop-blur-md p-2 rounded-full cursor-pointer hover:bg-white text-white hover:text-red-500 transition-colors z-10"
+          className="absolute top-4 right-4 bg-white/30 backdrop-blur-md px-3 py-2 rounded-full cursor-pointer hover:bg-white text-white hover:text-red-500 transition-colors z-10 flex items-center gap-2"
         >
           <Heart
             size={20}
             className={hasLiked ? "fill-red-500 text-red-500" : ""}
           />
+          <span
+            className={`text-sm font-bold ${hasLiked ? "text-red-500" : "text-white group-hover:text-red-500 text-shadow-sm"}`}
+          >
+            {property.reactionsCount || 0}
+          </span>
         </div>
       </div>
 

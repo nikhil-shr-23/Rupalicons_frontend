@@ -2,12 +2,25 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
-import { Menu, X, Phone, Instagram, Facebook } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Menu, X, Phone, Instagram, Facebook, Heart } from "lucide-react";
 import { motion, AnimatePresence, Variants } from "framer-motion";
+import { fetchLikedPropertyIds } from "@/lib/api";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [likedCount, setLikedCount] = useState(0);
+
+  useEffect(() => {
+    fetchLikedPropertyIds().then((ids) => setLikedCount(ids.length));
+
+    // Listen for custom event when a property is liked/unliked
+    const handler = () => {
+      fetchLikedPropertyIds().then((ids) => setLikedCount(ids.length));
+    };
+    window.addEventListener("likedPropertiesChanged", handler);
+    return () => window.removeEventListener("likedPropertiesChanged", handler);
+  }, []);
 
   const navVariants: Variants = {
     hidden: { y: -100, opacity: 0 },
@@ -59,6 +72,12 @@ export default function Navbar() {
           >
             Rent
           </Link>
+          <Link
+            href="/sell"
+            className="text-sm uppercase tracking-widest hover:text-gold transition-colors font-medium"
+          >
+            Sell
+          </Link>
 
           <Link
             href="/blogs"
@@ -66,17 +85,21 @@ export default function Navbar() {
           >
             Blogs
           </Link>
+
+          {/* Heart icon for liked properties */}
           <Link
-            href="/sell"
-            className="px-6 py-2 bg-gold/10 text-gold border border-gold font-bold text-sm uppercase tracking-widest hover:bg-gold hover:text-white transition-all duration-300 rounded-full ml-2"
+            href="/liked"
+            className="relative p-2 rounded-full hover:bg-red-50 transition-colors group"
           >
-            Sell Property
-          </Link>
-          <Link
-            href="/#contact"
-            className="px-6 py-2 bg-accent-dark text-white font-bold text-sm uppercase tracking-widest hover:bg-gold transition-all duration-300 rounded-full"
-          >
-            Contact
+            <Heart
+              size={22}
+              className="text-gray-500 group-hover:text-red-500 transition-colors"
+            />
+            {likedCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                {likedCount}
+              </span>
+            )}
           </Link>
         </div>
 
@@ -105,7 +128,6 @@ export default function Navbar() {
             >
               Home
             </Link>
-
             <Link
               href="/buy"
               onClick={() => setIsOpen(false)}
@@ -120,7 +142,13 @@ export default function Navbar() {
             >
               Rent
             </Link>
-
+            <Link
+              href="/sell"
+              onClick={() => setIsOpen(false)}
+              className="text-2xl text-white font-syne hover:text-gold"
+            >
+              Sell
+            </Link>
             <Link
               href="/blogs"
               onClick={() => setIsOpen(false)}
@@ -128,19 +156,14 @@ export default function Navbar() {
             >
               Blogs
             </Link>
+
             <Link
-              href="/sell"
+              href="/liked"
               onClick={() => setIsOpen(false)}
-              className="text-2xl text-gold font-syne font-bold border border-gold px-8 py-3 rounded-full"
+              className="text-2xl text-white font-syne hover:text-gold flex items-center gap-3"
             >
-              Sell Property
-            </Link>
-            <Link
-              href="/#contact"
-              onClick={() => setIsOpen(false)}
-              className="text-2xl text-white font-syne hover:text-gold"
-            >
-              Contact
+              <Heart size={24} className="text-red-400" />
+              Liked {likedCount > 0 && `(${likedCount})`}
             </Link>
 
             <div className="flex gap-6 mt-8">
