@@ -70,6 +70,7 @@ export default function AdminProjects() {
     PropertyStatus.AVAILABLE,
   );
   const [formImageUrl, setFormImageUrl] = useState("");
+  const [formImageGallery, setFormImageGallery] = useState<string[]>([]);
   const [formBrochureUrl, setFormBrochureUrl] = useState("");
   const [formBedrooms, setFormBedrooms] = useState("");
   const [formBathrooms, setFormBathrooms] = useState("");
@@ -159,6 +160,7 @@ export default function AdminProjects() {
     setFormType(PropertyType.SALE);
     setFormStatus(PropertyStatus.AVAILABLE);
     setFormImageUrl("");
+    setFormImageGallery([]);
     setFormBrochureUrl("");
     setFormBedrooms("");
     setFormBathrooms("");
@@ -201,6 +203,7 @@ export default function AdminProjects() {
     setFormType(p.type);
     setFormStatus(p.status);
     setFormImageUrl(p.imageUrl || "");
+    setFormImageGallery(p.imageGallery ? p.imageGallery.split(",") : []);
     setFormBrochureUrl(p.brochureUrl || "");
     setFormBedrooms(String(p.bedrooms || ""));
     setFormBathrooms(String(p.bathrooms || ""));
@@ -250,6 +253,8 @@ export default function AdminProjects() {
       type: formType,
       status: formStatus,
       imageUrl: formImageUrl || undefined,
+      imageGallery:
+        formImageGallery.length > 0 ? formImageGallery.join(",") : undefined,
       brochureUrl: formBrochureUrl || undefined,
       bedrooms: formBedrooms ? Number(formBedrooms) : undefined,
       bathrooms: formBathrooms ? Number(formBathrooms) : undefined,
@@ -523,6 +528,52 @@ export default function AdminProjects() {
               placeholder="https://example.com/brochure.pdf"
               icon={FileDown}
             />
+          </div>
+
+          <div className="space-y-3 mb-6 bg-gray-50/50 p-4 rounded-xl border border-gray-100">
+            <Label className="flex items-center gap-2 text-sm font-semibold text-gray-800">
+              <ImageIcon size={14} className="text-gold" /> Image Gallery
+              (Optional)
+            </Label>
+            <p className="text-xs text-gray-500 mb-2">
+              Add additional photos for the property's photo slider.
+            </p>
+            {formImageGallery.map((url, i) => (
+              <div key={i} className="flex gap-2 items-start">
+                <Input
+                  value={url}
+                  onChange={(e) => {
+                    const newGallery = [...formImageGallery];
+                    newGallery[i] = e.target.value;
+                    setFormImageGallery(newGallery);
+                  }}
+                  placeholder="https://example.com/photo2.jpg"
+                  className="h-9 text-sm"
+                />
+                <button
+                  type="button"
+                  onClick={() =>
+                    setFormImageGallery(
+                      formImageGallery.filter((_, idx) => idx !== i),
+                    )
+                  }
+                  className="p-2 text-red-500 hover:bg-red-50 rounded-lg shrink-0 transition-colors"
+                >
+                  <Trash2 size={16} />
+                </button>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={() => setFormImageGallery([...formImageGallery, ""])}
+              className="mt-2 text-xs font-medium text-accent-dark border border-accent-dark/20 bg-white hover:bg-gray-50 px-3 py-1.5 rounded-lg flex items-center gap-1 transition-colors group"
+            >
+              <Plus
+                size={12}
+                className="group-hover:text-gold transition-colors"
+              />{" "}
+              Add Image URL
+            </button>
           </div>
 
           {/* Section 4: Featured + Tags */}

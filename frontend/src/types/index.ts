@@ -58,6 +58,7 @@ export interface Property {
 
   // Media
   imageUrl?: string;
+  imageGallery?: string; // Comma-separated extra images
   brochureUrl?: string;
 
   // Room details

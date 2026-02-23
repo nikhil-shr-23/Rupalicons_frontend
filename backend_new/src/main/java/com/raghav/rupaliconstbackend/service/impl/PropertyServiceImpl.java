@@ -83,6 +83,7 @@ public class PropertyServiceImpl implements PropertyService {
         dto.setCreatedBy(property.getCreatedBy().getId());
         dto.setCreatedAt(property.getCreatedAt());
         dto.setImageUrl(property.getImageUrl());
+        dto.setImageGallery(property.getImageGallery());
         dto.setBrochureUrl(property.getBrochureUrl());
         dto.setBedrooms(property.getBedrooms());
         dto.setBathrooms(property.getBathrooms());

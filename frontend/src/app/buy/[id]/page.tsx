@@ -19,6 +19,9 @@ import {
   Sofa,
   CalendarDays,
   User,
+  ChevronLeft,
+  ChevronRight,
+  X,
 } from "lucide-react";
 import { getAmenityIcon } from "@/lib/amenities";
 import confetti from "canvas-confetti";
@@ -43,6 +46,8 @@ export default function PropertyDetailsPage() {
   const [fired, setFired] = useState(false);
   const [showFireAnimation, setShowFireAnimation] = useState(false);
   const [showAllAmenities, setShowAllAmenities] = useState(false);
+  const [showGallery, setShowGallery] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [otherProperties, setOtherProperties] = useState<Property[]>([]);
 
   useEffect(() => {
@@ -180,7 +185,10 @@ export default function PropertyDetailsPage() {
             </div>
 
             <div className="absolute bottom-4 right-4 flex gap-2">
-              <button className="bg-white/90 backdrop-blur text-accent-dark px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 hover:bg-white transition-colors shadow-lg">
+              <button
+                onClick={() => setShowGallery(true)}
+                className="bg-white/90 backdrop-blur text-accent-dark px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 hover:bg-white transition-colors shadow-lg"
+              >
                 <Maximize size={16} /> View Photos
               </button>
             </div>
@@ -560,6 +568,70 @@ export default function PropertyDetailsPage() {
               </Link>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* Image Gallery Modal */}
+      {showGallery && property && (
+        <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4">
+          <button
+            onClick={() => setShowGallery(false)}
+            className="absolute top-6 right-6 text-white/70 hover:text-white p-2"
+          >
+            <X size={32} />
+          </button>
+
+          {(() => {
+            const allImages = [
+              property.imageUrl,
+              ...(property.imageGallery
+                ? property.imageGallery.split(",")
+                : []),
+            ].filter(Boolean) as string[];
+
+            if (allImages.length === 0) return null;
+
+            return (
+              <div className="relative w-full max-w-5xl aspect-video flex items-center justify-center">
+                {allImages.length > 1 && (
+                  <button
+                    onClick={() =>
+                      setCurrentImageIndex((prev) =>
+                        prev === 0 ? allImages.length - 1 : prev - 1,
+                      )
+                    }
+                    className="absolute left-4 md:left-8 z-10 p-3 bg-black/50 hover:bg-black/80 text-white rounded-full transition-colors"
+                  >
+                    <ChevronLeft size={32} />
+                  </button>
+                )}
+
+                <Image
+                  src={allImages[currentImageIndex]}
+                  alt={`${property.title} - Image ${currentImageIndex + 1}`}
+                  fill
+                  className="object-contain"
+                />
+
+                {allImages.length > 1 && (
+                  <button
+                    onClick={() =>
+                      setCurrentImageIndex((prev) =>
+                        prev === allImages.length - 1 ? 0 : prev + 1,
+                      )
+                    }
+                    className="absolute right-4 md:right-8 z-10 p-3 bg-black/50 hover:bg-black/80 text-white rounded-full transition-colors"
+                  >
+                    <ChevronRight size={32} />
+                  </button>
+                )}
+
+                <div className="absolute bottom-[-40px] left-0 right-0 text-center text-white/50 text-sm">
+                  {currentImageIndex + 1} / {allImages.length}
+                </div>
+              </div>
+            );
+          })()}
         </div>
       )}
     </div>

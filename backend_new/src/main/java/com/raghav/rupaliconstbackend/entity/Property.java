@@ -59,6 +59,9 @@ public class Property {
     @Column(length = 1000)
     private String imageUrl;
 
+    @Column(length = 5000)
+    private String imageGallery;
+
     @Column(length = 1000)
     private String brochureUrl;
 

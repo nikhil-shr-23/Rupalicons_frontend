@@ -50,6 +50,7 @@ public class AdminPropertyServiceImpl implements AdminPropertyService {
         property.setCreatedBy(admin);
         // Media
         property.setImageUrl(dto.getImageUrl());
+        property.setImageGallery(dto.getImageGallery());
         property.setBrochureUrl(dto.getBrochureUrl());
         // Room details
         property.setBedrooms(dto.getBedrooms());
@@ -89,6 +90,7 @@ public class AdminPropertyServiceImpl implements AdminPropertyService {
         property.setStatus(dto.getStatus());
         // Media
         property.setImageUrl(dto.getImageUrl());
+        property.setImageGallery(dto.getImageGallery());
         property.setBrochureUrl(dto.getBrochureUrl());
         // Room details
         property.setBedrooms(dto.getBedrooms());
@@ -217,6 +219,7 @@ public class AdminPropertyServiceImpl implements AdminPropertyService {
         dto.setCreatedBy(property.getCreatedBy().getId());
         dto.setCreatedAt(property.getCreatedAt());
         dto.setImageUrl(property.getImageUrl());
+        dto.setImageGallery(property.getImageGallery());
         dto.setBrochureUrl(property.getBrochureUrl());
         dto.setBedrooms(property.getBedrooms());
         dto.setBathrooms(property.getBathrooms());

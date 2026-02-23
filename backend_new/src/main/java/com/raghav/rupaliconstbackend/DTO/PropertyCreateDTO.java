@@ -32,6 +32,7 @@ public class PropertyCreateDTO {
 
     // Media
     private String imageUrl;
+    private String imageGallery;
     private String brochureUrl;
 
     // Room details

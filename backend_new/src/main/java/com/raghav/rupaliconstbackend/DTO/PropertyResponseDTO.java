@@ -27,6 +27,7 @@ public class PropertyResponseDTO {
 
     // Media
     private String imageUrl;
+    private String imageGallery;
     private String brochureUrl;
 
     // Room details
