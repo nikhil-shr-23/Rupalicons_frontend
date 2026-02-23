@@ -145,7 +145,7 @@ export default function HeroV2() {
               src={
                 activeTab === "commercial"
                   ? "/commercial.png"
-                  : activeTab === "interior"
+                  : activeTab === "rent"
                     ? "/interior.png"
                     : "/touse.png"
               }
