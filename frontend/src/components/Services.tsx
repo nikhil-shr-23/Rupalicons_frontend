@@ -79,10 +79,10 @@ export default function Services() {
               viewport={{ once: true }}
               transition={{ delay: index * 0.2, duration: 0.5 }}
               whileHover={{ y: -10 }}
-              className="bg-[#FDF6F0] rounded-4xl p-4 pb-0 overflow-hidden relative group hover:shadow-2xl transition-all duration-300"
+              className="bg-[#FDF6F0] rounded-4xl p-4 pb-0 overflow-hidden relative group hover:shadow-2xl transition-all duration-300 flex flex-col"
             >
               {/* Card Header */}
-              <div className="p-4 mb-4 flex justify-between items-start">
+              <div className="p-4 mb-4 flex justify-between items-start flex-grow">
                 <div>
                   <h3 className="text-2xl font-bold font-syne text-accent-dark mb-3 leading-tight">
                     {service.title}
@@ -96,7 +96,7 @@ export default function Services() {
               </div>
 
               {/* Card Image */}
-              <div className="relative h-64 w-full rounded-t-4xl overflow-hidden mt-4">
+              <div className="relative h-64 w-full rounded-t-4xl overflow-hidden mt-auto">
                 <Image
                   src={service.image}
                   alt={service.title}
