@@ -1,6 +1,5 @@
 import Navbar from "../components/Navbar";
 import HeroV2 from "../components/HeroV2";
-import Marquee from "../components/Marquee";
 import About from "../components/About";
 import Projects from "../components/Projects";
 import WhyChooseUs from "../components/WhyChooseUs";
@@ -16,7 +15,6 @@ export default function Home() {
     <main className="min-h-screen flex flex-col">
       <Navbar />
       <HeroV2 />
-      <Marquee />
       <Projects />
       <About />
       <ProcessFlow />

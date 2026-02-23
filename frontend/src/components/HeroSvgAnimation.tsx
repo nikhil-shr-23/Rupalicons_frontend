@@ -24,7 +24,7 @@ export default function HeroSvgAnimation() {
         viewBox="0 0 600 600"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className="text-gold w-[120%] h-[120%] md:w-full md:h-full translate-x-[20%] md:translate-x-[25%]"
+        className="text-gold w-[120%] h-[120%] md:w-full md:h-full translate-x-[20%] md:translate-x-[25%] translate-y-[5%] md:translate-y-[10%]"
       >
         {/* Simple Modern House Outline */}
         <motion.path

@@ -70,7 +70,7 @@ export default function HeroV2() {
   }, [activeTab]);
 
   return (
-    <div className="relative min-h-[80vh] flex flex-col justify-center px-4 pt-16 overflow-hidden bg-grid">
+    <div className="relative min-h-[85vh] flex flex-col justify-start px-4 pt-44 pb-16 overflow-hidden bg-grid">
       <HeroSvgAnimation />
 
       <div className="max-w-6xl mx-auto w-full grid lg:grid-cols-[1.15fr_0.85fr] gap-12 items-center relative z-10">
@@ -91,7 +91,7 @@ export default function HeroV2() {
 
           <h1
             ref={headingRef}
-            className="text-4xl md:text-[3.1rem] lg:text-[3.4rem] font-semibold leading-[1.08] text-accent-dark mb-5 font-syne tracking-tight"
+            className="text-4xl md:text-[3.4rem] lg:text-[3.8rem] font-semibold leading-[1.04] text-accent-dark mb-6 font-syne tracking-tight"
           >
             {currentHeading.prefix}{" "}
             <span className="relative inline-block text-gold">
@@ -103,7 +103,7 @@ export default function HeroV2() {
             </span>
           </h1>
 
-          <div className="w-full relative z-20 mt-10">
+          <div className="w-full relative z-20 mt-12">
             <HeroSearch onTabChange={setActiveTab} />
           </div>
         </motion.div>

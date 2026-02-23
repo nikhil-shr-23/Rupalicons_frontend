@@ -157,7 +157,7 @@ export default function HeroSearch({
   };
 
   return (
-    <div className="w-full max-w-4xl mt-20 relative z-20">
+    <div className="w-full max-w-4xl mt-20  mb-20 relative z-20">
       {/* Tabs */}
       <div className="flex overflow-x-auto no-scrollbar bg-slate-900/80 backdrop-blur-md rounded-t-lg border-b border-white/10">
         {tabs.map((tab) => (
