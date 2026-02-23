@@ -7,25 +7,25 @@ import Image from "next/image";
 export default function Services() {
   const services = [
     {
-      title: "Real Estate Services",
+      title: "Property Buying",
       description:
-        "Expert guidance for buying, selling, and renting properties in prime locations.",
+        "Find your dream home from our curated collection of premium residential and commercial properties across India.",
       image:
         "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
     },
     {
-      title: "Investment Consultancy",
+      title: "Property Selling",
       description:
-        "Strategic advice to maximize returns on your real estate investments.",
+        "List and sell your property at the best price with our expert market analysis and wide buyer network.",
       image:
-        "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1582407947304-fd86f028f716?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
     },
     {
-      title: "Legal & Documentation",
+      title: "Home Loans & Finance",
       description:
-        "Professional assistance with contracts, registry, and compliance paperwork.",
+        "Get hassle-free home loan assistance with the best interest rates from leading banks and NBFCs.",
       image:
-        "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
     },
   ];
 
@@ -40,8 +40,7 @@ export default function Services() {
             viewport={{ once: true }}
             className="text-5xl md:text-6xl font-bold font-syne text-accent-dark leading-tight max-w-xl"
           >
-            Your Journey to the{" "}
-            <span className="text-gold">Perfect Property</span>
+            Buy, Sell & Finance <span className="text-gold">Your Property</span>
           </motion.h2>
 
           <motion.div
@@ -52,16 +51,15 @@ export default function Services() {
             className="max-w-lg"
           >
             <p className="text-gray-600 text-lg mb-8 leading-relaxed">
-              We offer a complete suite of services—from finding your perfect
-              property to securing the best deal and handling all legal
-              formalities.
+              From handpicked luxury homes to hassle-free selling and
+              financing—we handle every step so you don&apos;t have to.
             </p>
             <p className="text-sm text-gray-500 mb-8">
-              Whether you are buying, selling, or renovating, we provide
-              tailored solutions to make your vision a reality.
+              Trusted by thousands of homeowners across Delhi NCR, Mumbai, Pune
+              and more. Your property goals are our priority.
             </p>
             <button className="bg-accent-dark text-white px-8 py-4 rounded-full font-bold flex items-center gap-2 hover:bg-black transition-colors group">
-              Learn More
+              Explore Properties
               <div className="bg-white text-accent-dark rounded-full p-1 group-hover:scale-110 transition-transform">
                 <ArrowUpRight size={16} />
               </div>

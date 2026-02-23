@@ -1,12 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 import { fetchProperties } from "../lib/api";
 import { Property } from "../types";
 import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { AnimateSvg } from "./AnimateSvg";
+import gsap from "gsap";
 
 export default function Projects() {
   const [properties, setProperties] = useState<Property[]>([]);
@@ -84,15 +86,34 @@ export default function Projects() {
                 it seamless.
               </span>
             </p>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              className="flex items-center gap-2 bg-white text-accent-dark px-6 py-3 rounded-full font-bold"
+            <Link
+              href="/buy"
+              className="inline-flex items-center gap-2 bg-white text-accent-dark px-6 py-3 rounded-full font-bold hover:shadow-xl transition-shadow group"
+              onMouseEnter={(e) => {
+                const arrow = e.currentTarget.querySelector(".gsap-arrow");
+                if (arrow) {
+                  gsap
+                    .timeline()
+                    .to(arrow, {
+                      x: 4,
+                      y: -4,
+                      duration: 0.2,
+                      ease: "power2.out",
+                    })
+                    .to(arrow, {
+                      x: 0,
+                      y: 0,
+                      duration: 0.3,
+                      ease: "bounce.out",
+                    });
+                }
+              }}
             >
-              <div className="w-8 h-8 rounded-full bg-gold flex items-center justify-center">
-                <ArrowUpRight size={16} />
+              <div className="w-8 h-8 rounded-full bg-gold flex items-center justify-center overflow-hidden">
+                <ArrowUpRight size={16} className="gsap-arrow" />
               </div>
               View All Properties
-            </motion.button>
+            </Link>
           </div>
         </div>
 

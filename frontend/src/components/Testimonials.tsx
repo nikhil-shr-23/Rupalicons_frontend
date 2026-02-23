@@ -83,7 +83,7 @@ export default function Testimonials() {
           viewport={{ once: true }}
           className="text-5xl md:text-6xl font-bold font-syne text-accent-dark mb-6"
         >
-          What Our <span className="text-gold">Clients Say</span>
+          What People <span className="text-gold">Say About Us</span>
         </motion.h2>
       </div>
 
