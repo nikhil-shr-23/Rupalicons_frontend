@@ -33,10 +33,10 @@ import {
   Layers,
 } from "lucide-react";
 import {
-  fetchProperties,
   deleteProperty,
   createProperty,
   updateProperty,
+  uploadImage,
 } from "@/lib/api";
 import {
   AMENITY_OPTIONS,
@@ -57,6 +57,12 @@ export default function AdminProjects() {
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [filterType, setFilterType] = useState<string>("ALL");
   const [showAdvanced, setShowAdvanced] = useState(false);
+
+  // Upload state
+  const [uploadingMain, setUploadingMain] = useState(false);
+  const [uploadingGalleryIdx, setUploadingGalleryIdx] = useState<number | null>(
+    null,
+  );
 
   // Form state — core
   const [formTitle, setFormTitle] = useState("");
@@ -149,6 +155,38 @@ export default function AdminProjects() {
   useEffect(() => {
     loadProperties();
   }, []);
+
+  const handleImageUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+    isMain: boolean,
+    index?: number,
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      if (isMain) setUploadingMain(true);
+      else if (index !== undefined) setUploadingGalleryIdx(index);
+
+      const url = await uploadImage(file);
+
+      if (isMain) {
+        setFormImageUrl(url);
+      } else if (index !== undefined) {
+        const newGallery = [...formImageGallery];
+        newGallery[index] = url;
+        setFormImageGallery(newGallery);
+      }
+    } catch (error) {
+      console.error("Upload failed", error);
+      alert("Failed to upload image. Please try again.");
+    } finally {
+      if (isMain) setUploadingMain(false);
+      else if (index !== undefined) setUploadingGalleryIdx(null);
+      // reset file input
+      e.target.value = "";
+    }
+  };
 
   const resetForm = () => {
     setFormTitle("");
@@ -501,12 +539,32 @@ export default function AdminProjects() {
               <Label className="flex items-center gap-1 text-xs font-medium text-gray-600">
                 <ImageIcon size={12} /> Image URL
               </Label>
-              <Input
-                value={formImageUrl}
-                onChange={(e) => setFormImageUrl(e.target.value)}
-                placeholder="https://example.com/property.jpg"
-                className="h-9 text-sm"
-              />
+              <div className="flex gap-2">
+                <Input
+                  value={formImageUrl}
+                  onChange={(e) => setFormImageUrl(e.target.value)}
+                  placeholder="https://example.com/property.jpg"
+                  className="h-9 text-sm flex-1"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="h-9 px-3 shrink-0 relative overflow-hidden"
+                  disabled={uploadingMain}
+                >
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="absolute inset-0 opacity-0 cursor-pointer"
+                    onChange={(e) => handleImageUpload(e, true)}
+                  />
+                  {uploadingMain ? (
+                    <RefreshCw className="h-4 w-4 animate-spin text-gray-500" />
+                  ) : (
+                    "Upload"
+                  )}
+                </Button>
+              </div>
               {formImageUrl && (
                 <div className="relative w-32 h-24 rounded-lg overflow-hidden border border-gray-200 mt-1.5">
                   <Image
@@ -548,8 +606,26 @@ export default function AdminProjects() {
                     setFormImageGallery(newGallery);
                   }}
                   placeholder="https://example.com/photo2.jpg"
-                  className="h-9 text-sm"
+                  className="h-9 text-sm flex-1"
                 />
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="h-9 px-3 shrink-0 relative overflow-hidden"
+                  disabled={uploadingGalleryIdx === i}
+                >
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="absolute inset-0 opacity-0 cursor-pointer"
+                    onChange={(e) => handleImageUpload(e, false, i)}
+                  />
+                  {uploadingGalleryIdx === i ? (
+                    <RefreshCw className="h-4 w-4 animate-spin text-gray-500" />
+                  ) : (
+                    "Upload"
+                  )}
+                </Button>
                 <button
                   type="button"
                   onClick={() =>

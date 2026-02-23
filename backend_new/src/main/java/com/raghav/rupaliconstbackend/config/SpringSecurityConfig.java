@@ -45,6 +45,7 @@ public class SpringSecurityConfig {
                                 .requestMatchers("/properties/**").permitAll()
                                 .requestMatchers("/inquiries/**").permitAll()
                                 .requestMatchers("/likes/**").permitAll()
+                                .requestMatchers("/images/**").permitAll()
                                 .requestMatchers("/admin/**").hasRole("ADMIN")
                                 .requestMatchers("/super-admin/**").hasRole("SUPER_ADMIN")
                                 .anyRequest().authenticated())

@@ -420,3 +420,23 @@ export async function deleteInquiry(id: number): Promise<boolean> {
   }
   return false;
 }
+
+// ─── Image Upload API ───────────────────────────────────────────────────
+
+export async function uploadImage(file: File): Promise<string> {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const res = await fetch(`${API_URL}/admin/images/upload`, {
+    method: "POST",
+    headers: getAuthHeader(),
+    body: formData,
+  });
+
+  if (!res.ok) {
+    throw new Error(`Upload failed: ${res.statusText}`);
+  }
+
+  // Returns the DB URL directly, e.g., "http://localhost:8080/images/1"
+  return await res.text();
+}
