@@ -11,7 +11,6 @@ import { useEffect, useState, useRef } from "react";
 import gsap from "gsap";
 import HeroSvgAnimation from "@/components/HeroSvgAnimation";
 import HeroSearch from "@/components/HeroSearch";
-import { AnimateSvg } from "@/components/AnimateSvg";
 
 export default function HeroV2() {
   const [activeTab, setActiveTab] = useState("buy");
@@ -71,10 +70,10 @@ export default function HeroV2() {
   }, [activeTab]);
 
   return (
-    <div className="relative min-h-[90vh] flex flex-col justify-center px-4 pt-20 overflow-hidden bg-grid">
+    <div className="relative min-h-[80vh] flex flex-col justify-center px-4 pt-16 overflow-hidden bg-grid">
       <HeroSvgAnimation />
 
-      <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-12 items-center relative z-10">
+      <div className="max-w-6xl mx-auto w-full grid lg:grid-cols-[1.15fr_0.85fr] gap-12 items-center relative z-10">
         {/* Text Content */}
         <motion.div
           style={{ y: yText }}
@@ -92,27 +91,11 @@ export default function HeroV2() {
 
           <h1
             ref={headingRef}
-            className="text-5xl md:text-7xl font-bold leading-[1.1] text-accent-dark mb-8 font-syne relative"
+            className="text-4xl md:text-[3.1rem] lg:text-[3.4rem] font-semibold leading-[1.08] text-accent-dark mb-5 font-syne tracking-tight"
           >
             {currentHeading.prefix}{" "}
-            <span className="relative inline-block">
-              <span className="text-gold">{currentHeading.highlight}</span>
-              <AnimateSvg
-                width="100%"
-                height="100%"
-                viewBox="0 0 240 100"
-                className="absolute -bottom-1 -left-1 w-[105%] h-12"
-                path="M0.00 50.00 C24.01 46.41, 40.79 59.65, 60.79 49.65 C84.34 47.59, 100.79 59.65, 120.00 50.00 C141.72 49.35, 160.00 60.00, 180.00 50.00 C203.51 48.47, 220.00 60.00, 240.00 50.00"
-                strokeColor="#C5A059"
-                strokeWidth={2.5}
-                strokeLinecap="round"
-                animationDuration={3.7}
-                animationDelay={0.3}
-                animationBounce={0.3}
-                reverseAnimation={false}
-                enableHoverAnimation={true}
-                hoverAnimationType="redraw"
-              />
+            <span className="relative inline-block text-gold">
+              {currentHeading.highlight}
             </span>
             <br />
             <span className="relative inline-block mt-2">
@@ -120,7 +103,7 @@ export default function HeroV2() {
             </span>
           </h1>
 
-          <div className="w-full relative z-20 mt-20">
+          <div className="w-full relative z-20 mt-10">
             <HeroSearch onTabChange={setActiveTab} />
           </div>
         </motion.div>
@@ -132,25 +115,26 @@ export default function HeroV2() {
             x: springX, // Apply magnetic effect
             translateY: springY,
           }}
-          initial={{ opacity: 0, scale: 0.9 }}
+          initial={{ opacity: 0, scale: 0.97 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1, delay: 0.2 }}
-          className="relative h-[500px] flex items-center justify-end pointer-events-none" // changed justify-center to justify-end
+          className="relative h-[440px] md:h-[500px] flex items-center justify-end pointer-events-none"
         >
-          <div className="relative z-10 w-full h-full flex justify-end items-center translate-x-20">
-            {" "}
-            {/* Added translate-x-20 to move further right */}
-            {/* Reduced scale from 1.35 to 1.1 */}
+          <div className="relative z-10 w-[96%] h-full flex justify-end items-center translate-x-6">
             <motion.img
               src={
                 activeTab === "commercial"
                   ? "/commercial.png"
                   : activeTab === "rent"
-                    ? "/interior.png"
-                    : "/touse.png"
+                    ? "/3dinteriorr.png"
+                    : activeTab === "projects"
+                      ? "/tousenew.png"
+                      : activeTab === "plot"
+                        ? "/tenniscourt.png"
+                        : "/touse.png"
               }
               alt="Luxury Home"
-              className="object-contain w-full h-full scale-110 drop-shadow-2xl"
+              className="object-contain w-full h-full scale-100 drop-shadow-2xl"
               style={{
                 x: springX,
                 y: springY,

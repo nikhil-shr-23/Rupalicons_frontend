@@ -157,14 +157,14 @@ export default function HeroSearch({
   };
 
   return (
-    <div className="w-full max-w-5xl mt-8 relative z-20">
+    <div className="w-full max-w-4xl mt-20 relative z-20">
       {/* Tabs */}
-      <div className="flex overflow-x-auto no-scrollbar bg-slate-900/80 backdrop-blur-md rounded-t-xl border-b border-white/10">
+      <div className="flex overflow-x-auto no-scrollbar bg-slate-900/80 backdrop-blur-md rounded-t-lg border-b border-white/10">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as typeof activeTab)}
-            className={`flex items-center gap-2 px-6 py-4 text-sm font-medium transition-colors whitespace-nowrap ${
+            className={`flex items-center gap-2 px-5 py-3 text-xs md:text-sm font-medium transition-colors whitespace-nowrap ${
               activeTab === tab.id
                 ? "bg-white text-slate-900"
                 : "text-gray-300 hover:text-white hover:bg-white/10"
@@ -176,11 +176,11 @@ export default function HeroSearch({
       </div>
 
       {/* Search Bar Container */}
-      <div className="bg-white rounded-b-xl rounded-tr-xl shadow-2xl p-2 flex flex-col md:flex-row items-center gap-2">
+      <div className="bg-white rounded-b-xl rounded-tr-xl shadow-xl p-1.5 flex flex-col md:flex-row items-center gap-1.5">
         {/* City Selector Dropdown */}
         <div
           ref={cityRef}
-          className="relative w-full md:w-auto min-w-[160px] border-b md:border-b-0 md:border-r border-gray-200 px-4 py-3 cursor-pointer hover:bg-gray-50 rounded-lg group"
+          className="relative w-full md:w-auto min-w-[150px] border-b md:border-b-0 md:border-r border-gray-200 px-3 py-2.5 cursor-pointer hover:bg-gray-50 rounded-lg group"
           onClick={() => setShowCityDropdown(!showCityDropdown)}
         >
           <div className="flex items-center justify-between text-gray-700 font-bold text-sm">
@@ -216,34 +216,34 @@ export default function HeroSearch({
         </div>
 
         {/* Main Search Input */}
-        <div className="flex-grow w-full relative flex items-center px-2">
-          <Search className="text-gray-400 w-5 h-5 absolute left-4" />
+        <div className="grow w-full relative flex items-center px-2">
+          <Search className="text-gray-400 w-4 h-4 absolute left-3.5" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={placeholders[currentPlaceholderIndex]}
-            className="w-full pl-12 pr-4 py-3 outline-none text-gray-700 placeholder-gray-400 text-ellipsis transition-all duration-500"
+            className="w-full pl-10 pr-3 py-2.5 outline-none text-gray-700 placeholder-gray-400 text-sm text-ellipsis transition-all duration-500"
           />
         </div>
 
         {/* Search Button */}
         <button
           onClick={handleSearch}
-          className="w-full md:w-auto bg-gold hover:bg-gold-hover text-accent-dark font-bold px-8 py-4 rounded-lg transition-colors shadow-md uppercase tracking-wider text-sm"
+          className="w-full md:w-auto bg-gold hover:bg-gold-hover text-accent-dark font-semibold px-7 py-3 rounded-lg transition-colors shadow-md uppercase tracking-wide text-xs md:text-sm"
         >
           Search
         </button>
       </div>
 
       {/* Secondary Filters Row */}
-      <div className="flex gap-4 mt-4 px-2 flex-wrap">
+      <div className="flex gap-3 mt-3 px-1.5 flex-wrap">
         {/* Budget Dropdown */}
         <div ref={budgetRef} className="relative">
           <button
             onClick={() => setShowBudgetDropdown(!showBudgetDropdown)}
-            className="bg-white px-6 py-3 rounded-lg shadow-lg text-sm font-medium text-gray-700 flex items-center gap-2 hover:bg-gray-50 transition-colors"
+            className="bg-white px-5 py-2.5 rounded-lg shadow-md text-xs md:text-sm font-medium text-gray-700 flex items-center gap-2 hover:bg-gray-50 transition-colors"
           >
             {selectedBudget || "Budget"}
             <ChevronDown
@@ -283,7 +283,7 @@ export default function HeroSearch({
               onClick={() =>
                 setShowPropertyTypeDropdown(!showPropertyTypeDropdown)
               }
-              className="bg-white px-6 py-3 rounded-lg shadow-lg text-sm font-medium text-gray-700 flex items-center gap-2 hover:bg-gray-50 transition-colors"
+            className="bg-white px-5 py-2.5 rounded-lg shadow-md text-xs md:text-sm font-medium text-gray-700 flex items-center gap-2 hover:bg-gray-50 transition-colors"
             >
               {selectedPropertyType || "Property Type"}
               <ChevronDown
@@ -321,7 +321,7 @@ export default function HeroSearch({
           <div ref={possessionRef} className="relative">
             <button
               onClick={() => setShowPossessionDropdown(!showPossessionDropdown)}
-              className="bg-white px-6 py-3 rounded-lg shadow-lg text-sm font-medium text-gray-700 flex items-center gap-2 hover:bg-gray-50 transition-colors"
+              className="bg-white px-5 py-2.5 rounded-lg shadow-md text-xs md:text-sm font-medium text-gray-700 flex items-center gap-2 hover:bg-gray-50 transition-colors"
             >
               {selectedPossession || "Possession Status"}
               <ChevronDown
