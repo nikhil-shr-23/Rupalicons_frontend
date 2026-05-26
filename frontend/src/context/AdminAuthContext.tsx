@@ -39,7 +39,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     password: string,
   ): Promise<boolean> => {
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://api.rupalihomes.com";
       const response = await fetch(`${apiUrl}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { fetchBlogById } from "@/lib/api";
+import { fetchBlogById, API_URL } from "@/lib/api";
 import { Blog } from "@/types";
 import { Calendar, User, ArrowLeft } from "lucide-react";
 import Image from "next/image";
@@ -67,7 +67,7 @@ export default function BlogDetail() {
       <div className="relative h-[60vh] min-h-[400px] w-full mt-20">
         {blog.imageType ? (
           <Image
-            src={`http://localhost:8080/blogs/${blog.id}/image`}
+            src={`${API_URL}/blogs/${blog.id}/image`}
             alt={blog.title}
             fill
             className="object-cover"

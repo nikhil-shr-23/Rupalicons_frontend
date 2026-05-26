@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { Calendar, User, ArrowRight } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { fetchBlogs } from "@/lib/api";
+import { fetchBlogs, API_URL } from "@/lib/api";
 import { Blog } from "@/types";
 import Link from "next/link";
 
@@ -70,7 +70,7 @@ export default function BlogsPage() {
                 <div className="relative h-64 overflow-hidden w-full bg-gray-100">
                   {blog.imageType ? (
                     <Image
-                      src={`http://localhost:8080/blogs/${blog.id}/image`}
+                      src={`${API_URL}/blogs/${blog.id}/image`}
                       alt={blog.title}
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-700"

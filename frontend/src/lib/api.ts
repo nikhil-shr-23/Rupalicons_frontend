@@ -1,6 +1,6 @@
 import { Property, PropertyType, PropertyStatus, ContactFormSubmission, Blog, Inquiry, DashboardStats } from "../types";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+export const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.rupalihomes.com";
 
 export function getAuthHeader(): Record<string, string> {
   if (typeof window === "undefined") return {};
@@ -437,6 +437,6 @@ export async function uploadImage(file: File): Promise<string> {
     throw new Error(`Upload failed: ${res.statusText}`);
   }
 
-  // Returns the DB URL directly, e.g., "http://localhost:8080/images/1"
+  // Returns the DB URL directly, e.g., "https://api.rupalihomes.com/images/1"
   return await res.text();
 }
