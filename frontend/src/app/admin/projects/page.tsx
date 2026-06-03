@@ -481,7 +481,7 @@ export default function AdminProjects() {
                 Total Reactions
               </p>
               <h3 className="text-2xl font-bold text-accent-dark">
-                {dashboardStats.totalReactions || 0}
+                {properties.reduce((sum, p) => sum + (p.reactionsCount || 0), 0)}
               </h3>
             </div>
             <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-500">

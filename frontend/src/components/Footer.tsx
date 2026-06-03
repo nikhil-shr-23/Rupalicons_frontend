@@ -172,7 +172,7 @@ export default function Footer() {
             </ul>
 
             <div className="flex flex-wrap gap-4 text-xs font-medium text-gray-500">
-              <Link href="/about" className="hover:text-gold transition-colors">
+              <Link href="/about-us" className="hover:text-gold transition-colors">
                 About Us
               </Link>
               <span className="text-gray-300">|</span>
@@ -184,7 +184,7 @@ export default function Footer() {
               </Link>
               <span className="text-gray-300">|</span>
               <Link
-                href="/privacy"
+                href="/privacy-policy"
                 className="hover:text-gold transition-colors"
               >
                 Privacy Policy
