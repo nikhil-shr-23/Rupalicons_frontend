@@ -116,6 +116,10 @@ export interface Blog {
 
 export interface Inquiry extends ContactFormSubmission {
     id: number;
+    type?: string;
+    city?: string;
+    propertyType?: string;
+    alternatePhone?: string;
     createdAt: string;
     status: "NEW" | "CONTACTED" | "CLOSED";
 }

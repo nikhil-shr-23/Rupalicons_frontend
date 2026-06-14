@@ -18,10 +18,12 @@ import {
   RefreshCw,
   MessageSquare,
   Search,
+  ShieldAlert,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { fetchInquiries, deleteInquiry } from "@/lib/api";
 import { Inquiry } from "@/types";
+import { useAdminAuth } from "@/context/AdminAuthContext";
 
 export default function LeadsPage() {
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
@@ -29,6 +31,7 @@ export default function LeadsPage() {
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [search, setSearch] = useState("");
   const [selectedInquiry, setSelectedInquiry] = useState<Inquiry | null>(null);
+  const { isSuperAdmin } = useAdminAuth();
 
   const loadData = async () => {
     setLoading(true);
@@ -48,6 +51,8 @@ export default function LeadsPage() {
     if (success) {
       setInquiries((prev) => prev.filter((i) => i.id !== id));
       if (selectedInquiry?.id === id) setSelectedInquiry(null);
+    } else {
+      alert("Failed to delete. Only Super Admins can delete inquiries.");
     }
     setDeletingId(null);
   };
@@ -170,22 +175,24 @@ export default function LeadsPage() {
                         <span className="text-[10px] text-gray-400 hidden sm:inline">
                           {formatDate(inq.createdAt)}
                         </span>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className="h-8 w-8 text-gray-400 hover:text-red-500 hover:bg-red-50"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (inq.id) handleDelete(inq.id);
-                          }}
-                          disabled={deletingId === inq.id}
-                        >
-                          {deletingId === inq.id ? (
-                            <RefreshCw size={14} className="animate-spin" />
-                          ) : (
-                            <Trash2 size={14} />
-                          )}
-                        </Button>
+                        {isSuperAdmin && (
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="h-8 w-8 text-gray-400 hover:text-red-500 hover:bg-red-50"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (inq.id) handleDelete(inq.id);
+                            }}
+                            disabled={deletingId === inq.id}
+                          >
+                            {deletingId === inq.id ? (
+                              <RefreshCw size={14} className="animate-spin" />
+                            ) : (
+                              <Trash2 size={14} />
+                            )}
+                          </Button>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -287,17 +294,24 @@ export default function LeadsPage() {
                     </p>
                   </div>
 
-                  <Button
-                    variant="outline"
-                    className="w-full text-red-500 hover:text-red-600 hover:bg-red-50 gap-2"
-                    onClick={() =>
-                      selectedInquiry.id && handleDelete(selectedInquiry.id)
-                    }
-                    disabled={deletingId === selectedInquiry.id}
-                  >
-                    <Trash2 size={14} />
-                    Delete Inquiry
-                  </Button>
+                  {isSuperAdmin ? (
+                    <Button
+                      variant="outline"
+                      className="w-full text-red-500 hover:text-red-600 hover:bg-red-50 gap-2"
+                      onClick={() =>
+                        selectedInquiry.id && handleDelete(selectedInquiry.id)
+                      }
+                      disabled={deletingId === selectedInquiry.id}
+                    >
+                      <Trash2 size={14} />
+                      Delete Inquiry
+                    </Button>
+                  ) : (
+                    <div className="flex items-center gap-2 text-xs text-gray-400 bg-gray-50 rounded-lg p-3">
+                      <ShieldAlert size={14} />
+                      <span>Only Super Admins can delete inquiries</span>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="text-center py-8 text-gray-300">

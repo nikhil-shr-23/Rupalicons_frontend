@@ -232,11 +232,27 @@ export const defaultProperty: Property = {
   brochureUrl: "",
 };
 
-// ─── Contact Form (no backend endpoint – frontend-only) ─────────────────
+// ─── Contact Form → submits as an inquiry with type "CONTACT" ─────────────
 
 export async function submitContactForm(submission: ContactFormSubmission): Promise<boolean> {
-  console.log("Contact form submitted:", submission);
-  return new Promise((resolve) => setTimeout(() => resolve(true), 1000));
+  try {
+    const res = await fetch(`${API_URL}/inquiries`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: submission.name,
+        phone: submission.phone,
+        email: submission.email,
+        type: "CONTACT",
+        city: submission.location,
+        message: submission.message,
+      }),
+    });
+    return res.ok;
+  } catch (error) {
+    console.error("Failed to submit contact form:", error);
+    return false;
+  }
 }
 
 export async function submitInquiry(inquiry: {
@@ -379,46 +395,51 @@ export async function deleteBlog(id: number): Promise<boolean> {
   return false;
 }
 
-// ─── Inquiry/Lead Mock Data (no backend endpoint yet) ───────────────────
-
-const mockInquiries: Inquiry[] = [
-  {
-    id: 1,
-    name: "Alice Johnson",
-    email: "alice@example.com",
-    phone: "1234567890",
-    location: "Mumbai",
-    message: "Interested in 3BHK",
-    createdAt: new Date().toISOString(),
-    status: "NEW",
-  },
-  {
-    id: 2,
-    name: "Bob Smith",
-    email: "bob@example.com",
-    phone: "9876543210",
-    location: "Delhi",
-    message: "Looking for commercial space",
-    createdAt: new Date(Date.now() - 86400000).toISOString(),
-    status: "CONTACTED",
-  },
-];
+// ─── Inquiry/Lead API (Real Backend) ─────────────────────────────────────
 
 export async function fetchContactSubmissions(): Promise<Inquiry[]> {
-  return mockInquiries;
+  return fetchInquiries();
 }
 
 export async function fetchInquiries(): Promise<Inquiry[]> {
-  return mockInquiries;
+  try {
+    const res = await fetch(`${API_URL}/admin/inquiries`, {
+      headers: { ...getAuthHeader() },
+    });
+    if (!res.ok) return [];
+    return await res.json();
+  } catch (error) {
+    console.error("Failed to fetch inquiries:", error);
+    return [];
+  }
 }
 
 export async function deleteInquiry(id: number): Promise<boolean> {
-  const index = mockInquiries.findIndex((i) => i.id === id);
-  if (index !== -1) {
-    mockInquiries.splice(index, 1);
-    return true;
+  try {
+    const res = await fetch(`${API_URL}/admin/inquiries/${id}`, {
+      method: "DELETE",
+      headers: { ...getAuthHeader() },
+    });
+    return res.ok || res.status === 204;
+  } catch (error) {
+    console.error("Failed to delete inquiry:", error);
+    return false;
   }
-  return false;
+}
+
+// ─── Helper: Get admin role from JWT ────────────────────────────────────
+
+export function getAdminRole(): string | null {
+  if (typeof window === "undefined") return null;
+  const token = sessionStorage.getItem("adminToken");
+  if (!token) return null;
+  try {
+    const payload = token.split(".")[1];
+    const decoded = JSON.parse(atob(payload));
+    return decoded.role || null;
+  } catch {
+    return null;
+  }
 }
 
 // ─── Image Upload API ───────────────────────────────────────────────────

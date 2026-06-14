@@ -11,22 +11,36 @@ import {
 interface AdminAuthContextType {
   isAuthenticated: boolean;
   token: string | null;
+  role: string | null;
+  isSuperAdmin: boolean;
   login: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
 }
 
 const AdminAuthContext = createContext<AdminAuthContextType | null>(null);
 
+function parseJwtRole(token: string): string | null {
+  try {
+    const payload = token.split(".")[1];
+    const decoded = JSON.parse(atob(payload));
+    return decoded.role || null;
+  } catch {
+    return null;
+  }
+}
+
 export function AdminAuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [token, setToken] = useState<string | null>(null);
+  const [role, setRole] = useState<string | null>(null);
 
   useEffect(() => {
     const initAuth = () => {
       const storedToken = sessionStorage.getItem("adminToken");
       if (storedToken) {
         setToken(storedToken);
+        setRole(parseJwtRole(storedToken));
         setIsAuthenticated(true);
       }
       setIsLoading(false);
@@ -48,23 +62,12 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
 
       if (response.ok) {
         const data = await response.json();
-        // AuthResponseDTO contains "token" or "accessToken"?
-        // efficient verification needed. API_DOCS say "200 OK with JWT token as plain string"
-        // But AuthController returns AuthResponseDTO.
-        // Let's assume AuthResponseDTO has a field 'accessToken' or similar.
-        // Actually earlier code showed `new AuthResponseDTO(jwtService.generateToken(user))`
-        // I need to check AuthResponseDTO definition.
-
-        // For now, let's assume it returns { accessToken: "..." } or similar.
-        // WAIT: `return new AuthResponseDTO(jwtService.generateToken(saved));`
-        // I should check AuthResponseDTO.
-        // I will assume it has a single field, likely 'accessToken' or 'token'.
-
         const accessToken = data.accessToken || data.token;
 
         if (accessToken) {
           sessionStorage.setItem("adminToken", accessToken);
           setToken(accessToken);
+          setRole(parseJwtRole(accessToken));
           setIsAuthenticated(true);
           return true;
         }
@@ -79,6 +82,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     sessionStorage.removeItem("adminToken");
     setToken(null);
+    setRole(null);
     setIsAuthenticated(false);
   };
 
@@ -92,7 +96,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AdminAuthContext.Provider
-      value={{ isAuthenticated, token, login, logout }}
+      value={{ isAuthenticated, token, role, isSuperAdmin: role === "SUPER_ADMIN", login, logout }}
     >
       {children}
     </AdminAuthContext.Provider>
