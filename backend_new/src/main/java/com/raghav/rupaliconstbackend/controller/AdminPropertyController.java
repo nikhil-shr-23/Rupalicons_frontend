@@ -50,8 +50,11 @@ public class AdminPropertyController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProperty(@PathVariable Long id) {
-        adminPropertyService.deleteProperty(id);
+    public ResponseEntity<Void> deleteProperty(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        adminPropertyService.deleteProperty(id, userDetails.getUsername());
         return ResponseEntity.noContent().build();
     }
 

@@ -33,7 +33,8 @@ public class PropertyLikeController {
 
         // Check if already liked
         if (propertyLikeRepository.existsByVisitorIdAndPropertyId(visitorId, propertyId)) {
-            return ResponseEntity.ok(Map.of("liked", true, "message", "Already liked"));
+            long count = propertyLikeRepository.countByPropertyId(propertyId);
+            return ResponseEntity.ok(Map.of("liked", true, "message", "Already liked", "count", count));
         }
 
         // Save the like
@@ -42,16 +43,15 @@ public class PropertyLikeController {
         like.setPropertyId(propertyId);
         propertyLikeRepository.save(like);
 
-        // Increment reactions count on property
+        // Sync reactionsCount from actual COUNT
+        long count = propertyLikeRepository.countByPropertyId(propertyId);
         Optional<Property> propertyOpt = propertyRepository.findById(propertyId);
         propertyOpt.ifPresent(property -> {
-            Integer current = property.getReactionsCount();
-            if (current == null) current = 0;
-            property.setReactionsCount(current + 1);
+            property.setReactionsCount((int) count);
             propertyRepository.save(property);
         });
 
-        return ResponseEntity.ok(Map.of("liked", true, "message", "Liked successfully"));
+        return ResponseEntity.ok(Map.of("liked", true, "message", "Liked successfully", "count", count));
     }
 
     // Unlike a property
@@ -64,20 +64,19 @@ public class PropertyLikeController {
         if (existing.isPresent()) {
             propertyLikeRepository.delete(existing.get());
 
-            // Decrement reactions count on property
+            // Sync reactionsCount from actual COUNT
+            long count = propertyLikeRepository.countByPropertyId(propertyId);
             Optional<Property> propertyOpt = propertyRepository.findById(propertyId);
             propertyOpt.ifPresent(property -> {
-                Integer current = property.getReactionsCount();
-                if (current != null && current > 0) {
-                    property.setReactionsCount(current - 1);
-                }
+                property.setReactionsCount((int) count);
                 propertyRepository.save(property);
             });
 
-            return ResponseEntity.ok(Map.of("liked", false, "message", "Unliked successfully"));
+            return ResponseEntity.ok(Map.of("liked", false, "message", "Unliked successfully", "count", count));
         }
 
-        return ResponseEntity.ok(Map.of("liked", false, "message", "Was not liked"));
+        long count = propertyLikeRepository.countByPropertyId(propertyId);
+        return ResponseEntity.ok(Map.of("liked", false, "message", "Was not liked", "count", count));
     }
 
     // Get all liked property IDs for a visitor

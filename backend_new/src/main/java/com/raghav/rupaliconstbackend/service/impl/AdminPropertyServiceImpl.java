@@ -16,9 +16,11 @@ import com.raghav.rupaliconstbackend.entity.PropertyStatus;
 import com.raghav.rupaliconstbackend.entity.PropertyType;
 import com.raghav.rupaliconstbackend.entity.Purchase;
 import com.raghav.rupaliconstbackend.entity.Rental;
+import com.raghav.rupaliconstbackend.entity.Role;
 import com.raghav.rupaliconstbackend.entity.User;
 import com.raghav.rupaliconstbackend.exception.BadRequestException;
 import com.raghav.rupaliconstbackend.exception.ResourceNotFoundException;
+import com.raghav.rupaliconstbackend.repository.PropertyLikeRepository;
 import com.raghav.rupaliconstbackend.service.AdminPropertyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -32,6 +34,7 @@ public class AdminPropertyServiceImpl implements AdminPropertyService {
     private final PurchaseRepository purchaseRepository;
     private final RentalRepository rentalRepository;
     private final UserRepository userRepository;
+    private final PropertyLikeRepository propertyLikeRepository;
 
     @Override
     public PropertyResponseDTO createProperty(PropertyCreateDTO dto, String adminEmail) {
@@ -116,10 +119,17 @@ public class AdminPropertyServiceImpl implements AdminPropertyService {
     }
 
     @Override
-    public void deleteProperty(Long id) {
-        if (!propertyRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Property not found");
+    public void deleteProperty(Long id, String callerEmail) {
+        Property property = propertyRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Property not found"));
+
+        User caller = getAdmin(callerEmail);
+
+        // RBAC: ADMIN can only delete properties they created; SUPER_ADMIN can delete any
+        if (caller.getRole() == Role.ADMIN && !property.getCreatedBy().getId().equals(caller.getId())) {
+            throw new BadRequestException("You can only delete properties you created");
         }
+
         propertyRepository.deleteById(id);
     }
 
@@ -241,7 +251,9 @@ public class AdminPropertyServiceImpl implements AdminPropertyService {
         dto.setAgentName(property.getAgentName());
         dto.setAgentPhotoUrl(property.getAgentPhotoUrl());
         dto.setAmenities(property.getAmenities());
-        dto.setReactionsCount(property.getReactionsCount());
+        // Use real count from property_likes table for accuracy (#16)
+        long realCount = propertyLikeRepository.countByPropertyId(property.getId());
+        dto.setReactionsCount((int) realCount);
         return dto;
     }
 }

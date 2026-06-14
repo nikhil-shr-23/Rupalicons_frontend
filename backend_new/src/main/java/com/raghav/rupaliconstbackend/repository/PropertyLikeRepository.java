@@ -10,4 +10,5 @@ public interface PropertyLikeRepository extends JpaRepository<PropertyLike, Long
     Optional<PropertyLike> findByVisitorIdAndPropertyId(String visitorId, Long propertyId);
     List<PropertyLike> findAllByVisitorId(String visitorId);
     boolean existsByVisitorIdAndPropertyId(String visitorId, Long propertyId);
+    long countByPropertyId(Long propertyId);
 }

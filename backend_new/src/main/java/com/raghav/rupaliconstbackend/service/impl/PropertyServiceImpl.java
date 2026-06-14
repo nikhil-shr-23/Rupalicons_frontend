@@ -6,6 +6,7 @@ import com.raghav.rupaliconstbackend.entity.Property;
 import com.raghav.rupaliconstbackend.entity.PropertyStatus;
 import com.raghav.rupaliconstbackend.entity.PropertyType;
 import com.raghav.rupaliconstbackend.exception.ResourceNotFoundException;
+import com.raghav.rupaliconstbackend.repository.PropertyLikeRepository;
 import com.raghav.rupaliconstbackend.service.PropertyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -14,12 +15,12 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class PropertyServiceImpl implements PropertyService {
     private final PropertyRepository propertyRepository;
+    private final PropertyLikeRepository propertyLikeRepository;
 
     @Override
     public Page<PropertyResponseDTO> getAvailableProperties(Pageable pageable, PropertyType type, BigDecimal minPrice,
@@ -32,8 +33,13 @@ public class PropertyServiceImpl implements PropertyService {
             spec = spec.and((root, query, cb) -> cb.equal(root.get("type"), type));
         }
         if (location != null && !location.isBlank()) {
-            spec = spec.and((root, query, cb) -> cb.like(cb.lower(root.get("location")),
-                    "%" + location.toLowerCase() + "%"));
+            String locationLower = "%" + location.toLowerCase() + "%";
+            spec = spec.and((root, query, cb) -> cb.or(
+                    cb.like(cb.lower(root.get("location")), locationLower),
+                    cb.like(cb.lower(root.get("city")), locationLower),
+                    cb.like(cb.lower(root.get("microMarket")), locationLower),
+                    cb.like(cb.lower(root.get("locality")), locationLower)
+            ));
         }
         if (minPrice != null) {
             spec = spec.and((root, query, cb) -> cb.greaterThanOrEqualTo(root.get("price"), minPrice));
@@ -105,7 +111,9 @@ public class PropertyServiceImpl implements PropertyService {
         dto.setAgentName(property.getAgentName());
         dto.setAgentPhotoUrl(property.getAgentPhotoUrl());
         dto.setAmenities(property.getAmenities());
-        dto.setReactionsCount(property.getReactionsCount());
+        // Use real count from property_likes table for accuracy (#16)
+        long realCount = propertyLikeRepository.countByPropertyId(property.getId());
+        dto.setReactionsCount((int) realCount);
         return dto;
     }
 }

@@ -29,6 +29,8 @@ public class Inquiry {
 
     private String email;
 
+    private String alternatePhone;
+
     @Column(nullable = false)
     private String type; // e.g. "SELL", "CONTACT", "PROPERTY"
 

@@ -46,7 +46,10 @@ public class SpringSecurityConfig {
                                 .requestMatchers("/inquiries/**").permitAll()
                                 .requestMatchers("/likes/**").permitAll()
                                 .requestMatchers("/images/**").permitAll()
-                                .requestMatchers("/admin/**").hasRole("ADMIN")
+                                .requestMatchers("/blogs/**").permitAll()
+                                .requestMatchers("/site-visits/**").permitAll()
+                                .requestMatchers("/instagram/**").permitAll()
+                                .requestMatchers("/admin/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
                                 .requestMatchers("/super-admin/**").hasRole("SUPER_ADMIN")
                                 .anyRequest().authenticated())
                 .sessionManagement(sm ->
@@ -59,7 +62,7 @@ public class SpringSecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of("http://localhost:3000", "http://127.0.0.1:3000"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

@@ -15,7 +15,7 @@ public interface AdminPropertyService {
 
     PropertyResponseDTO updateProperty(Long id, PropertyUpdateDTO dto);
 
-    void deleteProperty(Long id);
+    void deleteProperty(Long id, String callerEmail);
 
     PurchaseResponseDTO purchaseProperty(Long id, PurchaseRequestDTO dto, String adminEmail);
 
