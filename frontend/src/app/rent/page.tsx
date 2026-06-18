@@ -74,7 +74,41 @@ export default function RentPage() {
         bedrooms: filters.bedrooms ? Number(filters.bedrooms) : undefined,
       });
       if (data && data.content) {
-        setProperties(data.content);
+        let filtered = data.content;
+        
+        // Client-side filtering to fix backend search limitations
+        if (filters.location) {
+          const locStr = filters.location.toLowerCase();
+          filtered = filtered.filter(p => 
+            (p.location?.toLowerCase().includes(locStr)) || 
+            (p.city?.toLowerCase().includes(locStr)) ||
+            (p.microMarket?.toLowerCase().includes(locStr)) ||
+            (p.locality?.toLowerCase().includes(locStr))
+          );
+        }
+        
+        if (filters.propertyType && filters.propertyType !== "Any Type") {
+          const ptLower = filters.propertyType.toLowerCase();
+          filtered = filtered.filter(p => 
+            p.propertyCategory?.toLowerCase().includes(ptLower) ||
+            p.title?.toLowerCase().includes(ptLower) ||
+            p.description?.toLowerCase().includes(ptLower)
+          );
+        }
+
+        if (filters.bedrooms && filters.bedrooms !== "Any") {
+          const minBeds = Number(filters.bedrooms);
+          filtered = filtered.filter(p => p.bedrooms && p.bedrooms >= minBeds);
+        }
+        
+        if (minPrice !== undefined) {
+          filtered = filtered.filter(p => p.rentAmount && p.rentAmount >= minPrice);
+        }
+        if (maxPrice !== undefined) {
+          filtered = filtered.filter(p => p.rentAmount && p.rentAmount <= maxPrice);
+        }
+
+        setProperties(filtered);
       }
     } catch (error) {
       console.error("Failed to load properties for rent", error);
