@@ -49,7 +49,7 @@ export default function RentPage() {
       const params = new URLSearchParams(window.location.search);
       const q = params.get("q");
       const city = params.get("city");
-      const locList = [];
+      const locList: string[] = [];
       if (q) locList.push(q);
       if (city) locList.push(city);
       const urlLocation = params.get("location") || locList.join(", ");
@@ -125,10 +125,10 @@ export default function RentPage() {
         }
         
         if (minPrice !== undefined) {
-          filtered = filtered.filter(p => p.rentAmount && p.rentAmount >= minPrice);
+          filtered = filtered.filter(p => p.rentAmount && p.rentAmount >= minPrice!);
         }
         if (maxPrice !== undefined) {
-          filtered = filtered.filter(p => p.rentAmount && p.rentAmount <= maxPrice);
+          filtered = filtered.filter(p => p.rentAmount && p.rentAmount <= maxPrice!);
         }
 
         setProperties(filtered);

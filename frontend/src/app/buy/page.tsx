@@ -52,7 +52,7 @@ export default function BuyPage() {
       const params = new URLSearchParams(window.location.search);
       const q = params.get("q");
       const city = params.get("city");
-      const locList = [];
+      const locList: string[] = [];
       if (q) locList.push(q);
       if (city) locList.push(city);
       const urlLocation = params.get("location") || locList.join(", ");
@@ -130,10 +130,10 @@ export default function BuyPage() {
         }
         
         if (minPrice !== undefined) {
-          filtered = filtered.filter(p => p.price && p.price >= minPrice);
+          filtered = filtered.filter(p => p.price && p.price >= minPrice!);
         }
         if (maxPrice !== undefined) {
-          filtered = filtered.filter(p => p.price && p.price <= maxPrice);
+          filtered = filtered.filter(p => p.price && p.price <= maxPrice!);
         }
 
         setProperties(filtered);

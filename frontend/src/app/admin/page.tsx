@@ -113,15 +113,6 @@ export default function AdminDashboard() {
       href: "/admin/leads",
       actionLabel: "View Leads",
     },
-    {
-      title: "Total Sales Revenue",
-      value: stats
-        ? `₹${(stats.totalSalesRevenue / 10000000).toFixed(1)}Cr`
-        : "—",
-      icon: BarChart3,
-      href: "#",
-      actionLabel: "Revenue",
-    },
   ];
 
   return (

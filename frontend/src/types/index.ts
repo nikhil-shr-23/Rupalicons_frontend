@@ -133,3 +133,10 @@ export interface DashboardStats {
     totalRentalIncome: number;
     totalReactions: number;
 }
+
+export interface Admin {
+  id: number;
+  email: string;
+  role: "ADMIN" | "SUPER_ADMIN";
+  createdAt: string;
+}

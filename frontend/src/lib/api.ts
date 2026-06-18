@@ -461,3 +461,31 @@ export async function uploadImage(file: File): Promise<string> {
   // Returns the DB URL directly, e.g., "https://api.rupalihomes.com/images/1"
   return await res.text();
 }
+
+// ─── Super Admin API ───────────────────────────────────────────────────
+
+export async function fetchAdmins(): Promise<import("../types").Admin[]> {
+  try {
+    const res = await fetch(`${API_URL}/super-admin/admins`, {
+      headers: getAuthHeader(),
+    });
+    if (!res.ok) throw new Error("Failed to fetch admins");
+    return await res.json();
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+}
+
+export async function deleteAdmin(id: number): Promise<boolean> {
+  try {
+    const res = await fetch(`${API_URL}/super-admin/admins/${id}`, {
+      method: "DELETE",
+      headers: getAuthHeader(),
+    });
+    return res.ok;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+}

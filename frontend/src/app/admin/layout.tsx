@@ -38,6 +38,11 @@ const sidebarItems = [
     href: "/admin/leads",
     icon: Users,
   },
+  {
+    title: "Admins",
+    href: "/admin/admins",
+    icon: Settings,
+  },
 ];
 
 function AdminContent({ children }: { children: React.ReactNode }) {
