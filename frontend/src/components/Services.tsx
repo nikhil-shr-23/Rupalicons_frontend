@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Services() {
   const services = [
@@ -12,6 +13,7 @@ export default function Services() {
         "Find your dream home from our curated collection of premium residential and commercial properties across India.",
       image:
         "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+      link: "/buy",
     },
     {
       title: "Property Selling",
@@ -19,6 +21,7 @@ export default function Services() {
         "List and sell your property at the best price with our expert market analysis and wide buyer network.",
       image:
         "https://images.unsplash.com/photo-1582407947304-fd86f028f716?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+      link: "/sell",
     },
     {
       title: "Home Loans & Finance",
@@ -26,6 +29,7 @@ export default function Services() {
         "Get hassle-free home loan assistance with the best interest rates from leading banks and NBFCs.",
       image:
         "https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+      link: "/contact",
     },
   ];
 
@@ -77,31 +81,33 @@ export default function Services() {
               viewport={{ once: true }}
               transition={{ delay: index * 0.2, duration: 0.5 }}
               whileHover={{ y: -10 }}
-              className="bg-[#FDF6F0] rounded-4xl p-4 pb-0 overflow-hidden relative group hover:shadow-2xl transition-all duration-300 flex flex-col"
+              className="relative group transition-all duration-300"
             >
-              {/* Card Header */}
-              <div className="p-4 mb-4 flex justify-between items-start flex-grow">
-                <div>
-                  <h3 className="text-2xl font-bold font-syne text-accent-dark mb-3 leading-tight">
-                    {service.title}
-                  </h3>
-                  <div className="h-px w-12 bg-gray-300 mb-3"></div>
-                  <p className="text-sm text-gray-600">{service.description}</p>
+              <Link href={service.link} className="block h-full bg-[#FDF6F0] rounded-4xl p-4 pb-0 overflow-hidden relative group-hover:shadow-2xl flex flex-col cursor-pointer">
+                {/* Card Header */}
+                <div className="p-4 mb-4 flex justify-between items-start flex-grow">
+                  <div>
+                    <h3 className="text-2xl font-bold font-syne text-accent-dark mb-3 leading-tight">
+                      {service.title}
+                    </h3>
+                    <div className="h-px w-12 bg-gray-300 mb-3"></div>
+                    <p className="text-sm text-gray-600">{service.description}</p>
+                  </div>
+                  <div className="w-10 h-10 bg-accent-dark rounded-full flex items-center justify-center shrink-0 group-hover:bg-gold transition-colors">
+                    <ArrowUpRight size={20} className="text-white" />
+                  </div>
                 </div>
-                <div className="w-10 h-10 bg-accent-dark rounded-full flex items-center justify-center shrink-0 group-hover:bg-gold transition-colors">
-                  <ArrowUpRight size={20} className="text-white" />
-                </div>
-              </div>
 
-              {/* Card Image */}
-              <div className="relative h-64 w-full rounded-t-4xl overflow-hidden mt-auto">
-                <Image
-                  src={service.image}
-                  alt={service.title}
-                  fill
-                  className="object-cover group-hover:scale-110 transition-transform duration-700"
-                />
-              </div>
+                {/* Card Image */}
+                <div className="relative h-64 w-full rounded-t-4xl overflow-hidden mt-auto">
+                  <Image
+                    src={service.image}
+                    alt={service.title}
+                    fill
+                    className="object-cover group-hover:scale-110 transition-transform duration-700"
+                  />
+                </div>
+              </Link>
             </motion.div>
           ))}
         </div>

@@ -18,28 +18,6 @@ export default function HeroV2() {
   const y = useTransform(scrollY, [0, 500], [0, 150]);
   const yText = useTransform(scrollY, [0, 500], [0, -50]);
 
-  // Magnetic Text / Image Effect
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-
-  const springConfig = { damping: 25, stiffness: 150 };
-  const springX = useSpring(mouseX, springConfig);
-  const springY = useSpring(mouseY, springConfig);
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      const { clientX, clientY } = e;
-      const { innerWidth, innerHeight } = window;
-      const x = (clientX - innerWidth / 2) / 80; // Slowed down significantly (was 25)
-      const y = (clientY - innerHeight / 2) / 80;
-      mouseX.set(x);
-      mouseY.set(y);
-    };
-
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, [mouseX, mouseY]);
-
   const headings = {
     buy: { prefix: "Find Your", highlight: "Dream", suffix: "Property Today" },
     rent: { prefix: "Rent Your", highlight: "Perfect", suffix: "Space" },
@@ -110,11 +88,7 @@ export default function HeroV2() {
 
         {/* Hero Image */}
         <motion.div
-          style={{
-            y,
-            x: springX, // Apply magnetic effect
-            translateY: springY,
-          }}
+          style={{ y }}
           initial={{ opacity: 0, scale: 0.97 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1, delay: 0.2 }}
@@ -135,10 +109,6 @@ export default function HeroV2() {
               }
               alt="Luxury Home"
               className="object-contain w-full h-full scale-100 drop-shadow-2xl"
-              style={{
-                x: springX,
-                y: springY,
-              }}
             />
           </div>
         </motion.div>

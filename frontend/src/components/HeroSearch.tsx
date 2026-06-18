@@ -144,7 +144,25 @@ export default function HeroSearch({
     const params = new URLSearchParams();
     if (searchQuery) params.set("q", searchQuery);
     if (selectedCity !== "All Cities") params.set("city", selectedCity);
-    if (selectedBudget) params.set("budget", selectedBudget);
+    
+    let rawMinPrice = "";
+    let rawMaxPrice = "";
+    if (selectedBudget) {
+      if (selectedBudget === "Under ₹50 Lac") { rawMaxPrice = "5000000"; }
+      else if (selectedBudget === "₹50 Lac - ₹1 Cr") { rawMinPrice = "5000000"; rawMaxPrice = "10000000"; }
+      else if (selectedBudget === "₹1 Cr - ₹2 Cr") { rawMinPrice = "10000000"; rawMaxPrice = "20000000"; }
+      else if (selectedBudget === "₹2 Cr - ₹5 Cr") { rawMinPrice = "20000000"; rawMaxPrice = "50000000"; }
+      else if (selectedBudget === "₹5 Cr+") { rawMinPrice = "50000000"; }
+      else if (selectedBudget === "Under ₹10,000") { rawMaxPrice = "10000"; }
+      else if (selectedBudget === "₹10,000 - ₹25,000") { rawMinPrice = "10000"; rawMaxPrice = "25000"; }
+      else if (selectedBudget === "₹25,000 - ₹50,000") { rawMinPrice = "25000"; rawMaxPrice = "50000"; }
+      else if (selectedBudget === "₹50,000 - ₹1,00,000") { rawMinPrice = "50000"; rawMaxPrice = "100000"; }
+      else if (selectedBudget === "₹1,00,000+") { rawMinPrice = "100000"; }
+    }
+    
+    if (rawMinPrice) params.set("minPrice", rawMinPrice);
+    if (rawMaxPrice) params.set("maxPrice", rawMaxPrice);
+    
     if (selectedPropertyType) params.set("propertyType", selectedPropertyType);
     if (selectedPossession) params.set("possession", selectedPossession);
 

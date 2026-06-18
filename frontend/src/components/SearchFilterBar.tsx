@@ -120,15 +120,6 @@ export default function SearchFilterBar({ onSearch }: SearchFilterBarProps) {
 
       {/* Actions */}
       <div className="flex items-center gap-2 pl-2">
-        <button className="p-4 rounded-full border border-gray-200 hover:bg-gray-50 hover:border-gold transition-colors flex items-center gap-2 group">
-          <SlidersHorizontal
-            size={18}
-            className="text-gray-400 group-hover:text-gold transition-colors"
-          />
-          <span className="text-sm font-medium text-gray-600 hidden lg:inline">
-            More
-          </span>
-        </button>
         <button
           onClick={handleSearch}
           className="px-8 py-4 bg-accent-dark text-white rounded-full font-medium hover:bg-gold hover:text-accent-dark transition-all shadow-md flex items-center gap-2"

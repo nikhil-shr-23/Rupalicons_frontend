@@ -43,6 +43,29 @@ export default function RentPage() {
 
   useEffect(() => {
     fetchLikedPropertyIds().then((ids) => setLikedIds(new Set(ids)));
+    
+    // Parse URL parameters for initial filters
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const q = params.get("q");
+      const city = params.get("city");
+      const locList = [];
+      if (q) locList.push(q);
+      if (city) locList.push(city);
+      const urlLocation = params.get("location") || locList.join(", ");
+      
+      const urlPropertyType = params.get("propertyType");
+      const urlMinPrice = params.get("minPrice");
+      const urlMaxPrice = params.get("maxPrice");
+      
+      setFilters((prev) => ({
+        ...prev,
+        ...(urlLocation && { location: urlLocation }),
+        ...(urlPropertyType && { propertyType: urlPropertyType }),
+        ...(urlMinPrice && { minPrice: urlMinPrice }),
+        ...(urlMaxPrice && { maxPrice: urlMaxPrice }),
+      }));
+    }
   }, []);
 
   const applyFilters = useCallback(async () => {
