@@ -43,10 +43,22 @@ export default function BlogsPage() {
           >
             Our <span className="text-gold">Journal</span>
           </motion.h1>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto font-outfit">
+          <p className="text-xl text-gray-300 max-w-2xl mx-auto font-outfit mb-8">
             Insights, trends, and stories from the world of luxury real estate
             and design.
           </p>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+          >
+            <Link
+              href="/blogs/submit"
+              className="inline-flex items-center gap-2 bg-gold text-white font-bold py-3 px-8 rounded-full shadow-lg hover:bg-yellow-600 hover:-translate-y-1 transition-all"
+            >
+              Submit an Article
+            </Link>
+          </motion.div>
         </div>
       </section>
 

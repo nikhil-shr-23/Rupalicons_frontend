@@ -44,55 +44,55 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Column 2: Popular Cities */}
+          {/* Column 2: Popular Localities */}
           <div>
             <h4 className="text-lg font-bold font-syne text-accent-dark mb-6">
-              Top Cities
+              Top Localities
             </h4>
             <ul className="space-y-4 text-sm text-gray-500">
               <li>
                 <Link
-                  href="/buy?city=Gurgaon"
+                  href="/buy?location=Southern%20Peripheral"
                   className="hover:text-gold transition-colors inline-flex items-center gap-2"
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-gold/60"></span>
-                  Properties in Gurgaon
+                  Properties in Southern Peripheral
                 </Link>
               </li>
               <li>
                 <Link
-                  href="/buy?city=Delhi"
+                  href="/buy?location=Dwarka%20Expressway"
                   className="hover:text-gold transition-colors inline-flex items-center gap-2"
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-gold/60"></span>
-                  Properties in Delhi
+                  Properties in Dwarka Expressway
                 </Link>
               </li>
               <li>
                 <Link
-                  href="/buy?city=Noida"
+                  href="/buy?location=Golf%20Course%20Road"
                   className="hover:text-gold transition-colors inline-flex items-center gap-2"
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-gold/60"></span>
-                  Properties in Noida
+                  Properties in Golf Course Road
                 </Link>
               </li>
               <li>
                 <Link
-                  href="/buy?city=Mumbai"
+                  href="/buy?location=New%20Gurgaon"
                   className="hover:text-gold transition-colors inline-flex items-center gap-2"
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-gold/60"></span>
-                  Properties in Mumbai
+                  Properties in New Gurgaon
                 </Link>
               </li>
               <li>
                 <Link
-                  href="/buy?city=Pune"
+                  href="/buy?location=Sohna%20Road"
                   className="hover:text-gold transition-colors inline-flex items-center gap-2"
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-gold/60"></span>
-                  Properties in Pune
+                  Properties in Sohna Road
                 </Link>
               </li>
             </ul>

@@ -19,6 +19,7 @@ import {
   MessageSquare,
   Search,
   ShieldAlert,
+  Download,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { fetchInquiries, deleteInquiry } from "@/lib/api";
@@ -90,15 +91,29 @@ export default function LeadsPage() {
             the contact form.
           </p>
         </div>
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={loadData}
-          disabled={loading}
-          title="Refresh"
-        >
-          <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
-        </Button>
+        <div className="flex items-center gap-3">
+          <Button
+            variant="outline"
+            className="gap-2"
+            onClick={() => {
+              window.open(`${process.env.NEXT_PUBLIC_API_URL || "https://api.rupalihomes.com"}/admin/export/inquiries`, "_blank");
+            }}
+            disabled={loading || inquiries.length === 0}
+            title="Export CSV"
+          >
+            <Download size={16} />
+            <span className="hidden sm:inline">Export CSV</span>
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={loadData}
+            disabled={loading}
+            title="Refresh"
+          >
+            <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
+          </Button>
+        </div>
       </div>
 
       {/* Search */}

@@ -179,10 +179,12 @@ export default function ProcessFlow() {
                 >
                   {/* Content Side */}
                   <div className="w-full md:w-5/12 px-4 mb-8 md:mb-0">
-                    <div
-                      className={`bg-white p-8 rounded-3xl shadow-xl border border-gray-100 relative group hover:-translate-y-2 transition-transform duration-500`}
+                    <motion.div
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      className={`bg-white p-8 rounded-3xl shadow-xl border border-gray-100 relative group transition-all duration-300 cursor-pointer hover:shadow-gold/10 hover:border-gold/30`}
                     >
-                      <div className="absolute -top-6 -right-6 w-12 h-12 bg-accent-dark text-white rounded-full flex items-center justify-center font-bold text-xl shadow-lg z-20">
+                      <div className="absolute -top-6 -right-6 w-12 h-12 bg-accent-dark text-white rounded-full flex items-center justify-center font-bold text-xl shadow-lg z-20 group-hover:bg-gold group-hover:scale-110 transition-all duration-300">
                         {index + 1}
                       </div>
                       <h3 className="text-2xl font-bold font-syne text-accent-dark mb-4 group-hover:text-gold transition-colors">
@@ -191,7 +193,7 @@ export default function ProcessFlow() {
                       <p className="text-gray-600 leading-relaxed">
                         {step.description}
                       </p>
-                    </div>
+                    </motion.div>
                   </div>
 
                   {/* Center Icon Node (Ref Target) */}

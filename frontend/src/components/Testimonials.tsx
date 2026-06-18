@@ -93,13 +93,14 @@ export default function Testimonials() {
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-gray-50 to-transparent z-10 pointer-events-none"></div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 h-full">
-          {/* Column 1 - Moving Up */}
+          {/* Column 1 - Moving Down */}
           <div className="relative h-full overflow-hidden">
             <motion.div
-              animate={{ y: [0, -1000] }} // Adjust based on content height
+              initial={{ y: -1000 }}
+              animate={{ y: 0 }} // Moving downwards
               transition={{
                 repeat: Infinity,
-                duration: 40,
+                duration: 60, // Slowed down
                 ease: "linear",
               }}
             >
@@ -113,10 +114,10 @@ export default function Testimonials() {
           <div className="relative h-full overflow-hidden">
             <motion.div
               initial={{ y: -1000 }}
-              animate={{ y: 0 }}
+              animate={{ y: 0 }} // Moving downwards
               transition={{
                 repeat: Infinity,
-                duration: 45, // Slightly different speed for organic feel
+                duration: 65, // Slightly different speed for organic feel
                 ease: "linear",
               }}
             >

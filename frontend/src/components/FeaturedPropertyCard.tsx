@@ -3,10 +3,11 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Heart } from "lucide-react";
+import { Heart, Scale } from "lucide-react";
 import { Property } from "@/types";
 import confetti from "canvas-confetti";
 import { likeProperty, unlikeProperty, fetchLikedPropertyIds } from "@/lib/api";
+import { useCompare } from "@/context/CompareContext";
 
 interface FeaturedPropertyCardProps {
   property: Property;
@@ -18,6 +19,9 @@ export default function FeaturedPropertyCard({
   const [property, setProperty] = useState(initialProperty);
   const [hasLiked, setHasLiked] = useState(false);
   const [hasFiredConfetti, setHasFiredConfetti] = useState(false);
+  const { addToCompare, compareItems } = useCompare();
+  
+  const isCompared = compareItems.some((p) => p.id === property.id);
 
   useEffect(() => {
     if (initialProperty.id) {
@@ -125,6 +129,19 @@ export default function FeaturedPropertyCard({
           >
             {property.reactionsCount || 0}
           </span>
+        </div>
+        <div
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (!isCompared) addToCompare(property);
+          }}
+          className={`absolute top-4 right-20 backdrop-blur-md px-3 py-2 rounded-full cursor-pointer transition-colors z-10 flex items-center gap-2 ${
+            isCompared ? "bg-gold text-white" : "bg-white/30 hover:bg-gold hover:text-white text-white"
+          }`}
+          title={isCompared ? "Added to compare" : "Compare Property"}
+        >
+          <Scale size={20} />
         </div>
       </div>
 

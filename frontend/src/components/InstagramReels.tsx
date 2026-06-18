@@ -80,12 +80,10 @@ const InstagramReels = () => {
 
   // Duplicate reels for seamless loop if we have enough items, otherwise just show them
   // If we have very few items, we might need to duplicate more
-  const displayReels =
-    reels.length > 0
-      ? reels.length < 5
-        ? [...reels, ...reels, ...reels, ...reels]
-        : [...reels, ...reels]
-      : [];
+  // Duplicate reels to create a seamless loop. We need enough items to fill the screen twice.
+  const copiesCount = reels.length > 0 && reels.length < 4 ? 4 : 2;
+  const displayReels = Array(copiesCount).fill(reels).flat();
+  const shiftPercent = `-${100 / copiesCount}%`;
 
   return (
     <section className="py-24 bg-background overflow-hidden relative">
@@ -119,8 +117,7 @@ const InstagramReels = () => {
           <motion.div
             className="flex gap-6 px-6"
             animate={{
-              x: ["0%", "-33.33%"], // Adjust based on duplication logic. If we duplicate once (original + copy), moving -50% is one full loop. If default duplication is [...reels, ...reels], then -50% is correct.
-              // Wait, previous logic was [...reels, ...reels, ...reels] (3 sets). -33.33% moves one full set.
+              x: ["0%", shiftPercent],
             }}
             transition={{
               x: {

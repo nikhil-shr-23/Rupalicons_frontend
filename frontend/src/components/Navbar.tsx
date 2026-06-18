@@ -10,13 +10,26 @@ import { fetchLikedPropertyIds } from "@/lib/api";
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [likedCount, setLikedCount] = useState(0);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    fetchLikedPropertyIds().then((ids) => setLikedCount(ids.length));
+    setIsClient(true);
+    const cachedCount = localStorage.getItem("likedPropertiesCount");
+    if (cachedCount) {
+      setLikedCount(parseInt(cachedCount, 10));
+    }
+
+    fetchLikedPropertyIds().then((ids) => {
+      setLikedCount(ids.length);
+      localStorage.setItem("likedPropertiesCount", ids.length.toString());
+    });
 
     // Listen for custom event when a property is liked/unliked
     const handler = () => {
-      fetchLikedPropertyIds().then((ids) => setLikedCount(ids.length));
+      fetchLikedPropertyIds().then((ids) => {
+        setLikedCount(ids.length);
+        localStorage.setItem("likedPropertiesCount", ids.length.toString());
+      });
     };
     window.addEventListener("likedPropertiesChanged", handler);
     return () => window.removeEventListener("likedPropertiesChanged", handler);

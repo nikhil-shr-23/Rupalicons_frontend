@@ -33,11 +33,24 @@ export default function SellPropertyPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validation
+    const phoneRegex = /^[6-9]\d{9}$/;
+    if (formData.phone && !phoneRegex.test(formData.phone.replace(/\D/g, ""))) {
+      alert("Please enter a valid 10-digit Indian mobile number.");
+      return;
+    }
+
     setStatus("submitting");
-    const success = await submitInquiry({
+
+    // Format phone to digits only if it matches
+    const submissionData = {
       ...formData,
+      phone: formData.phone.replace(/\D/g, ""),
       type: "SELL",
-    });
+    };
+
+    const success = await submitInquiry(submissionData);
 
     if (success) {
       setStatus("success");

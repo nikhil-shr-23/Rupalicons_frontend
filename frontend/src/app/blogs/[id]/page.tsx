@@ -6,7 +6,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { fetchBlogById, API_URL } from "@/lib/api";
 import { Blog } from "@/types";
-import { Calendar, User, ArrowLeft } from "lucide-react";
+import { Calendar, User, ArrowLeft, Download } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -105,13 +105,21 @@ export default function BlogDetail() {
         </div>
       </div>
 
-      <article className="max-w-3xl mx-auto px-6 py-20">
-        <Link
-          href="/blogs"
-          className="inline-flex items-center gap-2 text-gray-500 hover:text-accent-dark mb-10 transition-colors"
-        >
-          <ArrowLeft size={18} /> Back to Journal
-        </Link>
+      <article className="max-w-3xl mx-auto px-6 py-20 print:py-0 print:px-0">
+        <div className="flex items-center justify-between mb-10 print:hidden">
+          <Link
+            href="/blogs"
+            className="inline-flex items-center gap-2 text-gray-500 hover:text-accent-dark transition-colors"
+          >
+            <ArrowLeft size={18} /> Back to Journal
+          </Link>
+          <button
+            onClick={() => window.print()}
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium border border-gray-200 rounded-lg text-gray-600 hover:text-gold hover:border-gold transition-colors"
+          >
+            <Download size={16} /> Download PDF
+          </button>
+        </div>
 
         <div className="prose prose-lg prose-headings:font-syne prose-headings:text-accent-dark prose-p:text-gray-600 prose-a:text-gold prose-img:rounded-2xl max-w-none">
           {/* 

@@ -22,6 +22,7 @@ import {
   ChevronLeft,
   ChevronRight,
   X,
+  CheckCircle,
 } from "lucide-react";
 import { getAmenityIcon } from "@/lib/amenities";
 import confetti from "canvas-confetti";
@@ -35,11 +36,11 @@ import {
 import { Property, PropertyType } from "@/types";
 
 export default function PropertyDetailsPage() {
-  const params = useParams();
+  const { id } = useParams();
   const router = useRouter();
-  const id = params?.id;
   const [property, setProperty] = useState<Property | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isSharing, setIsSharing] = useState(false);
   const [liked, setLiked] = useState(false);
   const [hasFiredHeartConfetti, setHasFiredHeartConfetti] = useState(false);
   const [fireCount, setFireCount] = useState(0);
@@ -49,6 +50,8 @@ export default function PropertyDetailsPage() {
   const [showGallery, setShowGallery] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [otherProperties, setOtherProperties] = useState<Property[]>([]);
+  const [visitForm, setVisitForm] = useState({ name: "", email: "", phone: "", message: "" });
+  const [visitStatus, setVisitStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
 
   useEffect(() => {
     async function loadProperty() {
@@ -315,7 +318,31 @@ export default function PropertyDetailsPage() {
                 </AnimatePresence>
               </div>
 
-              <button className="p-4 rounded-full border-2 border-gray-200 hover:border-gold hover:text-gold text-gray-400 transition-colors">
+              <button
+                disabled={isSharing}
+                onClick={async () => {
+                  if (isSharing) return;
+                  if (navigator.share) {
+                    try {
+                      setIsSharing(true);
+                      await navigator.share({
+                        title: property.title,
+                        url: window.location.href,
+                      });
+                    } catch (err: any) {
+                      if (err.name !== 'AbortError') {
+                        console.error("Share failed:", err);
+                      }
+                    } finally {
+                      setIsSharing(false);
+                    }
+                  } else {
+                    navigator.clipboard.writeText(window.location.href);
+                    alert("Link copied to clipboard!");
+                  }
+                }}
+                className={`p-4 rounded-full border-2 border-gray-200 hover:border-gold hover:text-gold text-gray-400 transition-colors ${isSharing ? 'opacity-50 cursor-not-allowed' : ''}`}
+              >
                 <Share2 size={24} />
               </button>
             </div>
@@ -344,7 +371,7 @@ export default function PropertyDetailsPage() {
             <div className="flex flex-col items-center justify-center">
               <Maximize size={28} className="text-gray-400 mb-2" />
               <span className="text-2xl font-bold text-accent-dark">
-                {property.sqft || property.size}
+                {property.sqft || "-"}
               </span>
               <span className="text-xs text-gray-500 uppercase tracking-widest">
                 Sqft
@@ -485,40 +512,100 @@ export default function PropertyDetailsPage() {
               </h3>
             </div>
 
-            <form
-              className="space-y-4"
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleConfetti();
-              }}
-            >
-              <input
-                type="text"
-                placeholder="Full Name"
-                className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:border-gold transition-colors"
-              />
-              <input
-                type="email"
-                placeholder="Email Address"
-                className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:border-gold transition-colors"
-              />
-              <input
-                type="tel"
-                placeholder="Phone Number"
-                className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:border-gold transition-colors"
-              />
-              <textarea
-                placeholder="I am interested in this property..."
-                className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:border-gold transition-colors h-32"
-              ></textarea>
+            {visitStatus === "success" ? (
+              <div className="py-8 text-center text-green-600">
+                <CheckCircle size={48} className="mx-auto mb-4 text-gold" />
+                <h4 className="text-xl font-bold font-syne mb-2 text-accent-dark">Visit Requested!</h4>
+                <p className="text-gray-500">Our team will contact you shortly.</p>
+              </div>
+            ) : (
+              <form
+                className="space-y-4"
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  if (!visitForm.name.trim() || !visitForm.phone.trim()) return;
+                  
+                  const phoneRegex = /^[6-9]\d{9}$/;
+                  if (visitForm.phone && !phoneRegex.test(visitForm.phone.replace(/\D/g, ""))) {
+                    alert("Please enter a valid 10-digit Indian mobile number.");
+                    return;
+                  }
+                  
+                  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                  if (visitForm.email && !emailRegex.test(visitForm.email)) {
+                    alert("Please enter a valid email address.");
+                    return;
+                  }
 
-              <button
-                type="submit"
-                className="w-full py-4 bg-accent-dark text-white rounded-xl font-bold text-lg hover:bg-gold transition-all duration-300 shadow-lg hover:shadow-gold/20 transform hover:-translate-y-1"
+                  setVisitStatus("submitting");
+                  try {
+                    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "https://api.rupalihomes.com"}/site-visits`, {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        propertyId: property.id,
+                        visitorName: visitForm.name,
+                        visitorEmail: visitForm.email,
+                        visitorPhone: visitForm.phone.replace(/\D/g, ""),
+                        message: visitForm.message
+                      })
+                    });
+                    
+                    if (res.ok) {
+                      setVisitStatus("success");
+                      setVisitForm({ name: "", email: "", phone: "", message: "" });
+                      handleConfetti();
+                      setTimeout(() => setVisitStatus("idle"), 5000);
+                    } else {
+                      const errData = await res.json();
+                      alert(errData.message || "Failed to book visit");
+                      setVisitStatus("error");
+                    }
+                  } catch (error) {
+                    alert("Something went wrong. Please try again.");
+                    setVisitStatus("error");
+                  }
+                }}
               >
-                Book a Visit
-              </button>
-            </form>
+                <input
+                  type="text"
+                  required
+                  value={visitForm.name}
+                  onChange={(e) => setVisitForm({ ...visitForm, name: e.target.value })}
+                  placeholder="Full Name *"
+                  className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:border-gold transition-colors"
+                />
+                <input
+                  type="email"
+                  value={visitForm.email}
+                  onChange={(e) => setVisitForm({ ...visitForm, email: e.target.value })}
+                  placeholder="Email Address"
+                  className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:border-gold transition-colors"
+                />
+                <input
+                  type="tel"
+                  required
+                  value={visitForm.phone}
+                  onChange={(e) => setVisitForm({ ...visitForm, phone: e.target.value })}
+                  placeholder="Phone Number *"
+                  className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:border-gold transition-colors"
+                />
+                <textarea
+                  value={visitForm.message}
+                  onChange={(e) => setVisitForm({ ...visitForm, message: e.target.value })}
+                  placeholder="I am interested in this property..."
+                  className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:border-gold transition-colors h-32"
+                ></textarea>
+
+                <button
+                  type="submit"
+                  disabled={visitStatus === "submitting"}
+                  className="w-full py-4 bg-accent-dark text-white rounded-xl font-bold text-lg hover:bg-gold transition-all duration-300 shadow-lg hover:shadow-gold/20 transform hover:-translate-y-1 disabled:opacity-70 disabled:hover:-translate-y-0"
+                >
+                  {visitStatus === "submitting" ? "Submitting..." : "Book a Visit"}
+                </button>
+              </form>
+            )}
 
             <p className="text-xs text-gray-400 text-center mt-4">
               By submitting, you agree to our Terms of Use and Privacy Policy.

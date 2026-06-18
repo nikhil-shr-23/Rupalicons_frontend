@@ -46,6 +46,15 @@ export default function BuyPage() {
 
   useEffect(() => {
     fetchLikedPropertyIds().then((ids) => setLikedIds(new Set(ids)));
+    
+    // Parse URL parameters for initial filters (e.g. from Hero search or Footer links)
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const urlLocation = params.get("location") || params.get("city");
+      if (urlLocation) {
+        setFilters((prev) => ({ ...prev, location: urlLocation }));
+      }
+    }
   }, []);
 
   const applyFilters = useCallback(async () => {
@@ -205,11 +214,12 @@ export default function BuyPage() {
           <div className="text-center py-32 flex flex-col mx-auto bg-white max-w-md rounded-3xl items-center border border-gray-100 shadow-xl px-10">
             <span className="text-6xl mb-6 shadow-sm">🏠</span>
             <h3 className="text-3xl font-bold font-syne text-accent-dark mb-3">
-              You've seen them all!
+              {filters.location ? "Coming Soon!" : "You've seen them all!"}
             </h3>
             <p className="text-gray-500 mb-8 max-w-[280px]">
-              You've swiped through all available properties matching your
-              criteria in this area.
+              {filters.location
+                ? `We're expanding to ${filters.location} soon. Stay tuned for new properties!`
+                : "You've swiped through all available properties matching your criteria."}
             </p>
             <button
               onClick={() => {
@@ -219,9 +229,9 @@ export default function BuyPage() {
                   maxPrice: "",
                   propertyType: "",
                   bedrooms: "",
+                  priceRange: "",
                 });
                 setCurrentIndex(0);
-                applyFilters();
               }}
               className="bg-gold text-white font-bold py-3.5 px-8 rounded-full shadow-lg hover:bg-yellow-600 hover:-translate-y-1 transition-all"
             >

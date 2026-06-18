@@ -10,8 +10,9 @@ import {
 import { Property } from "@/types";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { MapPin, Bath, Bed, Square } from "lucide-react";
+import { MapPin, Bath, Bed, Square, Scale } from "lucide-react";
 import { useState, MouseEvent } from "react";
+import { useCompare } from "@/context/CompareContext";
 
 interface SwipeablePropertyCardProps {
   property: Property;
@@ -29,6 +30,9 @@ export default function SwipeablePropertyCard({
   const router = useRouter();
   const controls = useAnimation();
   const [isDragging, setIsDragging] = useState(false);
+  const { addToCompare, compareItems } = useCompare();
+  
+  const isCompared = compareItems.some((p) => p.id === property.id);
 
   // Motion values
   const x = useMotionValue(0);
@@ -190,8 +194,22 @@ export default function SwipeablePropertyCard({
         </div>
       </div>
 
+      {/* Compare Button */}
+      <div className="absolute top-4 right-4 z-10 flex flex-col gap-2">
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            if (!isCompared) addToCompare(property);
+          }}
+          className={`bg-black/40 backdrop-blur-md rounded-full p-3 text-white transition-all hover:bg-gold ${isCompared ? 'bg-gold' : ''}`}
+          title={isCompared ? "Added to compare" : "Compare"}
+        >
+          <Scale size={18} />
+        </button>
+      </div>
+
       {/* Click hint */}
-      <div className="absolute top-4 right-4 bg-black/40 backdrop-blur-md rounded-full px-4 py-2 text-white text-xs font-medium z-10 pointer-events-none drop-shadow-lg">
+      <div className="absolute top-16 right-4 bg-black/40 backdrop-blur-md rounded-full px-4 py-2 text-white text-xs font-medium z-10 pointer-events-none drop-shadow-lg">
         Tap to view details
       </div>
     </motion.div>

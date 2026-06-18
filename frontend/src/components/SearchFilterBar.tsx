@@ -44,7 +44,7 @@ export default function SearchFilterBar({ onSearch }: SearchFilterBarProps) {
           </p>
           <input
             type="text"
-            placeholder="San Jose, CA"
+            placeholder="Golf Course Road, Gurgaon"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
             className="w-full text-sm font-medium text-accent-dark placeholder-gray-300 focus:outline-none bg-transparent"

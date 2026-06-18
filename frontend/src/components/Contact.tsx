@@ -27,11 +27,28 @@ export default function Contact() {
     e.preventDefault();
     if (!formData.name.trim()) return;
 
+    // Validation
+    const phoneRegex = /^[6-9]\d{9}$/;
+    if (formData.phone && !phoneRegex.test(formData.phone.replace(/\D/g, ""))) {
+      setError("Please enter a valid 10-digit Indian mobile number.");
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (formData.email && !emailRegex.test(formData.email)) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+
     setSubmitting(true);
     setError("");
 
-    // Use placeholder submission function
-    const result = await submitContactForm(formData);
+    // Format phone to digits only if it matches
+    const submissionData = {
+      ...formData,
+      phone: formData.phone.replace(/\D/g, ""),
+    };
+
+    const result = await submitContactForm(submissionData);
 
     if (result) {
       setSubmitted(true);
@@ -236,6 +253,51 @@ export default function Contact() {
                     </p>
                     <p className="text-white text-lg">info@rupalihomes.com</p>
                   </div>
+                </div>
+
+                <div className="flex items-center gap-6 pt-4">
+                  <a
+                    href="https://wa.me/919876543210"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center justify-center w-12 h-12 rounded-full bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366] hover:text-white transition-colors"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+                    </svg>
+                  </a>
+                  <a
+                    href="https://instagram.com/rupali_homes"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center justify-center w-12 h-12 rounded-full bg-[#E1306C]/10 text-[#E1306C] hover:bg-[#E1306C] hover:text-white transition-colors"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+                      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                      <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+                    </svg>
+                  </a>
                 </div>
               </div>
             </div>
