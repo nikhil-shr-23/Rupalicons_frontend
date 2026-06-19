@@ -22,7 +22,7 @@ import {
   Download,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { fetchInquiries, deleteInquiry, getAuthHeader, API_URL } from "@/lib/api";
+import { fetchInquiries, deleteInquiry } from "@/lib/api";
 import { Inquiry } from "@/types";
 import { useAdminAuth } from "@/context/AdminAuthContext";
 
@@ -120,15 +120,33 @@ export default function LeadsPage() {
           <Button
             variant="outline"
             className="gap-2"
-            onClick={async () => {
+            onClick={() => {
               try {
-                const res = await fetch(`${API_URL}/admin/leads/export/csv`, {
-                  headers: { ...getAuthHeader() },
-                });
+                const escapeCsv = (value?: string | number | null): string => {
+                  const str = value == null ? "" : String(value);
+                  if (str.includes(",") || str.includes('"') || str.includes("\n")) {
+                    return `"${str.replace(/"/g, '""')}"`;
+                  }
+                  return str;
+                };
 
-                if (!res.ok) throw new Error("Export failed");
+                const header = "ID,Name,Phone,Email,Type,City,Location,Message,Created At";
+                const rows = inquiries.map((inq) =>
+                  [
+                    escapeCsv(inq.id),
+                    escapeCsv(inq.name),
+                    escapeCsv(inq.phone),
+                    escapeCsv(inq.email),
+                    escapeCsv(inq.type),
+                    escapeCsv(inq.city),
+                    escapeCsv(inq.location),
+                    escapeCsv(inq.message),
+                    escapeCsv(inq.createdAt ? formatDate(inq.createdAt) : ""),
+                  ].join(",")
+                );
 
-                const blob = await res.blob();
+                const csvContent = [header, ...rows].join("\n");
+                const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
                 const url = URL.createObjectURL(blob);
 
                 try {
