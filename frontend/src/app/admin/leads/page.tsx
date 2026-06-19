@@ -184,19 +184,6 @@ export default function LeadsPage() {
     });
   };
 
-  // ── Status badge color ───────────────────────────────────────────────
-  const statusColor = (status?: string): string => {
-    switch (status) {
-      case "NEW":
-        return "bg-blue-50 text-blue-700 border-blue-200";
-      case "CONTACTED":
-        return "bg-amber-50 text-amber-700 border-amber-200";
-      case "CLOSED":
-        return "bg-green-50 text-green-700 border-green-200";
-      default:
-        return "bg-gray-50 text-gray-600 border-gray-200";
-    }
-  };
 
   // ── CSV export (selected only) ───────────────────────────────────────
   const handleExportCsv = (): void => {
@@ -477,11 +464,7 @@ export default function LeadsPage() {
                             </div>
                           </div>
                           <div className="flex items-center gap-3 shrink-0">
-                            <span
-                              className={`text-[10px] px-2 py-0.5 rounded-full border font-medium hidden sm:inline ${statusColor(inq.status)}`}
-                            >
-                              {inq.status}
-                            </span>
+
                             <span className="text-[10px] text-gray-400 hidden md:inline">
                               {formatDate(inq.createdAt)}
                             </span>
@@ -540,19 +523,7 @@ export default function LeadsPage() {
                     </p>
                   </div>
 
-                  {/* Status + Type badges */}
-                  <div className="flex flex-wrap gap-2">
-                    <span
-                      className={`text-[11px] px-2.5 py-1 rounded-full border font-medium ${statusColor(selectedInquiry.status)}`}
-                    >
-                      {selectedInquiry.status}
-                    </span>
-                    {selectedInquiry.type && (
-                      <span className="text-[11px] px-2.5 py-1 rounded-full border font-medium bg-purple-50 text-purple-700 border-purple-200">
-                        {selectedInquiry.type}
-                      </span>
-                    )}
-                  </div>
+
 
                   {selectedInquiry.email && (
                     <div className="flex items-start gap-2">
