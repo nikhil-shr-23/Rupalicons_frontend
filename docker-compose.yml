@@ -6,17 +6,5 @@ services:
       dockerfile: Dockerfile
     container_name: rupali-backend
     restart: unless-stopped
-    environment:
-      # Supabase PostgreSQL
-      SPRING_DATASOURCE_URL: ${SUPABASE_DB_URL}
-      SPRING_DATASOURCE_USERNAME: ${SUPABASE_DB_USER:-postgres}
-      SPRING_DATASOURCE_PASSWORD: ${SUPABASE_DB_PASSWORD}
-      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
-      # JPA
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      SPRING_JPA_SHOW_SQL: "false"
-      # JWT
-      APP_JWT_SECRET: ${JWT_SECRET}
-      APP_JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS:-3600000}
     ports:
       - "${BACKEND_PORT:-8080}:8080"

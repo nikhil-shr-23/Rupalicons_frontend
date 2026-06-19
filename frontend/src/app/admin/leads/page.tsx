@@ -22,7 +22,7 @@ import {
   Download,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { fetchInquiries, deleteInquiry } from "@/lib/api";
+import { fetchInquiries, deleteInquiry, getAuthHeader, API_URL } from "@/lib/api";
 import { Inquiry } from "@/types";
 import { useAdminAuth } from "@/context/AdminAuthContext";
 
@@ -34,41 +34,66 @@ export default function LeadsPage() {
   const [selectedInquiry, setSelectedInquiry] = useState<Inquiry | null>(null);
   const { isSuperAdmin } = useAdminAuth();
 
-  const loadData = async () => {
-    setLoading(true);
-    const data = await fetchInquiries();
-    setInquiries(data);
-    setLoading(false);
+  const loadData = async (): Promise<void> => {
+    try {
+      setLoading(true);
+      const data = await fetchInquiries();
+      setInquiries(data ?? []);
+    } catch (error) {
+      console.error("Failed to load inquiries:", error);
+      setInquiries([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
     loadData();
   }, []);
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: number): Promise<void> => {
     if (!confirm("Delete this inquiry?")) return;
-    setDeletingId(id);
-    const success = await deleteInquiry(id);
-    if (success) {
-      setInquiries((prev) => prev.filter((i) => i.id !== id));
-      if (selectedInquiry?.id === id) setSelectedInquiry(null);
-    } else {
-      alert("Failed to delete. Only Super Admins can delete inquiries.");
+
+    try {
+      setDeletingId(id);
+
+      const success = await deleteInquiry(id);
+
+      if (success) {
+        setInquiries((prev) => prev.filter((i) => i.id !== id));
+
+        if (selectedInquiry?.id === id) {
+          setSelectedInquiry(null);
+        }
+      } else {
+        alert("Failed to delete inquiry.");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Failed to delete inquiry.");
+    } finally {
+      setDeletingId(null);
     }
-    setDeletingId(null);
   };
 
-  const filtered = inquiries.filter(
-    (inq) =>
-      inq.name.toLowerCase().includes(search.toLowerCase()) ||
-      (inq.email?.toLowerCase() || "").includes(search.toLowerCase()) ||
-      (inq.phone || "").includes(search) ||
-      (inq.location?.toLowerCase() || "").includes(search.toLowerCase()),
-  );
+  const filtered = inquiries.filter((inq) => {
+    const searchTerm = search.toLowerCase();
+
+    return (
+      (inq.name ?? "").toLowerCase().includes(searchTerm) ||
+      (inq.email ?? "").toLowerCase().includes(searchTerm) ||
+      (inq.phone ?? "").includes(search) ||
+      (inq.location ?? "").toLowerCase().includes(searchTerm)
+    );
+  });
 
   const formatDate = (dateStr?: string) => {
     if (!dateStr) return "—";
+
     const d = new Date(dateStr);
+
+    if (isNaN(d.getTime())) return "—";
+
     return d.toLocaleDateString("en-IN", {
       day: "numeric",
       month: "short",
@@ -95,8 +120,31 @@ export default function LeadsPage() {
           <Button
             variant="outline"
             className="gap-2"
-            onClick={() => {
-              window.open(`${process.env.NEXT_PUBLIC_API_URL || "https://api.rupalihomes.com"}/admin/export/inquiries`, "_blank");
+            onClick={async () => {
+              try {
+                const res = await fetch(`${API_URL}/admin/leads/export/csv`, {
+                  headers: { ...getAuthHeader() },
+                });
+
+                if (!res.ok) throw new Error("Export failed");
+
+                const blob = await res.blob();
+                const url = URL.createObjectURL(blob);
+
+                try {
+                  const a = document.createElement("a");
+                  a.href = url;
+                  a.download = "leads.csv";
+                  document.body.appendChild(a);
+                  a.click();
+                  a.remove();
+                } finally {
+                  URL.revokeObjectURL(url);
+                }
+              } catch (error) {
+                console.error("CSV export error:", error);
+                alert("Failed to export CSV. Please try again.");
+              }
             }}
             disabled={loading || inquiries.length === 0}
             title="Export CSV"
@@ -169,12 +217,13 @@ export default function LeadsPage() {
                       <div className="flex items-center gap-3 min-w-0">
                         <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
                           <span className="text-sm font-bold text-gray-500">
-                            {inq.name
+                            {(inq.name ?? "")
                               .split(" ")
-                              .map((n) => n[0])
+                              .filter(Boolean)
+                              .map((n) => n.charAt(0))
                               .join("")
                               .toUpperCase()
-                              .slice(0, 2)}
+                              .slice(0, 2) || "NA"}
                           </span>
                         </div>
                         <div className="min-w-0">
