@@ -157,6 +157,11 @@ export default function PropertyDetailsPage() {
 
   const statusStyles = getPropertyStatusStyles(property.status);
 
+  const allImages = [
+    property.imageUrl,
+    ...(property.imageGallery ? property.imageGallery.split(",") : []),
+  ].filter(Boolean) as string[];
+
   return (
     <div className="min-h-screen bg-[#FDFCF8] pt-24 pb-12">
       {/* Navigation Breadcrumb */}
@@ -173,31 +178,52 @@ export default function PropertyDetailsPage() {
       <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-3 gap-8">
         {/* Main Content (Left Column) */}
         <div className="lg:col-span-2 space-y-8">
-          {/* Hero Image Gallery */}
-          <div className="relative rounded-3xl overflow-hidden shadow-2xl bg-gray-100 group">
-            <div className="aspect-video relative">
-              {property.imageUrl ? (
-                <Image
-                  src={property.imageUrl}
-                  alt={property.title}
-                  fill
-                  className="object-cover"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-gray-400">
-                  No Image
+          {/* Hero Image Gallery (Airbnb Style Grid) */}
+          <div className="relative rounded-3xl overflow-hidden shadow-xl bg-gray-100 group h-[50vh] min-h-[400px]">
+            {allImages.length === 0 ? (
+              <div className="w-full h-full flex items-center justify-center text-gray-400">
+                No Image
+              </div>
+            ) : allImages.length === 1 ? (
+              <div className="w-full h-full relative cursor-pointer" onClick={() => setShowGallery(true)}>
+                <Image src={allImages[0]} alt={property.title} fill className="object-cover hover:scale-105 transition-transform duration-700" />
+              </div>
+            ) : allImages.length === 2 ? (
+              <div className="grid grid-cols-2 h-full gap-2 cursor-pointer" onClick={() => setShowGallery(true)}>
+                <div className="relative overflow-hidden"><Image src={allImages[0]} alt={property.title} fill className="object-cover hover:scale-105 transition-transform duration-700" /></div>
+                <div className="relative overflow-hidden"><Image src={allImages[1]} alt={property.title} fill className="object-cover hover:scale-105 transition-transform duration-700" /></div>
+              </div>
+            ) : allImages.length === 3 || allImages.length === 4 ? (
+              <div className="grid grid-cols-2 h-full gap-2 cursor-pointer" onClick={() => setShowGallery(true)}>
+                <div className="relative overflow-hidden"><Image src={allImages[0]} alt={property.title} fill className="object-cover hover:scale-105 transition-transform duration-700" /></div>
+                <div className="grid grid-rows-2 gap-2">
+                  <div className="relative overflow-hidden"><Image src={allImages[1]} alt={property.title} fill className="object-cover hover:scale-105 transition-transform duration-700" /></div>
+                  <div className="relative overflow-hidden"><Image src={allImages[2]} alt={property.title} fill className="object-cover hover:scale-105 transition-transform duration-700" /></div>
                 </div>
-              )}
-            </div>
+              </div>
+            ) : (
+              // 5 or more images
+              <div className="grid grid-cols-4 grid-rows-2 h-full gap-2 cursor-pointer" onClick={() => setShowGallery(true)}>
+                <div className="col-span-2 row-span-2 relative overflow-hidden">
+                  <Image src={allImages[0]} alt={property.title} fill className="object-cover hover:scale-105 transition-transform duration-700" />
+                </div>
+                <div className="relative overflow-hidden"><Image src={allImages[1]} alt={property.title} fill className="object-cover hover:scale-105 transition-transform duration-700" /></div>
+                <div className="relative overflow-hidden"><Image src={allImages[2]} alt={property.title} fill className="object-cover hover:scale-105 transition-transform duration-700" /></div>
+                <div className="relative overflow-hidden"><Image src={allImages[3]} alt={property.title} fill className="object-cover hover:scale-105 transition-transform duration-700" /></div>
+                <div className="relative overflow-hidden"><Image src={allImages[4]} alt={property.title} fill className="object-cover hover:scale-105 transition-transform duration-700" /></div>
+              </div>
+            )}
 
-            <div className="absolute bottom-4 right-4 flex gap-2">
-              <button
-                onClick={() => setShowGallery(true)}
-                className="bg-white/90 backdrop-blur text-accent-dark px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 hover:bg-white transition-colors shadow-lg"
-              >
-                <Maximize size={16} /> View Photos
-              </button>
-            </div>
+            {allImages.length > 0 && (
+              <div className="absolute bottom-4 right-4 flex gap-2">
+                <button
+                  onClick={() => setShowGallery(true)}
+                  className="bg-white/90 backdrop-blur text-accent-dark px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 hover:bg-white transition-colors shadow-lg border border-gray-200"
+                >
+                  <Maximize size={16} /> Show all {allImages.length} photos
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Key Info Header */}
