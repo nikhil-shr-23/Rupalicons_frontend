@@ -77,24 +77,27 @@ export default function AdminDashboard() {
     setDeletingId(null);
   };
 
+  const soldCount = properties.filter(p => p.status === "SOLD").length;
+  const rentedCount = properties.filter(p => p.status === "RENTED").length;
+
   const statCards = [
     {
       title: "Total Properties",
-      value: stats ? stats.totalProperties : properties.length,
+      value: properties.length,
       icon: Building2,
       href: "/admin/projects",
       actionLabel: "Manage Properties",
     },
     {
       title: "Sold Properties",
-      value: stats ? stats.totalSoldProperties : "—",
+      value: soldCount,
       icon: TrendingUp,
       href: "/admin/projects?status=SOLD",
       actionLabel: "View Sold",
     },
     {
       title: "Rented Properties",
-      value: stats ? stats.totalRentedProperties : "—",
+      value: rentedCount,
       icon: IndianRupee,
       href: "/admin/projects?status=RENTED",
       actionLabel: "View Rented",
