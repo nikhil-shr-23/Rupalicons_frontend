@@ -56,6 +56,35 @@ import {
 } from "@/types";
 import Image from "next/image";
 
+const InputField = ({
+  label,
+  value,
+  onChange,
+  placeholder,
+  type = "text",
+  icon: Icon,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder: string;
+  type?: string;
+  icon?: React.ElementType;
+}) => (
+  <div className="space-y-1.5">
+    <Label className="flex items-center gap-1 text-xs font-medium text-gray-600">
+      {Icon && <Icon size={12} />} {label}
+    </Label>
+    <Input
+      type={type}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder={placeholder}
+      className="h-9 text-sm"
+    />
+  </div>
+);
+
 export default function AdminProjects() {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
@@ -401,34 +430,7 @@ export default function AdminProjects() {
     return typeMatch && statusMatch;
   });
 
-  const InputField = ({
-    label,
-    value,
-    onChange,
-    placeholder,
-    type = "text",
-    icon: Icon,
-  }: {
-    label: string;
-    value: string;
-    onChange: (v: string) => void;
-    placeholder: string;
-    type?: string;
-    icon?: React.ElementType;
-  }) => (
-    <div className="space-y-1.5">
-      <Label className="flex items-center gap-1 text-xs font-medium text-gray-600">
-        {Icon && <Icon size={12} />} {label}
-      </Label>
-      <Input
-        type={type}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        className="h-9 text-sm"
-      />
-    </div>
-  );
+
 
   return (
     <div className="space-y-6">
