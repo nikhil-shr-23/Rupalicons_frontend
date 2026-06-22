@@ -256,4 +256,16 @@ public class AdminPropertyServiceImpl implements AdminPropertyService {
         dto.setReactionsCount((int) realCount);
         return dto;
     }
+
+    @Override
+    public org.springframework.data.domain.Page<PropertyResponseDTO> getAllProperties(org.springframework.data.domain.Pageable pageable) {
+        return propertyRepository.findAll(pageable).map(this::toDto);
+    }
+
+    @Override
+    public PropertyResponseDTO getPropertyById(Long id) {
+        Property property = propertyRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Property not found"));
+        return toDto(property);
+    }
 }

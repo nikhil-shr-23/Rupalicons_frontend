@@ -22,6 +22,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 import java.util.UUID;
 
 @RestController
@@ -39,6 +46,25 @@ public class AdminPropertyController {
                 adminPropertyService.createProperty(dto, userDetails.getUsername()),
                 HttpStatus.CREATED
         );
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<PropertyResponseDTO>> getAllProperties(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "100") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDir
+    ) {
+        Sort sort = sortDir.equalsIgnoreCase("asc")
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return ResponseEntity.ok(adminPropertyService.getAllProperties(pageable));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<PropertyResponseDTO> getPropertyById(@PathVariable Long id) {
+        return ResponseEntity.ok(adminPropertyService.getPropertyById(id));
     }
 
     @PutMapping("/{id}")

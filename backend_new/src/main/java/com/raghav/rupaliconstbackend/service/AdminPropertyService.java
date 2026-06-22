@@ -20,4 +20,8 @@ public interface AdminPropertyService {
     PurchaseResponseDTO purchaseProperty(Long id, PurchaseRequestDTO dto, String adminEmail);
 
     RentalResponseDTO rentProperty(Long id, RentalRequestDTO dto, String adminEmail);
+
+    org.springframework.data.domain.Page<PropertyResponseDTO> getAllProperties(org.springframework.data.domain.Pageable pageable);
+
+    PropertyResponseDTO getPropertyById(Long id);
 }
