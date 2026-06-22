@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import {
-  fetchProperties,
+  fetchAdminProperties,
   fetchBlogs,
   fetchContactSubmissions,
   fetchDashboardStats,
@@ -45,7 +45,7 @@ export default function AdminDashboard() {
     try {
       const [propertiesRes, blogsRes, leadsRes, dashboardRes] =
         await Promise.all([
-          fetchProperties(0, 100),
+          fetchAdminProperties(0, 100),
           fetchBlogs(),
           fetchContactSubmissions(),
           fetchDashboardStats(),
@@ -77,8 +77,8 @@ export default function AdminDashboard() {
     setDeletingId(null);
   };
 
-  const soldCount = properties.filter(p => p.status === "SOLD").length;
-  const rentedCount = properties.filter(p => p.status === "RENTED").length;
+  const soldCount = stats?.totalSoldProperties ?? properties.filter((p) => p.status === "SOLD").length;
+  const rentedCount = stats?.totalRentedProperties ?? properties.filter((p) => p.status === "RENTED").length;
 
   const statCards = [
     {

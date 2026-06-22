@@ -25,6 +25,7 @@ import {
   CheckCircle,
 } from "lucide-react";
 import { getAmenityIcon } from "@/lib/amenities";
+import { getPropertyStatusStyles } from "@/lib/propertyStatus";
 import confetti from "canvas-confetti";
 import {
   fetchPropertyById,
@@ -154,6 +155,8 @@ export default function PropertyDetailsPage() {
     );
   }
 
+  const statusStyles = getPropertyStatusStyles(property.status);
+
   return (
     <div className="min-h-screen bg-[#FDFCF8] pt-24 pb-12">
       {/* Navigation Breadcrumb */}
@@ -201,8 +204,8 @@ export default function PropertyDetailsPage() {
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-200 pb-8">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <span className="w-2 h-2 rounded-full bg-green-500"></span>
-                <span className="text-sm font-bold uppercase tracking-widest text-green-600">
+                <span className={`w-2 h-2 rounded-full ${statusStyles.dot}`}></span>
+                <span className={`text-sm font-bold uppercase tracking-widest ${statusStyles.text}`}>
                   {property.status}
                 </span>
                 <span className="text-gray-300">|</span>

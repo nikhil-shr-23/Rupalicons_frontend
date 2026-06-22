@@ -34,7 +34,7 @@ import {
   Layers,
 } from "lucide-react";
 import {
-  fetchProperties,
+  fetchAdminProperties,
   deleteProperty,
   createProperty,
   updateProperty,
@@ -156,7 +156,7 @@ export default function AdminProjects() {
     setLoading(true);
     try {
       const [data, stats] = await Promise.all([
-        fetchProperties(0, 100),
+        fetchAdminProperties(0, 100),
         fetchDashboardStats(),
       ]);
       if (data && data.content) setProperties(data.content);
@@ -166,6 +166,16 @@ export default function AdminProjects() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const upsertPropertyInList = (updated: Property) => {
+    setProperties((prev) => {
+      const exists = prev.some((p) => p.id === updated.id);
+      if (exists) {
+        return prev.map((p) => (p.id === updated.id ? updated : p));
+      }
+      return [updated, ...prev];
+    });
   };
 
   useEffect(() => {
@@ -349,7 +359,7 @@ export default function AdminProjects() {
       : await createProperty(propertyData);
 
     if (result) {
-      await loadProperties();
+      upsertPropertyInList(result);
       resetForm();
     } else {
       alert("Failed to save. Make sure you are logged in as admin.");
@@ -374,12 +384,15 @@ export default function AdminProjects() {
       !confirm(`Are you sure you want to mark this property as ${newStatus}?`)
     )
       return;
-    const ok = await updateProperty(Number(property.id), {
+    const result = await updateProperty(Number(property.id), {
       ...property,
       status: newStatus,
     });
-    if (ok) await loadProperties();
-    else alert("Failed to update status.");
+    if (result) {
+      upsertPropertyInList(result);
+      const stats = await fetchDashboardStats();
+      if (stats) setDashboardStats(stats);
+    } else alert("Failed to update status.");
   };
 
   const filteredProperties = properties.filter((p) => {

@@ -11,6 +11,115 @@ export function getAuthHeader(): Record<string, string> {
 
 // ─── Property API (Real Backend) ────────────────────────────────────────
 
+const ADMIN_PROPERTY_CACHE_KEY = "rupalihomes_admin_property_cache";
+
+function normalizePropertyStatus(status: unknown): PropertyStatus {
+  if (!status) return PropertyStatus.AVAILABLE;
+  const normalized = String(status).toUpperCase();
+  if (Object.values(PropertyStatus).includes(normalized as PropertyStatus)) {
+    return normalized as PropertyStatus;
+  }
+  return PropertyStatus.AVAILABLE;
+}
+
+function readAdminPropertyCache(): Property[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(ADMIN_PROPERTY_CACHE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as Property[];
+    return Array.isArray(parsed) ? parsed.map((p) => ({ ...p, status: normalizePropertyStatus(p.status) })) : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeAdminPropertyCache(properties: Property[]) {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(ADMIN_PROPERTY_CACHE_KEY, JSON.stringify(properties));
+}
+
+function cacheAdminProperty(property: Property) {
+  if (!property.id) return;
+  const cached = readAdminPropertyCache().filter((p) => p.id !== property.id);
+  if (property.status !== PropertyStatus.AVAILABLE) {
+    cached.push(property);
+  }
+  writeAdminPropertyCache(cached);
+}
+
+function removeAdminPropertyFromCache(id: string | number) {
+  writeAdminPropertyCache(readAdminPropertyCache().filter((p) => String(p.id) !== String(id)));
+}
+
+function mergeAdminProperties(available: Property[], cached: Property[]): Property[] {
+  const byId = new Map<number, Property>();
+  for (const property of available) {
+    if (property.id != null) byId.set(property.id, property);
+  }
+  for (const property of cached) {
+    if (property.id != null && property.status !== PropertyStatus.AVAILABLE) {
+      byId.set(property.id, property);
+    }
+  }
+  return Array.from(byId.values()).sort((a, b) => {
+    const aTime = a.createdAt ? Date.parse(a.createdAt) : 0;
+    const bTime = b.createdAt ? Date.parse(b.createdAt) : 0;
+    return bTime - aTime;
+  });
+}
+
+async function fetchAdminPropertiesFallback(
+  page = 0,
+  size = 100,
+): Promise<{ content: Property[]; totalPages: number; totalElements: number }> {
+  const [available, cached] = await Promise.all([
+    fetchProperties(page, size),
+    Promise.resolve(readAdminPropertyCache()),
+  ]);
+  const content = mergeAdminProperties(available.content, cached);
+  return {
+    content,
+    totalPages: 1,
+    totalElements: content.length,
+  };
+}
+
+/** Admin list: all statuses. Uses /admin/properties when available, otherwise merges public list + local cache. */
+export async function fetchAdminProperties(
+  page = 0,
+  size = 100,
+): Promise<{ content: Property[]; totalPages: number; totalElements: number }> {
+  try {
+    const params = new URLSearchParams();
+    params.set("page", String(page));
+    params.set("size", String(size));
+
+    const res = await fetch(`${API_URL}/admin/properties?${params.toString()}`, {
+      headers: { ...getAuthHeader() },
+    });
+
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    const data = await res.json();
+    const rawContent = Array.isArray(data) ? data : data.content || [];
+    const content: Property[] = rawContent.map(mapPropertyFromBackend);
+
+    writeAdminPropertyCache(
+      content.filter((property) => property.status !== PropertyStatus.AVAILABLE),
+    );
+
+    return {
+      content,
+      totalPages: data.totalPages || 1,
+      totalElements: data.totalElements || content.length,
+    };
+  } catch (error) {
+    console.warn("Admin properties endpoint unavailable, using fallback:", error);
+    return fetchAdminPropertiesFallback(page, size);
+  }
+}
+
 export async function fetchProperties(
   page = 0,
   size = 12,
@@ -105,7 +214,9 @@ export async function updateProperty(id: string | number, property: Partial<Prop
       return null;
     }
     const data = await res.json();
-    return mapPropertyFromBackend(data);
+    const updated = mapPropertyFromBackend(data);
+    cacheAdminProperty(updated);
+    return updated;
   } catch (error) {
     console.error("Failed to update property:", error);
     return null;
@@ -119,7 +230,11 @@ export async function deleteProperty(id: string | number): Promise<boolean> {
       method: "DELETE",
       headers: { ...getAuthHeader() },
     });
-    return res.ok || res.status === 204;
+    if (res.ok || res.status === 204) {
+      removeAdminPropertyFromCache(id);
+      return true;
+    }
+    return false;
   } catch (error) {
     console.error("Failed to delete property:", error);
     return false;
@@ -189,7 +304,7 @@ function mapPropertyFromBackend(dto: Record<string, unknown>): Property {
     location: (dto.location as string) || "",
     size: (dto.size as string) || "",
     type: (dto.type as PropertyType) || PropertyType.SALE,
-    status: (dto.status as PropertyStatus) || PropertyStatus.AVAILABLE,
+    status: normalizePropertyStatus(dto.status),
     createdBy: dto.createdBy ? Number(dto.createdBy) : undefined,
     createdAt: dto.createdAt ? String(dto.createdAt) : undefined,
     imageUrl: (dto.imageUrl as string) || undefined,
