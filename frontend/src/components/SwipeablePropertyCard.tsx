@@ -8,6 +8,7 @@ import {
   PanInfo,
 } from "framer-motion";
 import { Property } from "@/types";
+import { formatIndianPrice } from "@/lib/utils";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { MapPin, Bath, Bed, Square, Scale } from "lucide-react";
@@ -155,12 +156,12 @@ export default function SwipeablePropertyCard({
             <span className="text-sm font-bold text-gray-500 uppercase tracking-wider">
               {property.type === "RENT" ? "Monthly Rent" : "Price"}
             </span>
-            <span className="text-3xl font-black text-gold">
-              ₹
+            <p className="text-xl font-bold text-gold font-syne">
               {property.type === "RENT"
-                ? property.rentAmount?.toLocaleString()
-                : property.price?.toLocaleString()}
-            </span>
+                ? formatIndianPrice(property.rentAmount)
+                : formatIndianPrice(property.price)}
+              {property.type === "RENT" && <span className="text-sm font-normal text-gray-500">/mo</span>}
+            </p>
           </div>
 
           <p className="text-gray-600 line-clamp-3 text-base leading-relaxed">
