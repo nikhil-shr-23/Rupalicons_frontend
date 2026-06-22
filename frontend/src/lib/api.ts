@@ -489,3 +489,20 @@ export async function deleteAdmin(id: number): Promise<boolean> {
     return false;
   }
 }
+
+export async function createAdmin(data: { name: string; email: string; password: string }): Promise<boolean> {
+  try {
+    const res = await fetch(`${API_URL}/super-admin/admins`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...getAuthHeader(),
+      },
+      body: JSON.stringify(data),
+    });
+    return res.ok || res.status === 201;
+  } catch (error) {
+    console.error("Failed to create admin:", error);
+    return false;
+  }
+}

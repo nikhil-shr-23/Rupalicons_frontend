@@ -9,8 +9,8 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Shield, Trash2, Mail, RefreshCw, AlertCircle } from "lucide-react";
-import { fetchAdmins, deleteAdmin } from "@/lib/api";
+import { Shield, Trash2, Mail, RefreshCw, Plus, UserPlus, X, Eye, EyeOff } from "lucide-react";
+import { fetchAdmins, deleteAdmin, createAdmin } from "@/lib/api";
 import { Admin } from "@/types";
 import { useAdminAuth } from "@/context/AdminAuthContext";
 
@@ -19,6 +19,13 @@ export default function AdminsPage() {
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const { isSuperAdmin } = useAdminAuth();
+
+  // Add Admin form state
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [formData, setFormData] = useState({ name: "", email: "", password: "" });
+  const [formError, setFormError] = useState("");
 
   const loadData = async () => {
     setLoading(true);
@@ -43,6 +50,33 @@ export default function AdminsPage() {
     setDeletingId(null);
   };
 
+  const handleAddAdmin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormError("");
+
+    if (!formData.name.trim() || !formData.email.trim() || !formData.password.trim()) {
+      setFormError("All fields are required.");
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      setFormError("Password must be at least 6 characters.");
+      return;
+    }
+
+    setCreating(true);
+    const success = await createAdmin(formData);
+    if (success) {
+      setFormData({ name: "", email: "", password: "" });
+      setShowAddForm(false);
+      setShowPassword(false);
+      await loadData();
+    } else {
+      setFormError("Failed to create admin. Email may already be registered.");
+    }
+    setCreating(false);
+  };
+
   if (!isSuperAdmin) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[50vh] text-center px-4">
@@ -62,16 +96,146 @@ export default function AdminsPage() {
           </h1>
           <p className="text-gray-500 mt-1">Manage system administrators.</p>
         </div>
-        <Button
-          variant="outline"
-          onClick={loadData}
-          disabled={loading}
-          className="gap-2"
-        >
-          <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
-          Refresh
-        </Button>
+        <div className="flex gap-3">
+          <Button
+            variant="outline"
+            onClick={loadData}
+            disabled={loading}
+            className="gap-2"
+          >
+            <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
+            Refresh
+          </Button>
+          <Button
+            onClick={() => setShowAddForm(true)}
+            className="gap-2 bg-accent-dark hover:bg-accent-dark/90 text-white"
+          >
+            <UserPlus size={16} />
+            Add Admin
+          </Button>
+        </div>
       </div>
+
+      {/* Add Admin Form */}
+      {showAddForm && (
+        <Card className="border-gold/30 shadow-lg">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <UserPlus size={20} className="text-gold" />
+                Add New Admin
+              </CardTitle>
+              <CardDescription>
+                Create a new administrator account. Only Super Admins can perform this action.
+              </CardDescription>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => {
+                setShowAddForm(false);
+                setFormError("");
+                setFormData({ name: "", email: "", password: "" });
+                setShowPassword(false);
+              }}
+              className="shrink-0"
+            >
+              <X size={18} />
+            </Button>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleAddAdmin} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    Full Name
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    placeholder="John Doe"
+                    className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none transition-all text-sm"
+                    disabled={creating}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    placeholder="admin@example.com"
+                    className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none transition-all text-sm"
+                    disabled={creating}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      value={formData.password}
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                      placeholder="Min. 6 characters"
+                      className="w-full px-4 py-2.5 pr-10 rounded-lg border border-gray-200 focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none transition-all text-sm"
+                      disabled={creating}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                    >
+                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {formError && (
+                <p className="text-sm text-red-500 font-medium">{formError}</p>
+              )}
+
+              <div className="flex justify-end gap-3 pt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setShowAddForm(false);
+                    setFormError("");
+                    setFormData({ name: "", email: "", password: "" });
+                    setShowPassword(false);
+                  }}
+                  disabled={creating}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={creating}
+                  className="gap-2 bg-gold hover:bg-gold-hover text-white"
+                >
+                  {creating ? (
+                    <>
+                      <RefreshCw size={14} className="animate-spin" />
+                      Creating...
+                    </>
+                  ) : (
+                    <>
+                      <Plus size={14} />
+                      Create Admin
+                    </>
+                  )}
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      )}
 
       <Card>
         <CardHeader>
