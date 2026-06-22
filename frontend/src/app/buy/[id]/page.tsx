@@ -35,6 +35,7 @@ import {
   fetchLikedPropertyIds,
 } from "@/lib/api";
 import { Property, PropertyType } from "@/types";
+import { formatIndianPrice } from "@/lib/utils";
 
 export default function PropertyDetailsPage() {
   const { id } = useParams();
@@ -241,8 +242,8 @@ export default function PropertyDetailsPage() {
               </div>
               <h1 className="text-4xl md:text-5xl font-bold font-syne text-accent-dark mb-2">
                 {property.price
-                  ? `₹${(property.price / 10000000).toFixed(2)} Cr`
-                  : `₹${(property.rentAmount! / 1000).toFixed(1)}k/mo`}
+                  ? formatIndianPrice(property.price)
+                  : `${formatIndianPrice(property.rentAmount)}/mo`}
               </h1>
               <div className="flex items-center text-gray-500 text-lg">
                 <MapPin size={18} className="mr-2 text-gold" />
@@ -678,7 +679,7 @@ export default function PropertyDetailsPage() {
                     {p.location}
                   </p>
                   <p className="text-gold font-bold mt-2">
-                    {p.price ? `₹${(p.price / 10000000).toFixed(2)} Cr` : ""}
+                    {p.price ? formatIndianPrice(p.price) : ""}
                   </p>
                 </div>
               </Link>

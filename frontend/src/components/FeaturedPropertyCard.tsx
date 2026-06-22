@@ -8,6 +8,7 @@ import { Property } from "@/types";
 import confetti from "canvas-confetti";
 import { likeProperty, unlikeProperty, fetchLikedPropertyIds } from "@/lib/api";
 import { useCompare } from "@/context/CompareContext";
+import { formatIndianPrice } from "@/lib/utils";
 
 interface FeaturedPropertyCardProps {
   property: Property;
@@ -32,7 +33,7 @@ export default function FeaturedPropertyCard({
   }, [initialProperty.id]);
 
   // Use a fallback price if property.price is missing or 0, to avoid displaying "0"
-  const price = property.price ? property.price.toLocaleString() : "1,650,000";
+  const price = property.price ? formatIndianPrice(property.price) : "Price on Request";
 
   return (
     <motion.div
@@ -190,7 +191,7 @@ export default function FeaturedPropertyCard({
         <div className="flex items-center justify-between">
           <div>
             <p className="text-3xl font-bold text-accent-dark font-syne">
-              ₹{price}
+              {price}
             </p>
           </div>
           <button className="px-4 py-2 border border-gray-200 rounded-full text-sm font-medium hover:bg-gray-50 transition-colors flex items-center gap-1">

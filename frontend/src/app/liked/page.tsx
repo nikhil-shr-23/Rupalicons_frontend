@@ -6,6 +6,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { fetchLikedProperties, unlikeProperty } from "@/lib/api";
 import { Property } from "@/types";
+import { formatIndianPrice } from "@/lib/utils";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Heart, ArrowUpRight, HeartOff } from "lucide-react";
@@ -119,13 +120,13 @@ export default function LikedPage() {
                       <h3 className="text-xl font-bold font-syne text-accent-dark group-hover:text-gold transition-colors">
                         {property.title}
                       </h3>
-                      <span className="text-lg font-bold text-gold whitespace-nowrap ml-2">
+                      <p className="text-gold font-bold whitespace-nowrap ml-2">
                         {property.type === "RENT" && property.rentAmount
-                          ? `₹${property.rentAmount.toLocaleString()}/mo`
+                          ? `${formatIndianPrice(property.rentAmount)}/mo`
                           : property.price
-                            ? `₹${(property.price / 10000000).toFixed(2)} Cr`
-                            : ""}
-                      </span>
+                          ? formatIndianPrice(property.price)
+                          : "Price on Request"}
+                      </p>
                     </div>
 
                     <p className="text-gray-500 mb-4 flex items-center gap-2 text-sm">

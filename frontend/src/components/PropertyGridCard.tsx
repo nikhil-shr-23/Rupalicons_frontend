@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { formatIndianPrice } from "@/lib/utils";
 import { Heart, MapPin, Bed, Bath, Square, Scale, ArrowUpRight } from "lucide-react";
 import { Property } from "@/types";
 import confetti from "canvas-confetti";
@@ -73,9 +74,10 @@ export default function PropertyGridCard({ property, index = 0 }: PropertyGridCa
     }
   };
 
-  const price = property.type === "RENT"
-    ? property.rentAmount?.toLocaleString()
-    : property.price?.toLocaleString();
+  const formattedPrice =
+    property.type === "RENT"
+    ? `${formatIndianPrice(property.rentAmount)}`
+    : formatIndianPrice(property.price);
 
   const detailPath = property.type === "RENT"
     ? `/rent/${property.id}`
@@ -153,8 +155,8 @@ export default function PropertyGridCard({ property, index = 0 }: PropertyGridCa
           <div className="p-5">
             {/* Price */}
             <div className="flex items-baseline justify-between mb-2">
-              <span className="text-2xl font-black text-gold font-syne">
-                ₹{price || "—"}
+              <span className="text-xl font-bold font-syne text-accent-dark group-hover:text-gold transition-colors">
+                {formattedPrice}
               </span>
               <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
                 {property.type === "RENT" ? "/month" : ""}
