@@ -30,6 +30,7 @@ import {
   ChevronDown,
   ChevronUp,
   Building2,
+  Upload,
   MapPin,
   Layers,
 } from "lucide-react";
@@ -679,36 +680,28 @@ export default function AdminProjects() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div className="space-y-1.5">
               <Label className="flex items-center gap-1 text-xs font-medium text-gray-600">
-                <ImageIcon size={12} /> Image URL
+                <ImageIcon size={12} /> Main Property Image
               </Label>
-              <div className="flex gap-2">
-                <Input
-                  value={formImageUrl}
-                  onChange={(e) => setFormImageUrl(e.target.value)}
-                  placeholder="https://example.com/property.jpg"
-                  className="h-9 text-sm flex-1"
+              <Button
+                type="button"
+                variant="outline"
+                className="h-9 w-full relative overflow-hidden flex items-center justify-center gap-2 border-dashed border-gray-300 hover:border-accent-dark hover:bg-gray-50"
+                disabled={uploadingMain}
+              >
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="absolute inset-0 opacity-0 cursor-pointer"
+                  onChange={(e) => handleImageUpload(e, true)}
                 />
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="h-9 px-3 shrink-0 relative overflow-hidden"
-                  disabled={uploadingMain}
-                >
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="absolute inset-0 opacity-0 cursor-pointer"
-                    onChange={(e) => handleImageUpload(e, true)}
-                  />
-                  {uploadingMain ? (
-                    <RefreshCw className="h-4 w-4 animate-spin text-gray-500" />
-                  ) : (
-                    "Upload"
-                  )}
-                </Button>
-              </div>
+                {uploadingMain ? (
+                  <><RefreshCw className="h-4 w-4 animate-spin text-gray-500" /> Uploading...</>
+                ) : (
+                  <><Upload size={14} className="text-gray-500" /> Click to Upload Main Image</>
+                )}
+              </Button>
               {formImageUrl && (
-                <div className="relative w-32 h-24 rounded-lg overflow-hidden border border-gray-200 mt-1.5">
+                <div className="relative w-full h-32 rounded-lg overflow-hidden border border-gray-200 mt-2">
                   <Image
                     src={formImageUrl}
                     alt="Preview"
@@ -718,80 +711,93 @@ export default function AdminProjects() {
                       (e.target as HTMLImageElement).style.display = "none";
                     }}
                   />
+                  <button
+                    type="button"
+                    onClick={() => setFormImageUrl("")}
+                    className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors shadow-sm"
+                  >
+                    <Trash2 size={12} />
+                  </button>
                 </div>
               )}
             </div>
-            <InputField
-              label="Brochure URL"
-              value={formBrochureUrl}
-              onChange={setFormBrochureUrl}
-              placeholder="https://example.com/brochure.pdf"
-              icon={FileDown}
-            />
+            
+            <div className="space-y-1.5">
+              <Label className="flex items-center gap-1 text-xs font-medium text-gray-600">
+                <FileDown size={12} /> Brochure (PDF)
+              </Label>
+              <Input
+                value={formBrochureUrl}
+                onChange={(e) => setFormBrochureUrl(e.target.value)}
+                placeholder="https://example.com/brochure.pdf"
+                className="h-9 text-sm"
+              />
+              {/* Optional: You can implement a document upload similar to image upload if needed */}
+            </div>
           </div>
 
           <div className="space-y-3 mb-6 bg-gray-50/50 p-4 rounded-xl border border-gray-100">
             <Label className="flex items-center gap-2 text-sm font-semibold text-gray-800">
               <ImageIcon size={14} className="text-gold" /> Image Gallery
-              (Optional)
+              <span className="text-xs font-normal text-gray-500">(Optional)</span>
             </Label>
-            <p className="text-xs text-gray-500 mb-2">
+            <p className="text-xs text-gray-500 mb-3">
               Add additional photos for the property's photo slider.
             </p>
-            {formImageGallery.map((url, i) => (
-              <div key={i} className="flex gap-2 items-start">
-                <Input
-                  value={url}
-                  onChange={(e) => {
-                    const newGallery = [...formImageGallery];
-                    newGallery[i] = e.target.value;
-                    setFormImageGallery(newGallery);
-                  }}
-                  placeholder="https://example.com/photo2.jpg"
-                  className="h-9 text-sm flex-1"
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="h-9 px-3 shrink-0 relative overflow-hidden"
-                  disabled={uploadingGalleryIdx === i}
-                >
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="absolute inset-0 opacity-0 cursor-pointer"
-                    onChange={(e) => handleImageUpload(e, false, i)}
+            
+            {/* Gallery Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+              {formImageGallery.map((url, i) => (
+                <div key={i} className="relative aspect-video rounded-lg overflow-hidden border border-gray-200 group">
+                  <Image
+                    src={url}
+                    alt={`Gallery ${i + 1}`}
+                    fill
+                    className="object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = "none";
+                    }}
                   />
-                  {uploadingGalleryIdx === i ? (
-                    <RefreshCw className="h-4 w-4 animate-spin text-gray-500" />
-                  ) : (
-                    "Upload"
-                  )}
-                </Button>
-                <button
-                  type="button"
-                  onClick={() =>
-                    setFormImageGallery(
-                      formImageGallery.filter((_, idx) => idx !== i),
-                    )
-                  }
-                  className="p-2 text-red-500 hover:bg-red-50 rounded-lg shrink-0 transition-colors"
-                >
-                  <Trash2 size={16} />
-                </button>
-              </div>
-            ))}
-            <button
-              type="button"
-              onClick={() => setFormImageGallery([...formImageGallery, ""])}
-              className="mt-2 text-xs font-medium text-accent-dark border border-accent-dark/20 bg-white hover:bg-gray-50 px-3 py-1.5 rounded-lg flex items-center gap-1 transition-colors group"
-            >
-              <Plus
-                size={12}
-                className="group-hover:text-gold transition-colors"
-              />{" "}
-              Add Image URL
-            </button>
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <button
+                      type="button"
+                      onClick={() => setFormImageGallery(formImageGallery.filter((_, idx) => idx !== i))}
+                      className="p-1.5 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors shadow-sm"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                </div>
+              ))}
+              
+              {/* Add New Gallery Image Button */}
+              <Button
+                type="button"
+                variant="outline"
+                className="relative aspect-video h-auto rounded-lg overflow-hidden flex flex-col items-center justify-center gap-1 border-dashed border-gray-300 hover:border-accent-dark hover:bg-gray-50"
+                disabled={uploadingGalleryIdx === formImageGallery.length}
+              >
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="absolute inset-0 opacity-0 cursor-pointer"
+                  onChange={(e) => {
+                    const newIdx = formImageGallery.length;
+                    // Pre-fill with empty string so the index exists
+                    setFormImageGallery([...formImageGallery, ""]);
+                    handleImageUpload(e, false, newIdx);
+                  }}
+                />
+                {uploadingGalleryIdx === formImageGallery.length ? (
+                  <RefreshCw className="h-5 w-5 animate-spin text-gray-400" />
+                ) : (
+                  <>
+                    <Plus size={18} className="text-gray-400" />
+                    <span className="text-xs text-gray-500">Add Image</span>
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
 
           {/* Section 4: Featured + Tags */}

@@ -563,18 +563,18 @@ export async function uploadImage(file: File): Promise<string> {
   const formData = new FormData();
   formData.append("file", file);
 
-  const res = await fetch(`${API_URL}/admin/images/upload`, {
+  const res = await fetch(`/api/upload`, {
     method: "POST",
-    headers: getAuthHeader(),
     body: formData,
   });
 
   if (!res.ok) {
-    throw new Error(`Upload failed: ${res.statusText}`);
+    const err = await res.json().catch(() => ({}));
+    throw new Error(`Upload failed: ${err.error || res.statusText}`);
   }
 
-  // Returns the DB URL directly, e.g., "https://api.rupalihomes.com/images/1"
-  return await res.text();
+  const data = await res.json();
+  return data.url;
 }
 
 // ─── Super Admin API ───────────────────────────────────────────────────
