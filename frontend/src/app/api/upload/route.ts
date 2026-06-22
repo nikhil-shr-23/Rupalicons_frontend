@@ -23,10 +23,14 @@ export async function POST(request: Request) {
     const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
     const filePath = `properties/${fileName}`;
 
+    // Convert file to Buffer for Supabase upload in Node.js environment
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
     // Upload the file to the 'images' bucket
     const { data, error } = await supabase.storage
       .from('images')
-      .upload(filePath, file, {
+      .upload(filePath, buffer, {
         contentType: file.type || 'image/jpeg',
         cacheControl: '3600',
         upsert: false
