@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   Table,
   TableBody,
@@ -63,6 +64,7 @@ export default function AdminProjects() {
   const [saving, setSaving] = useState(false);
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [filterType, setFilterType] = useState<string>("ALL");
+  const [filterStatus, setFilterStatus] = useState<string>("ALL");
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [dashboardStats, setDashboardStats] = useState<DashboardStats | null>(
     null,
@@ -168,6 +170,17 @@ export default function AdminProjects() {
 
   useEffect(() => {
     loadProperties();
+  }, []);
+
+  // Read status query param from URL on mount
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const statusParam = params.get("status");
+      if (statusParam && ["SOLD", "RENTED", "AVAILABLE"].includes(statusParam)) {
+        setFilterStatus(statusParam);
+      }
+    }
   }, []);
 
   const handleImageUpload = async (
@@ -369,10 +382,11 @@ export default function AdminProjects() {
     else alert("Failed to update status.");
   };
 
-  const filteredProperties =
-    filterType === "ALL"
-      ? properties
-      : properties.filter((p) => p.type === filterType);
+  const filteredProperties = properties.filter((p) => {
+    const typeMatch = filterType === "ALL" || p.type === filterType;
+    const statusMatch = filterStatus === "ALL" || p.status === filterStatus;
+    return typeMatch && statusMatch;
+  });
 
   const InputField = ({
     label,
@@ -500,24 +514,52 @@ export default function AdminProjects() {
       )}
 
       {/* Filter Tabs */}
-      <div className="flex gap-2">
-        {["ALL", "SALE", "RENT"].map((t) => (
-          <Button
-            key={t}
-            variant={filterType === t ? "default" : "outline"}
-            size="sm"
-            onClick={() => setFilterType(t)}
-            className={
-              filterType === t ? "bg-accent-dark text-white" : "text-gray-600"
-            }
-          >
-            {t === "ALL"
-              ? `All (${properties.length})`
-              : t === "SALE"
-                ? `For Sale (${properties.filter((p) => p.type === PropertyType.SALE).length})`
-                : `For Rent (${properties.filter((p) => p.type === PropertyType.RENT).length})`}
-          </Button>
-        ))}
+      <div className="flex flex-wrap gap-2">
+        <div className="flex gap-2">
+          {["ALL", "SALE", "RENT"].map((t) => (
+            <Button
+              key={t}
+              variant={filterType === t ? "default" : "outline"}
+              size="sm"
+              onClick={() => setFilterType(t)}
+              className={
+                filterType === t ? "bg-accent-dark text-white" : "text-gray-600"
+              }
+            >
+              {t === "ALL"
+                ? `All (${properties.length})`
+                : t === "SALE"
+                  ? `For Sale (${properties.filter((p) => p.type === PropertyType.SALE).length})`
+                  : `For Rent (${properties.filter((p) => p.type === PropertyType.RENT).length})`}
+            </Button>
+          ))}
+        </div>
+        <div className="h-6 w-px bg-gray-200 self-center mx-1" />
+        <div className="flex gap-2">
+          {[
+            { key: "ALL", label: "All Status", count: properties.length },
+            { key: "AVAILABLE", label: "Available", count: properties.filter(p => p.status === PropertyStatus.AVAILABLE).length },
+            { key: "SOLD", label: "Sold", count: properties.filter(p => p.status === PropertyStatus.SOLD).length },
+            { key: "RENTED", label: "Rented", count: properties.filter(p => p.status === PropertyStatus.RENTED).length },
+          ].map((s) => (
+            <Button
+              key={s.key}
+              variant={filterStatus === s.key ? "default" : "outline"}
+              size="sm"
+              onClick={() => setFilterStatus(s.key)}
+              className={
+                filterStatus === s.key
+                  ? s.key === "SOLD" ? "bg-red-600 text-white hover:bg-red-700"
+                    : s.key === "RENTED" ? "bg-orange-500 text-white hover:bg-orange-600"
+                    : s.key === "AVAILABLE" ? "bg-green-600 text-white hover:bg-green-700"
+                    : "bg-accent-dark text-white"
+                  : "text-gray-600"
+              }
+            >
+              {s.label} ({s.count})
+            </Button>
+          ))}
+        </div>
       </div>
 
       {/* Create / Edit Form */}

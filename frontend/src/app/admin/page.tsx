@@ -89,14 +89,14 @@ export default function AdminDashboard() {
       title: "Sold Properties",
       value: stats ? stats.totalSoldProperties : "—",
       icon: TrendingUp,
-      href: "/admin/projects",
+      href: "/admin/projects?status=SOLD",
       actionLabel: "View Sold",
     },
     {
       title: "Rented Properties",
       value: stats ? stats.totalRentedProperties : "—",
       icon: IndianRupee,
-      href: "/admin/projects",
+      href: "/admin/projects?status=RENTED",
       actionLabel: "View Rented",
     },
     {
