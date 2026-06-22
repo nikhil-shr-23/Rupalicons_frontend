@@ -150,6 +150,62 @@ export default function AdminDashboard() {
         </div>
       </div>
 
+      {/* Quick Actions */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Quick Actions</CardTitle>
+          <CardDescription>Jump to common tasks.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <Link href="/admin/projects">
+              <Button
+                variant="outline"
+                className="w-full justify-between group h-12"
+              >
+                <span className="flex items-center gap-2">
+                  <Building2 size={16} /> Add New Property
+                </span>
+                <ArrowUpRight className="h-4 w-4 opacity-50 group-hover:opacity-100" />
+              </Button>
+            </Link>
+            <Link href="/admin/blogs/new">
+              <Button
+                variant="outline"
+                className="w-full justify-between group h-12"
+              >
+                <span className="flex items-center gap-2">
+                  <FileText size={16} /> Write New Blog
+                </span>
+                <ArrowUpRight className="h-4 w-4 opacity-50 group-hover:opacity-100" />
+              </Button>
+            </Link>
+            <Link href="/admin/leads">
+              <Button
+                variant="outline"
+                className="w-full justify-between group h-12"
+              >
+                <span className="flex items-center gap-2">
+                  <Users size={16} /> View Inquiries
+                </span>
+                <ArrowUpRight className="h-4 w-4 opacity-50 group-hover:opacity-100" />
+              </Button>
+            </Link>
+            <Link href="/" target="_blank">
+              <Button
+                variant="outline"
+                className="w-full justify-between group h-12"
+              >
+                <span className="flex items-center gap-2">
+                  <ExternalLink size={16} /> View Live Site
+                </span>
+                <ArrowUpRight className="h-4 w-4 opacity-50 group-hover:opacity-100" />
+              </Button>
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Stats Cards - Clickable */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {statCards.map((stat) => (
@@ -338,61 +394,7 @@ export default function AdminDashboard() {
         </Card>
       </div>
 
-      {/* Quick Actions */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Quick Actions</CardTitle>
-          <CardDescription>Jump to common tasks.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            <Link href="/admin/projects">
-              <Button
-                variant="outline"
-                className="w-full justify-between group h-12"
-              >
-                <span className="flex items-center gap-2">
-                  <Building2 size={16} /> Add New Property
-                </span>
-                <ArrowUpRight className="h-4 w-4 opacity-50 group-hover:opacity-100" />
-              </Button>
-            </Link>
-            <Link href="/admin/blogs/new">
-              <Button
-                variant="outline"
-                className="w-full justify-between group h-12"
-              >
-                <span className="flex items-center gap-2">
-                  <FileText size={16} /> Write New Blog
-                </span>
-                <ArrowUpRight className="h-4 w-4 opacity-50 group-hover:opacity-100" />
-              </Button>
-            </Link>
-            <Link href="/admin/leads">
-              <Button
-                variant="outline"
-                className="w-full justify-between group h-12"
-              >
-                <span className="flex items-center gap-2">
-                  <Users size={16} /> View Inquiries
-                </span>
-                <ArrowUpRight className="h-4 w-4 opacity-50 group-hover:opacity-100" />
-              </Button>
-            </Link>
-            <Link href="/" target="_blank">
-              <Button
-                variant="outline"
-                className="w-full justify-between group h-12"
-              >
-                <span className="flex items-center gap-2">
-                  <ExternalLink size={16} /> View Live Site
-                </span>
-                <ArrowUpRight className="h-4 w-4 opacity-50 group-hover:opacity-100" />
-              </Button>
-            </Link>
-          </div>
-        </CardContent>
-      </Card>
+
     </div>
   );
 }
