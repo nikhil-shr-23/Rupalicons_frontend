@@ -21,6 +21,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "api.rupalihomes.com",
       },
+      {
+        protocol: "https",
+        hostname: "jhyrkyidrxpflestimym.supabase.co",
+      },
     ],
   },
 };
