@@ -23,10 +23,11 @@ export default function SellPropertyPage() {
     phone: "",
     city: "",
     propertyType: "",
+    description: "",
   });
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
   ) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
@@ -48,13 +49,14 @@ export default function SellPropertyPage() {
       ...formData,
       phone: formData.phone.replace(/\D/g, ""),
       type: "SELL",
+      message: formData.description,
     };
 
     const success = await submitInquiry(submissionData);
 
     if (success) {
       setStatus("success");
-      setFormData({ name: "", phone: "", city: "", propertyType: "" });
+      setFormData({ name: "", phone: "", city: "", propertyType: "", description: "" });
     } else {
       setStatus("idle");
       alert("Something went wrong. Please try again.");
@@ -270,6 +272,20 @@ export default function SellPropertyPage() {
                         </select>
                       </div>
                     </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                      Describe your property
+                    </label>
+                    <textarea
+                      name="description"
+                      value={formData.description}
+                      onChange={handleChange}
+                      placeholder="Tell us a bit about your property..."
+                      rows={4}
+                      className="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all resize-none"
+                    ></textarea>
                   </div>
 
                   <button
