@@ -48,7 +48,7 @@ const testimonials = [
 ];
 
 const TestimonialCard = ({ data }: { data: (typeof testimonials)[0] }) => (
-  <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 mb-6 mx-4">
+  <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 mx-4 w-[350px] sm:w-[400px] shrink-0">
     <p className="text-gray-600 italic mb-6 leading-relaxed">
       &quot;{data.quote}&quot;
     </p>
@@ -68,11 +68,7 @@ const TestimonialCard = ({ data }: { data: (typeof testimonials)[0] }) => (
 );
 
 export default function Testimonials() {
-  const col1 = [...testimonials, ...testimonials, ...testimonials]; // Triple for loop goodness
-  const col2 = [...testimonials]
-    .reverse()
-    .concat([...testimonials].reverse())
-    .concat([...testimonials].reverse());
+  const row = [...testimonials, ...testimonials]; // Duplicated for seamless loop
 
   return (
     <section className="py-32 bg-gray-50 relative overflow-hidden">
@@ -87,45 +83,15 @@ export default function Testimonials() {
         </motion.h2>
       </div>
 
-      <div className="relative max-w-7xl mx-auto px-6 h-[600px] overflow-hidden">
-        {/* Fading Masks */}
-        <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-gray-50 to-transparent z-10 pointer-events-none"></div>
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-gray-50 to-transparent z-10 pointer-events-none"></div>
+      <div className="relative w-full overflow-hidden py-10">
+        {/* Horizontal Fading Masks */}
+        <div className="absolute top-0 bottom-0 left-0 w-16 md:w-32 bg-gradient-to-r from-gray-50 to-transparent z-10 pointer-events-none"></div>
+        <div className="absolute top-0 bottom-0 right-0 w-16 md:w-32 bg-gradient-to-l from-gray-50 to-transparent z-10 pointer-events-none"></div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 h-full">
-          {/* Column 1 - Moving Down */}
-          <div className="relative h-full overflow-hidden">
-            <motion.div
-              initial={{ y: -1000 }}
-              animate={{ y: 0 }} // Moving downwards
-              transition={{
-                repeat: Infinity,
-                duration: 60, // Slowed down
-                ease: "linear",
-              }}
-            >
-              {col1.map((item, idx) => (
-                <TestimonialCard key={`col1-${idx}`} data={item} />
-              ))}
-            </motion.div>
-          </div>
-
-          {/* Column 2 - Moving Down */}
-          <div className="relative h-full overflow-hidden">
-            <motion.div
-              initial={{ y: -1000 }}
-              animate={{ y: 0 }} // Moving downwards
-              transition={{
-                repeat: Infinity,
-                duration: 65, // Slightly different speed for organic feel
-                ease: "linear",
-              }}
-            >
-              {col2.map((item, idx) => (
-                <TestimonialCard key={`col2-${idx}`} data={item} />
-              ))}
-            </motion.div>
-          </div>
+        <div className="animate-marquee">
+          {row.map((item, idx) => (
+            <TestimonialCard key={`row-${idx}`} data={item} />
+          ))}
         </div>
       </div>
     </section>
