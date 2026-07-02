@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   fetchProperties,
@@ -53,6 +53,8 @@ export default function BuyPage() {
     bedrooms: "",
   });
 
+  const currentRequestId = useRef(0);
+
   // Swipe State Tracking
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -100,6 +102,7 @@ export default function BuyPage() {
   }, []);
 
   const applyFilters = useCallback(async () => {
+    const requestId = ++currentRequestId.current;
     setLoading(true);
     let minPrice: number | undefined = filters.minPrice
       ? Number(filters.minPrice)
@@ -111,8 +114,8 @@ export default function BuyPage() {
     // Parse priceRange dropdown label into numeric min/max
     if (filters.priceRange) {
       const parsed = parsePriceRange(filters.priceRange);
-      if (parsed.min !== undefined) minPrice = parsed.min;
-      if (parsed.max !== undefined) maxPrice = parsed.max;
+      minPrice = parsed.min;
+      maxPrice = parsed.max;
     }
 
     try {
@@ -123,6 +126,9 @@ export default function BuyPage() {
         maxPrice: maxPrice,
         bedrooms: filters.bedrooms ? Number(filters.bedrooms) : undefined,
       });
+
+      if (requestId !== currentRequestId.current) return;
+
       if (data && data.content) {
         let filtered = data.content;
 
@@ -160,9 +166,12 @@ export default function BuyPage() {
         setProperties(filtered);
       }
     } catch (error) {
+      if (requestId !== currentRequestId.current) return;
       console.error("Failed to load properties", error);
     } finally {
-      setLoading(false);
+      if (requestId === currentRequestId.current) {
+        setLoading(false);
+      }
     }
   }, [filters]);
 
@@ -276,6 +285,8 @@ export default function BuyPage() {
                   propertyType: newFilters.propertyType,
                   bedrooms: newFilters.bedrooms,
                   priceRange: newFilters.priceRange,
+                  minPrice: "", // Clear direct min/max so priceRange is single source of truth
+                  maxPrice: "",
                 }));
                 setCurrentIndex(0);
               }}

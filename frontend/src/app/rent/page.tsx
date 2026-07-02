@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -37,6 +37,8 @@ export default function RentPage() {
     minPrice: "",
     maxPrice: "",
   });
+
+  const currentRequestId = useRef(0);
 
   // Swipe State Tracking
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -77,6 +79,7 @@ export default function RentPage() {
   }, []);
 
   const applyFilters = useCallback(async () => {
+    const requestId = ++currentRequestId.current;
     setLoading(true);
 
     let minPrice: number | undefined = filters.minPrice
@@ -88,8 +91,8 @@ export default function RentPage() {
 
     if (filters.priceRange) {
       const parsed = parsePriceRange(filters.priceRange);
-      if (parsed.min !== undefined) minPrice = parsed.min;
-      if (parsed.max !== undefined) maxPrice = parsed.max;
+      minPrice = parsed.min;
+      maxPrice = parsed.max;
     }
 
     try {
@@ -100,6 +103,9 @@ export default function RentPage() {
         maxPrice: maxPrice,
         bedrooms: filters.bedrooms ? Number(filters.bedrooms) : undefined,
       });
+
+      if (requestId !== currentRequestId.current) return;
+
       if (data && data.content) {
         let filtered = data.content;
         
@@ -137,9 +143,12 @@ export default function RentPage() {
         setProperties(filtered);
       }
     } catch (error) {
+      if (requestId !== currentRequestId.current) return;
       console.error("Failed to load properties for rent", error);
     } finally {
-      setLoading(false);
+      if (requestId === currentRequestId.current) {
+        setLoading(false);
+      }
     }
   }, [filters]);
 
@@ -235,6 +244,8 @@ export default function RentPage() {
                 propertyType: newFilters.propertyType,
                 bedrooms: newFilters.bedrooms,
                 priceRange: newFilters.priceRange,
+                minPrice: "", // Clear direct min/max so priceRange is single source of truth
+                maxPrice: "",
               }));
               setCurrentIndex(0);
             }}
