@@ -11,7 +11,7 @@ import {
 import { Property, PropertyType } from "@/types";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import SearchFilterBar from "@/components/SearchFilterBar";
+import SearchFilterBar, { parsePriceRange } from "@/components/SearchFilterBar";
 import StickyCTA from "@/components/StickyCTA";
 import SwipeablePropertyCard from "@/components/SwipeablePropertyCard";
 import PropertyGridCard from "@/components/PropertyGridCard";
@@ -100,17 +100,11 @@ export default function BuyPage() {
       ? Number(filters.maxPrice)
       : undefined;
 
-    // Parse priceRange from SearchFilterBar if present and min/max are not manually set (priority logic or override?)
-    // Actually SearchFilterBar sets `priceRange` string. existing inputs set min/max.
-    // Let's parse priceRange if available. Format "$2,000-$13,000" or simple numbers.
+    // Parse priceRange dropdown label into numeric min/max
     if (filters.priceRange) {
-      const matches = filters.priceRange.match(/(\d[\d,]*)/g);
-      if (matches && matches.length >= 1) {
-        minPrice = Number(matches[0].replace(/,/g, ""));
-      }
-      if (matches && matches.length >= 2) {
-        maxPrice = Number(matches[1].replace(/,/g, ""));
-      }
+      const parsed = parsePriceRange(filters.priceRange);
+      if (parsed.min !== undefined) minPrice = parsed.min;
+      if (parsed.max !== undefined) maxPrice = parsed.max;
     }
 
     try {
@@ -260,6 +254,7 @@ export default function BuyPage() {
             transition={{ delay: 0.2 }}
           >
             <SearchFilterBar
+              mode="buy"
               initialFilters={{
                 location: filters.location,
                 propertyType: filters.propertyType,

@@ -17,16 +17,44 @@ export interface SearchFilters {
   bedrooms: string;
 }
 
+// Price range options for buy and rent modes
+export const buyPriceRanges = [
+  { label: "Under ₹50 Lac", min: undefined, max: 5000000 },
+  { label: "₹50 Lac - ₹1 Cr", min: 5000000, max: 10000000 },
+  { label: "₹1 Cr - ₹2 Cr", min: 10000000, max: 20000000 },
+  { label: "₹2 Cr - ₹5 Cr", min: 20000000, max: 50000000 },
+  { label: "₹5 Cr+", min: 50000000, max: undefined },
+];
+
+export const rentPriceRanges = [
+  { label: "Under ₹10,000", min: undefined, max: 10000 },
+  { label: "₹10,000 - ₹25,000", min: 10000, max: 25000 },
+  { label: "₹25,000 - ₹50,000", min: 25000, max: 50000 },
+  { label: "₹50,000 - ₹1,00,000", min: 50000, max: 100000 },
+  { label: "₹1,00,000+", min: 100000, max: undefined },
+];
+
+/** Maps a price range label to numeric min/max values */
+export function parsePriceRange(label: string): { min?: number; max?: number } {
+  const allRanges = [...buyPriceRanges, ...rentPriceRanges];
+  const found = allRanges.find((r) => r.label === label);
+  if (found) return { min: found.min, max: found.max };
+  return {};
+}
+
 interface SearchFilterBarProps {
   onSearch: (filters: SearchFilters) => void;
   initialFilters?: Partial<SearchFilters>;
+  mode?: "buy" | "rent";
 }
 
-export default function SearchFilterBar({ onSearch, initialFilters }: SearchFilterBarProps) {
+export default function SearchFilterBar({ onSearch, initialFilters, mode = "buy" }: SearchFilterBarProps) {
   const [location, setLocation] = useState(initialFilters?.location || "");
   const [propertyType, setPropertyType] = useState(initialFilters?.propertyType || "");
   const [priceRange, setPriceRange] = useState(initialFilters?.priceRange || "");
   const [bedrooms, setBedrooms] = useState(initialFilters?.bedrooms || "");
+
+  const priceOptions = mode === "rent" ? rentPriceRanges : buyPriceRanges;
 
   // Sync when initialFilters change (e.g. from URL params parsed after mount)
   useEffect(() => {
@@ -88,28 +116,35 @@ export default function SearchFilterBar({ onSearch, initialFilters }: SearchFilt
             <option value="Villa">Villas</option>
             <option value="Builder Floor">Builder Floor</option>
             <option value="Penthouse">Penthouse</option>
+            <option value="Plot">Plot & Land</option>
             <option value="Commercial">Commercial</option>
           </select>
         </div>
       </div>
 
-      {/* Price Range */}
+      {/* Price Range - Dropdown */}
       <div className="flex-1 w-full md:w-auto px-6 py-2 border-b md:border-b-0 md:border-r border-gray-100 flex items-center gap-3">
         <div className="p-2 bg-gray-50 rounded-full text-gray-400">
           <IndianRupee size={18} />
         </div>
         <div className="flex-1">
           <p className="text-xs text-gray-400 uppercase tracking-wider font-medium mb-1">
-            Price
+            Budget
           </p>
-          <input
-            type="text"
-            placeholder="₹10,000-₹50,000"
+          <select
             value={priceRange}
-            onChange={(e) => setPriceRange(e.target.value)}
-            onKeyDown={handleKeyDown}
-            className="w-full text-sm font-medium text-accent-dark placeholder-gray-300 focus:outline-none bg-transparent"
-          />
+            onChange={(e) => {
+              setPriceRange(e.target.value);
+            }}
+            className="w-full text-sm font-medium text-accent-dark bg-transparent focus:outline-none appearance-none cursor-pointer"
+          >
+            <option value="">Any Budget</option>
+            {priceOptions.map((range) => (
+              <option key={range.label} value={range.label}>
+                {range.label}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 
@@ -152,4 +187,5 @@ export default function SearchFilterBar({ onSearch, initialFilters }: SearchFilt
     </div>
   );
 }
+
 

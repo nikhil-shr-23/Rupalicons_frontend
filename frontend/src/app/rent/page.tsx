@@ -16,7 +16,7 @@ import Footer from "@/components/Footer";
 import { ArrowUpRight, Heart } from "lucide-react";
 import confetti from "canvas-confetti";
 import BounceCards from "@/components/BouncyCards";
-import SearchFilterBar from "@/components/SearchFilterBar";
+import SearchFilterBar, { parsePriceRange } from "@/components/SearchFilterBar";
 import SwipeablePropertyCard from "@/components/SwipeablePropertyCard";
 
 interface FilterState {
@@ -79,13 +79,9 @@ export default function RentPage() {
       : undefined;
 
     if (filters.priceRange) {
-      const matches = filters.priceRange.match(/(\d[\d,]*)/g);
-      if (matches && matches.length >= 1) {
-        minPrice = Number(matches[0].replace(/,/g, ""));
-      }
-      if (matches && matches.length >= 2) {
-        maxPrice = Number(matches[1].replace(/,/g, ""));
-      }
+      const parsed = parsePriceRange(filters.priceRange);
+      if (parsed.min !== undefined) minPrice = parsed.min;
+      if (parsed.max !== undefined) maxPrice = parsed.max;
     }
 
     try {
@@ -217,6 +213,7 @@ export default function RentPage() {
       <section className="pt-8 px-6 sticky top-0 z-20">
         <div className="max-w-7xl mx-auto">
           <SearchFilterBar
+            mode="rent"
             initialFilters={{
               location: filters.location,
               propertyType: filters.propertyType || "",

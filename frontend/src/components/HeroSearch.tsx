@@ -163,7 +163,13 @@ export default function HeroSearch({
     if (rawMinPrice) params.set("minPrice", rawMinPrice);
     if (rawMaxPrice) params.set("maxPrice", rawMaxPrice);
     
-    if (selectedPropertyType) params.set("propertyType", selectedPropertyType);
+    // Derive propertyType from tab when not explicitly selected from dropdown
+    let effectivePropertyType = selectedPropertyType;
+    if (!effectivePropertyType) {
+      if (activeTab === "plot") effectivePropertyType = "Plot";
+      else if (activeTab === "commercial") effectivePropertyType = "Commercial";
+    }
+    if (effectivePropertyType) params.set("propertyType", effectivePropertyType);
     if (selectedPossession) params.set("possession", selectedPossession);
 
     const queryString = params.toString();
