@@ -107,7 +107,9 @@ export default function SearchFilterBar({ onSearch, initialFilters, mode = "buy"
           <select
             value={propertyType}
             onChange={(e) => {
-              setPropertyType(e.target.value);
+              const val = e.target.value;
+              setPropertyType(val);
+              onSearch({ location, propertyType: val, priceRange, bedrooms });
             }}
             className="w-full text-sm font-medium text-accent-dark bg-transparent focus:outline-none appearance-none cursor-pointer"
           >
@@ -134,7 +136,9 @@ export default function SearchFilterBar({ onSearch, initialFilters, mode = "buy"
           <select
             value={priceRange}
             onChange={(e) => {
-              setPriceRange(e.target.value);
+              const val = e.target.value;
+              setPriceRange(val);
+              onSearch({ location, propertyType, priceRange: val, bedrooms });
             }}
             className="w-full text-sm font-medium text-accent-dark bg-transparent focus:outline-none appearance-none cursor-pointer"
           >
@@ -160,7 +164,9 @@ export default function SearchFilterBar({ onSearch, initialFilters, mode = "buy"
           <select
             value={bedrooms}
             onChange={(e) => {
-              setBedrooms(e.target.value);
+              const val = e.target.value;
+              setBedrooms(val);
+              onSearch({ location, propertyType, priceRange, bedrooms: val });
             }}
             className="w-full text-sm font-medium text-accent-dark bg-transparent focus:outline-none appearance-none cursor-pointer"
           >
