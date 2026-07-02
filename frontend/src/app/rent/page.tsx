@@ -16,7 +16,7 @@ import Footer from "@/components/Footer";
 import { ArrowUpRight, Heart } from "lucide-react";
 import confetti from "canvas-confetti";
 import BounceCards from "@/components/BouncyCards";
-import SearchFilterBar, { parsePriceRange } from "@/components/SearchFilterBar";
+import SearchFilterBar, { parsePriceRange, findPriceRangeLabel } from "@/components/SearchFilterBar";
 import SwipeablePropertyCard from "@/components/SwipeablePropertyCard";
 
 interface FilterState {
@@ -57,6 +57,13 @@ export default function RentPage() {
       const urlPropertyType = params.get("propertyType");
       const urlMinPrice = params.get("minPrice");
       const urlMaxPrice = params.get("maxPrice");
+
+      // Reverse-map minPrice/maxPrice to a priceRange label for the dropdown
+      const priceLabel = findPriceRangeLabel(
+        urlMinPrice ? Number(urlMinPrice) : undefined,
+        urlMaxPrice ? Number(urlMaxPrice) : undefined,
+        "rent"
+      );
       
       setFilters((prev) => ({
         ...prev,
@@ -64,6 +71,7 @@ export default function RentPage() {
         ...(urlPropertyType && { propertyType: urlPropertyType }),
         ...(urlMinPrice && { minPrice: urlMinPrice }),
         ...(urlMaxPrice && { maxPrice: urlMaxPrice }),
+        ...(priceLabel && { priceRange: priceLabel }),
       }));
     }
   }, []);

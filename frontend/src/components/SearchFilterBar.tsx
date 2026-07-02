@@ -42,6 +42,19 @@ export function parsePriceRange(label: string): { min?: number; max?: number } {
   return {};
 }
 
+/** Reverse-maps numeric min/max to a price range label (for syncing URL params to dropdown) */
+export function findPriceRangeLabel(
+  minPrice: number | undefined,
+  maxPrice: number | undefined,
+  mode: "buy" | "rent" = "buy"
+): string {
+  const ranges = mode === "rent" ? rentPriceRanges : buyPriceRanges;
+  const found = ranges.find(
+    (r) => (r.min ?? undefined) === minPrice && (r.max ?? undefined) === maxPrice
+  );
+  return found?.label || "";
+}
+
 interface SearchFilterBarProps {
   onSearch: (filters: SearchFilters) => void;
   initialFilters?: Partial<SearchFilters>;

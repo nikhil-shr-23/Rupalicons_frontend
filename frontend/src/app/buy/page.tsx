@@ -11,7 +11,7 @@ import {
 import { Property, PropertyType } from "@/types";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import SearchFilterBar, { parsePriceRange } from "@/components/SearchFilterBar";
+import SearchFilterBar, { parsePriceRange, findPriceRangeLabel } from "@/components/SearchFilterBar";
 import StickyCTA from "@/components/StickyCTA";
 import SwipeablePropertyCard from "@/components/SwipeablePropertyCard";
 import PropertyGridCard from "@/components/PropertyGridCard";
@@ -81,12 +81,20 @@ export default function BuyPage() {
       const urlMinPrice = params.get("minPrice");
       const urlMaxPrice = params.get("maxPrice");
 
+      // Reverse-map minPrice/maxPrice to a priceRange label for the dropdown
+      const priceLabel = findPriceRangeLabel(
+        urlMinPrice ? Number(urlMinPrice) : undefined,
+        urlMaxPrice ? Number(urlMaxPrice) : undefined,
+        "buy"
+      );
+
       setFilters((prev) => ({
         ...prev,
         ...(urlLocation && { location: urlLocation }),
         ...(urlPropertyType && { propertyType: urlPropertyType }),
         ...(urlMinPrice && { minPrice: urlMinPrice }),
         ...(urlMaxPrice && { maxPrice: urlMaxPrice }),
+        ...(priceLabel && { priceRange: priceLabel }),
       }));
     }
   }, []);
