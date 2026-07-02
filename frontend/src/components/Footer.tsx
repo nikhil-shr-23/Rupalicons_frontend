@@ -177,7 +177,7 @@ export default function Footer() {
               </Link>
               <span className="text-gray-300">|</span>
               <Link
-                href="/contact"
+                href="#contact"
                 className="hover:text-gold transition-colors"
               >
                 Contact
