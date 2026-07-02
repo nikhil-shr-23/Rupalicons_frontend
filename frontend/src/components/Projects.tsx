@@ -17,9 +17,10 @@ export default function Projects() {
   useEffect(() => {
     async function loadProperties() {
       try {
-        const data = await fetchProperties();
+        const data = await fetchProperties(0, 100);
         if (data && data.content) {
-          setProperties(data.content);
+          const featured = data.content.filter((p: Property) => p.featured);
+          setProperties(featured);
         }
       } catch (error) {
         console.error("Failed to load properties", error);
