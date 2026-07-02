@@ -226,7 +226,7 @@ export default function Contact() {
                       Office Address
                     </p>
                     <p className="text-white text-lg">
-                      123, Sector 56, Gurgaon, Haryana 122011
+                     3rd & 4th Floor, Knowledge Center, M3M Broadway, Sector 71, Gurugram, Haryana 122101
                     </p>
                   </div>
                 </div>
@@ -301,7 +301,7 @@ export default function Contact() {
             {/* Map Integration */}
             <div className="w-full h-[300px] rounded-2xl overflow-hidden grayscale hover:grayscale-0 transition-all duration-500 border border-gray-700/50 relative">
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14030.155462529683!2d77.0266!3d28.4595!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390d187cc8155555%3A0x6b77207860155555!2sSector%2056%2C%20Gurugram%2C%20Haryana!5e0!3m2!1sen!2sin!4v1710500000000!5m2!1sen!2sin"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d224363.53428788765!2d76.87113503874403!3d28.51926720784206!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390d23c63bb37b59%3A0x4b4cd50b438d77a3!2sKnowledge%20Center%20-%20The%20Designer&#39;s%20Club!5e0!3m2!1sen!2sin!4v1782992472958!5m2!1sen!2sin"
                 width="100%"
                 height="100%"
                 style={{ border: 0 }}
