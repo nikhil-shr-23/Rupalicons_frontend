@@ -62,12 +62,12 @@ export default function Services() {
               Trusted by thousands of homeowners across Delhi NCR, Mumbai, Pune
               and more. Your property goals are our priority.
             </p>
-            <button className="bg-accent-dark text-white px-8 py-4 rounded-full font-bold flex items-center gap-2 hover:bg-black transition-colors group">
+            <Link href="/buy" className="bg-accent-dark text-white px-8 py-4 rounded-full font-bold flex items-center gap-2 hover:bg-black transition-colors group w-fit inline-flex cursor-pointer">
               Explore Properties
               <div className="bg-white text-accent-dark rounded-full p-1 group-hover:scale-110 transition-transform">
                 <ArrowUpRight size={16} />
               </div>
-            </button>
+            </Link>
           </motion.div>
         </div>
 
