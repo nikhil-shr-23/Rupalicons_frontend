@@ -114,8 +114,7 @@ export default function RentPage() {
           const ptLower = filters.propertyType.toLowerCase();
           filtered = filtered.filter(p => 
             p.propertyCategory?.toLowerCase().includes(ptLower) ||
-            p.title?.toLowerCase().includes(ptLower) ||
-            p.description?.toLowerCase().includes(ptLower)
+            p.buildingType?.toLowerCase().includes(ptLower)
           );
         }
 
@@ -218,8 +217,21 @@ export default function RentPage() {
       <section className="pt-8 px-6 sticky top-0 z-20">
         <div className="max-w-7xl mx-auto">
           <SearchFilterBar
+            initialFilters={{
+              location: filters.location,
+              propertyType: filters.propertyType || "",
+              bedrooms: filters.bedrooms || "",
+              priceRange: filters.priceRange || "",
+            }}
             onSearch={(newFilters) => {
-              setFilters((prev) => ({ ...prev, ...newFilters }));
+              setFilters((prev) => ({
+                ...prev,
+                location: newFilters.location,
+                propertyType: newFilters.propertyType,
+                bedrooms: newFilters.bedrooms,
+                priceRange: newFilters.priceRange,
+              }));
+              setCurrentIndex(0);
             }}
           />
         </div>

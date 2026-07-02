@@ -139,8 +139,7 @@ export default function BuyPage() {
           const ptLower = filters.propertyType.toLowerCase();
           filtered = filtered.filter(p =>
             p.propertyCategory?.toLowerCase().includes(ptLower) ||
-            p.title?.toLowerCase().includes(ptLower) ||
-            p.description?.toLowerCase().includes(ptLower)
+            p.buildingType?.toLowerCase().includes(ptLower)
           );
         }
 
@@ -261,8 +260,20 @@ export default function BuyPage() {
             transition={{ delay: 0.2 }}
           >
             <SearchFilterBar
+              initialFilters={{
+                location: filters.location,
+                propertyType: filters.propertyType,
+                bedrooms: filters.bedrooms,
+                priceRange: filters.priceRange || "",
+              }}
               onSearch={(newFilters) => {
-                setFilters((prev) => ({ ...prev, ...newFilters }));
+                setFilters((prev) => ({
+                  ...prev,
+                  location: newFilters.location,
+                  propertyType: newFilters.propertyType,
+                  bedrooms: newFilters.bedrooms,
+                  priceRange: newFilters.priceRange,
+                }));
                 setCurrentIndex(0);
               }}
             />

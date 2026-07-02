@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Search,
   SlidersHorizontal,
@@ -19,16 +19,30 @@ export interface SearchFilters {
 
 interface SearchFilterBarProps {
   onSearch: (filters: SearchFilters) => void;
+  initialFilters?: Partial<SearchFilters>;
 }
 
-export default function SearchFilterBar({ onSearch }: SearchFilterBarProps) {
-  const [location, setLocation] = useState("");
-  const [propertyType, setPropertyType] = useState("");
-  const [priceRange, setPriceRange] = useState("");
-  const [bedrooms, setBedrooms] = useState("");
+export default function SearchFilterBar({ onSearch, initialFilters }: SearchFilterBarProps) {
+  const [location, setLocation] = useState(initialFilters?.location || "");
+  const [propertyType, setPropertyType] = useState(initialFilters?.propertyType || "");
+  const [priceRange, setPriceRange] = useState(initialFilters?.priceRange || "");
+  const [bedrooms, setBedrooms] = useState(initialFilters?.bedrooms || "");
+
+  // Sync when initialFilters change (e.g. from URL params parsed after mount)
+  useEffect(() => {
+    if (initialFilters?.location !== undefined) setLocation(initialFilters.location);
+    if (initialFilters?.propertyType !== undefined) setPropertyType(initialFilters.propertyType);
+    if (initialFilters?.priceRange !== undefined) setPriceRange(initialFilters.priceRange);
+    if (initialFilters?.bedrooms !== undefined) setBedrooms(initialFilters.bedrooms);
+  }, [initialFilters?.location, initialFilters?.propertyType, initialFilters?.priceRange, initialFilters?.bedrooms]);
 
   const handleSearch = () => {
     onSearch({ location, propertyType, priceRange, bedrooms });
+  };
+
+  // Also trigger search on Enter key in text inputs
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") handleSearch();
   };
 
   return (
@@ -47,6 +61,7 @@ export default function SearchFilterBar({ onSearch }: SearchFilterBarProps) {
             placeholder="Golf Course Road, Gurgaon"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
+            onKeyDown={handleKeyDown}
             className="w-full text-sm font-medium text-accent-dark placeholder-gray-300 focus:outline-none bg-transparent"
           />
         </div>
@@ -63,13 +78,16 @@ export default function SearchFilterBar({ onSearch }: SearchFilterBarProps) {
           </p>
           <select
             value={propertyType}
-            onChange={(e) => setPropertyType(e.target.value)}
+            onChange={(e) => {
+              setPropertyType(e.target.value);
+            }}
             className="w-full text-sm font-medium text-accent-dark bg-transparent focus:outline-none appearance-none cursor-pointer"
           >
             <option value="">Any Type</option>
-            <option value="Apartments">Apartments</option>
-            <option value="Houses">Houses</option>
-            <option value="Villas">Villas</option>
+            <option value="Apartment">Apartments</option>
+            <option value="Villa">Villas</option>
+            <option value="Builder Floor">Builder Floor</option>
+            <option value="Penthouse">Penthouse</option>
             <option value="Commercial">Commercial</option>
           </select>
         </div>
@@ -89,6 +107,7 @@ export default function SearchFilterBar({ onSearch }: SearchFilterBarProps) {
             placeholder="₹10,000-₹50,000"
             value={priceRange}
             onChange={(e) => setPriceRange(e.target.value)}
+            onKeyDown={handleKeyDown}
             className="w-full text-sm font-medium text-accent-dark placeholder-gray-300 focus:outline-none bg-transparent"
           />
         </div>
@@ -105,7 +124,9 @@ export default function SearchFilterBar({ onSearch }: SearchFilterBarProps) {
           </p>
           <select
             value={bedrooms}
-            onChange={(e) => setBedrooms(e.target.value)}
+            onChange={(e) => {
+              setBedrooms(e.target.value);
+            }}
             className="w-full text-sm font-medium text-accent-dark bg-transparent focus:outline-none appearance-none cursor-pointer"
           >
             <option value="">Any</option>
@@ -131,3 +152,4 @@ export default function SearchFilterBar({ onSearch }: SearchFilterBarProps) {
     </div>
   );
 }
+
