@@ -577,13 +577,11 @@ export default function LeadsPage() {
                         size={14}
                         className="text-gray-400 mt-0.5"
                       />
-                      <div>
+                      <div className="min-w-0">
                         <p className="text-xs text-gray-400 uppercase tracking-wider mb-0.5">
                           Message
                         </p>
-                        <p className="text-sm text-gray-600 leading-relaxed">
-                          {selectedInquiry.message}
-                        </p>
+                        <MessageWithMedia message={selectedInquiry.message} />
                       </div>
                     </div>
                   )}

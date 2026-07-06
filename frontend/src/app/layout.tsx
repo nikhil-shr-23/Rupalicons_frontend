@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import { Syne, Outfit } from "next/font/google";
 import "./globals.css";
 import { CompareProvider } from "@/context/CompareContext";
+import { AuthProvider } from "@/context/AuthContext";
 import CompareDrawer from "@/components/CompareDrawer";
+import StickyCTA from "@/components/StickyCTA";
 
 const syne = Syne({
   subsets: ["latin"],
@@ -31,10 +33,14 @@ export default function RootLayout({
       <body
         className={`${syne.variable} ${outfit.variable} antialiased bg-[#FDFCF8] text-[#1A1A1A] font-sans`}
       >
-        <CompareProvider>
-          {children}
-          <CompareDrawer />
-        </CompareProvider>
+        <AuthProvider>
+          <CompareProvider>
+            {children}
+            <CompareDrawer />
+            {/* Always-available contact hub on every page (call / WhatsApp / enquire) */}
+            <StickyCTA />
+          </CompareProvider>
+        </AuthProvider>
       </body>
     </html>
   );

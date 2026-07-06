@@ -144,6 +144,14 @@ export default function Footer() {
                   Commercial Spaces
                 </Link>
               </li>
+              <li>
+                <Link
+                  href="/finance"
+                  className="hover:text-gold transition-colors"
+                >
+                  Home Loans &amp; Finance
+                </Link>
+              </li>
             </ul>
           </div>
 

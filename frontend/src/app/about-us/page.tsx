@@ -2,50 +2,127 @@
 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import WhyChooseUs from "@/components/WhyChooseUs";
 import Image from "next/image";
+import { Building2, FileCheck2, Landmark, ShieldCheck } from "lucide-react";
+
+const credentials = [
+  {
+    icon: FileCheck2,
+    title: "RERA documentation checks",
+    copy: "Project recommendations are reviewed for RERA registration details, developer disclosures, and current project status.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Verified inventory process",
+    copy: "Listings are checked for location, ownership context, pricing signals, and basic document readiness before advisory.",
+  },
+  {
+    icon: Landmark,
+    title: "Bankable deal guidance",
+    copy: "Loan, registry, payment schedule, and possession checkpoints are explained before clients make a commitment.",
+  },
+];
 
 export default function AboutUsPage() {
   return (
     <main className="min-h-screen bg-background flex flex-col">
       <Navbar />
-      <section className="pt-32 pb-24 px-6 flex-grow">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-16">
-            <h1 className="text-4xl md:text-5xl font-bold font-syne text-accent-dark mb-4">About Rupali Homes</h1>
-            <p className="text-lg text-gray-500 max-w-2xl mx-auto">
-              India&apos;s premier luxury real estate platform, connecting discerning buyers with the finest properties across top metropolitan cities.
-            </p>
+
+      <section className="pt-32 pb-20 px-6 flex-grow">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-12 items-center mb-20">
+            <div>
+              <span className="text-gold font-bold tracking-widest uppercase text-sm mb-4 block">
+                About Rupali Homes
+              </span>
+              <h1 className="text-4xl md:text-6xl font-bold font-syne text-accent-dark mb-6 leading-tight">
+                A trusted real estate advisory brand for serious property
+                decisions
+              </h1>
+              <p className="text-lg text-gray-600 leading-relaxed mb-6">
+                Rupali Homes helps buyers, sellers, investors, and tenants make
+                clearer property decisions across high-demand micro-markets. The
+                work is advisory-led: understand the client, verify the property
+                context, compare the market, and then move with transparent next
+                steps.
+              </p>
+              <p className="text-lg text-gray-600 leading-relaxed">
+                Our team focuses on curated inventory, developer credibility,
+                location fundamentals, RERA and document checks, and practical
+                deal guidance so clients are not left navigating the market
+                alone.
+              </p>
+
+              <div className="grid sm:grid-cols-3 gap-4 mt-10">
+                {[
+                  ["15+", "Years of market experience"],
+                  ["500+", "Curated property options"],
+                  ["1200+", "Client conversations handled"],
+                ].map(([value, label]) => (
+                  <div
+                    key={value}
+                    className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm"
+                  >
+                    <p className="text-3xl font-bold font-syne text-accent-dark">
+                      {value}
+                    </p>
+                    <p className="text-sm text-gray-500 mt-2">{label}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="relative">
+              <div className="relative h-[520px] rounded-3xl overflow-hidden shadow-2xl">
+                <Image
+                  src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+                  alt="Premium residential property represented by Rupali Homes"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <div className="absolute -bottom-6 left-6 right-6 bg-white rounded-2xl shadow-xl border border-gray-100 p-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-gold/10 flex items-center justify-center text-gold">
+                    <Building2 size={24} />
+                  </div>
+                  <div>
+                    <p className="font-bold text-accent-dark">
+                      Advisory before transaction
+                    </p>
+                    <p className="text-sm text-gray-500 mt-1">
+                      Location, pricing, paperwork, and negotiation are reviewed
+                      as one decision, not separate steps.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          
-          <div className="grid md:grid-cols-2 gap-12 items-center bg-white p-8 md:p-12 rounded-3xl shadow-sm border border-gray-100">
-            <div className="space-y-6 text-gray-600 leading-relaxed">
-              <h2 className="text-3xl font-bold font-syne text-accent-dark">Our Vision</h2>
-              <p>
-                To redefine the luxury real estate experience by providing unparalleled service, transparency, and access to the most exclusive properties in the market.
-              </p>
-              <h2 className="text-3xl font-bold font-syne text-accent-dark pt-4">Our Mission</h2>
-              <p>
-                We strive to build lasting relationships with our clients by understanding their unique needs and delivering exceptional results through our expertise and dedication.
-              </p>
-              <h2 className="text-3xl font-bold font-syne text-accent-dark pt-4">Why Choose Us?</h2>
-              <ul className="list-disc pl-5 space-y-2">
-                <li>Curated selection of premium properties</li>
-                <li>Expert guidance throughout the buying/renting process</li>
-                <li>Transparent and honest communication</li>
-                <li>Deep understanding of local markets</li>
-              </ul>
-            </div>
-            <div className="relative h-[450px] rounded-2xl overflow-hidden shadow-lg">
-              <Image 
-                src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
-                alt="Luxury Home" 
-                fill 
-                className="object-cover hover:scale-105 transition-transform duration-700"
-              />
-            </div>
+
+          <div className="grid lg:grid-cols-3 gap-6">
+            {credentials.map((credential) => (
+              <div
+                key={credential.title}
+                className="bg-white border border-gray-100 rounded-2xl p-7 shadow-sm"
+              >
+                <div className="w-12 h-12 rounded-xl bg-gold/10 flex items-center justify-center text-gold mb-5">
+                  <credential.icon size={24} />
+                </div>
+                <h2 className="text-xl font-bold font-syne text-accent-dark mb-3">
+                  {credential.title}
+                </h2>
+                <p className="text-gray-600 leading-relaxed">
+                  {credential.copy}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
+
+      <WhyChooseUs />
       <Footer />
     </main>
   );

@@ -17,6 +17,7 @@ export default function Home() {
       <HeroV2 />
       <Projects />
       <About />
+      <WhyChooseUs />
       <ProcessFlow />
       <Services />
       <Testimonials />

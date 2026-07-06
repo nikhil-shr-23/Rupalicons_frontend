@@ -1,59 +1,79 @@
-
 import { NextResponse } from "next/server";
 
 interface InstagramMedia {
   id: string;
-  media_type: string;
-  media_url: string;
+  media_type: "IMAGE" | "VIDEO" | "CAROUSEL_ALBUM";
+  media_url?: string;
   thumbnail_url?: string;
-  permalink: string;
+  permalink?: string;
   caption?: string;
+  timestamp?: string;
   like_count?: number;
   comments_count?: number;
+}
+
+function isConfiguredToken(token: string | undefined) {
+  return Boolean(token && token.trim() && !token.startsWith("IGQVJV..."));
 }
 
 export async function GET() {
   const token = process.env.INSTAGRAM_ACCESS_TOKEN;
 
-  if (!token || token.startsWith("IGQVJV...")) { // Check for missing or placeholder token
+  if (!isConfiguredToken(token)) {
     return NextResponse.json(
-      { error: "Instagram Access Token not configured" },
-      { status: 500 }
+      { error: "Instagram access token is not configured" },
+      { status: 503 },
     );
   }
 
-  const url = `https://graph.instagram.com/me/media?fields=id,caption,media_type,media_url,thumbnail_url,permalink,like_count,comments_count&access_token=${token}`;
+  const url = new URL("https://graph.instagram.com/me/media");
+  url.searchParams.set(
+    "fields",
+    "id,caption,media_type,media_url,thumbnail_url,permalink,timestamp",
+  );
+  url.searchParams.set("access_token", token as string);
 
   try {
-    const response = await fetch(url, { next: { revalidate: 3600 } }); // Cache for 1 hour
-    
+    const response = await fetch(url, { next: { revalidate: 900 } });
+
     if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Instagram API Error:", errorData);
-        return NextResponse.json({ error: "Failed to fetch from Instagram" }, { status: response.status });
+      const errorData = await response.json().catch(() => ({}));
+      console.error("Instagram API Error:", errorData);
+      return NextResponse.json(
+        { error: "Failed to fetch live Instagram media" },
+        { status: response.status },
+      );
     }
 
     const data = await response.json();
-    
-    const posts = data.data
-        .filter((item: InstagramMedia) => item.media_type === "VIDEO" || item.media_type === "CAROUSEL_ALBUM") // Include albums as they might contain videos or be relevant
-        .slice(0, 10) // Limit to top 10
-        .map((item: InstagramMedia) => ({
-            id: item.id,
-            image: item.thumbnail_url || item.media_url, // thumbnail_url is for videos
-            permalink: item.permalink,
-            caption: item.caption,
-            likes: item.like_count || 0, // like_count might not be available depending on permission scope, falling back
-            comments: item.comments_count || 0,
-            media_type: item.media_type
-        }));
 
-    return NextResponse.json({ data: posts });
+    const posts = (data.data || [])
+      .filter((item: InstagramMedia) =>
+        ["IMAGE", "VIDEO", "CAROUSEL_ALBUM"].includes(item.media_type),
+      )
+      .map((item: InstagramMedia) => ({
+        id: item.id,
+        image: item.thumbnail_url || item.media_url,
+        permalink: item.permalink,
+        caption: item.caption || "",
+        likes: item.like_count || 0,
+        comments: item.comments_count || 0,
+        mediaType: item.media_type,
+        timestamp: item.timestamp,
+      }))
+      .filter((item: { image?: string; permalink?: string }) => item.image && item.permalink)
+      .slice(0, 12);
+
+    return NextResponse.json({
+      data: posts,
+      source: "instagram_api",
+      fetchedAt: new Date().toISOString(),
+    });
   } catch (error) {
     console.error("Instagram Fetch Error:", error);
     return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
+      { error: "Failed to load Instagram media" },
+      { status: 500 },
     );
   }
 }

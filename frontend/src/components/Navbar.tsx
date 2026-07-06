@@ -3,14 +3,16 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { Menu, X, Phone, Instagram, Facebook, Heart } from "lucide-react";
+import { Menu, X, Phone, Instagram, Facebook, Heart, User } from "lucide-react";
 import { motion, AnimatePresence, Variants } from "framer-motion";
 import { fetchLikedPropertyIds } from "@/lib/api";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [likedCount, setLikedCount] = useState(0);
   const [isClient, setIsClient] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     setIsClient(true);
@@ -86,27 +88,65 @@ export default function Navbar() {
           </Link>
 
           <Link
+            href="/finance"
+            className="text-sm uppercase tracking-widest hover:text-gold transition-colors font-medium"
+          >
+            Home Loans
+          </Link>
+
+          <Link
             href="/blogs"
             className="text-sm uppercase tracking-widest hover:text-gold transition-colors font-medium"
           >
             Blogs
           </Link>
 
-          {/* Heart icon for liked properties */}
+          {/* Heart icon for liked properties — badge always shows a live
+              count (including "0") so it never looks broken. */}
           <Link
             href="/liked"
+            aria-label={`Wishlist (${likedCount} saved)`}
             className="relative p-2 rounded-full hover:bg-red-50 transition-colors group"
           >
             <Heart
               size={22}
-              className="text-gray-500 group-hover:text-red-500 transition-colors"
+              className={`transition-colors ${
+                likedCount > 0
+                  ? "text-red-500 fill-red-500"
+                  : "text-gray-500 group-hover:text-red-500"
+              }`}
             />
-            {likedCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
-                {likedCount}
-              </span>
-            )}
+            <span
+              className={`absolute -top-1 -right-1 text-[10px] font-bold min-w-5 h-5 px-1 rounded-full flex items-center justify-center transition-colors ${
+                likedCount > 0
+                  ? "bg-red-500 text-white"
+                  : "bg-gray-200 text-gray-600"
+              }`}
+            >
+              {isClient ? likedCount : 0}
+            </span>
           </Link>
+
+          {/* Account: avatar when signed in, otherwise a login entry point */}
+          {isClient && user ? (
+            <Link
+              href="/account"
+              aria-label="My account"
+              className="flex items-center gap-2 pl-1"
+            >
+              <span className="w-9 h-9 rounded-full bg-accent-dark text-gold flex items-center justify-center text-sm font-bold font-syne hover:opacity-90 transition-opacity">
+                {user.name.charAt(0).toUpperCase()}
+              </span>
+            </Link>
+          ) : (
+            <Link
+              href="/account/login"
+              className="flex items-center gap-2 text-sm uppercase tracking-widest hover:text-gold transition-colors font-medium"
+            >
+              <User size={18} />
+              <span className="hidden lg:inline">Login</span>
+            </Link>
+          )}
         </div>
 
         {/* Mobile Menu Button */}
@@ -156,6 +196,13 @@ export default function Navbar() {
               Sell
             </Link>
             <Link
+              href="/finance"
+              onClick={() => setIsOpen(false)}
+              className="text-2xl text-white font-syne hover:text-gold"
+            >
+              Home Loans
+            </Link>
+            <Link
               href="/blogs"
               onClick={() => setIsOpen(false)}
               className="text-2xl text-white font-syne hover:text-gold"
@@ -169,7 +216,16 @@ export default function Navbar() {
               className="text-2xl text-white font-syne hover:text-gold flex items-center gap-3"
             >
               <Heart size={24} className="text-red-400" />
-              Liked {likedCount > 0 && `(${likedCount})`}
+              Liked ({isClient ? likedCount : 0})
+            </Link>
+
+            <Link
+              href={isClient && user ? "/account" : "/account/login"}
+              onClick={() => setIsOpen(false)}
+              className="text-2xl text-white font-syne hover:text-gold flex items-center gap-3"
+            >
+              <User size={24} className="text-gold" />
+              {isClient && user ? "My Account" : "Login / Sign Up"}
             </Link>
 
             <div className="flex gap-6 mt-8">

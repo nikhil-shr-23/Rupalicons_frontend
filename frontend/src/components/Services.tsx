@@ -29,7 +29,7 @@ export default function Services() {
         "Get hassle-free home loan assistance with the best interest rates from leading banks and NBFCs.",
       image:
         "https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      link: "/contact",
+      link: "/finance",
     },
   ];
 

@@ -36,6 +36,8 @@ import {
 } from "@/lib/api";
 import { Property, PropertyType } from "@/types";
 import { formatIndianPrice } from "@/lib/utils";
+import PhoneOtpVerifier, { VerifiedPhone } from "@/components/PhoneOtpVerifier";
+import { normalizeIndianPhoneNumber } from "@/lib/firebase";
 
 export default function PropertyDetailsPage() {
   const { id } = useParams();
@@ -54,6 +56,18 @@ export default function PropertyDetailsPage() {
   const [otherProperties, setOtherProperties] = useState<Property[]>([]);
   const [visitForm, setVisitForm] = useState({ name: "", email: "", phone: "", message: "" });
   const [visitStatus, setVisitStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
+  const [verifiedVisitPhone, setVerifiedVisitPhone] = useState<VerifiedPhone | null>(null);
+
+  const getVerifiedVisitPhoneE164 = () => {
+    try {
+      const enteredPhone = normalizeIndianPhoneNumber(visitForm.phone);
+      return verifiedVisitPhone?.phoneE164 === enteredPhone
+        ? enteredPhone
+        : undefined;
+    } catch {
+      return undefined;
+    }
+  };
 
   useEffect(() => {
     async function loadProperty() {
@@ -332,8 +346,8 @@ export default function PropertyDetailsPage() {
                           initial={{ opacity: 1, y: 0, scale: 0.5, x: 0 }}
                           animate={{
                             opacity: 0,
-                            y: -100 - Math.random() * 50,
-                            x: (Math.random() - 0.5) * 60,
+                            y: -100 - i * 12,
+                            x: (i - 2) * 18,
                             scale: 1.5,
                           }}
                           exit={{ opacity: 0 }}
@@ -359,8 +373,10 @@ export default function PropertyDetailsPage() {
                         title: property.title,
                         url: window.location.href,
                       });
-                    } catch (err: any) {
-                      if (err.name !== 'AbortError') {
+                    } catch (err: unknown) {
+                      const errorName =
+                        err instanceof DOMException ? err.name : "";
+                      if (errorName !== "AbortError") {
                         console.error("Share failed:", err);
                       }
                     } finally {
@@ -555,9 +571,14 @@ export default function PropertyDetailsPage() {
                   e.preventDefault();
                   if (!visitForm.name.trim() || !visitForm.phone.trim()) return;
                   
+                  const phone = visitForm.phone.replace(/\D/g, "");
                   const phoneRegex = /^[6-9]\d{9}$/;
-                  if (visitForm.phone && !phoneRegex.test(visitForm.phone.replace(/\D/g, ""))) {
+                  if (!phoneRegex.test(phone)) {
                     alert("Please enter a valid 10-digit Indian mobile number.");
+                    return;
+                  }
+                  if (!getVerifiedVisitPhoneE164()) {
+                    alert("Please verify your phone number with OTP before booking a visit.");
                     return;
                   }
                   
@@ -576,7 +597,7 @@ export default function PropertyDetailsPage() {
                         propertyId: property.id,
                         visitorName: visitForm.name,
                         visitorEmail: visitForm.email,
-                        visitorPhone: visitForm.phone.replace(/\D/g, ""),
+                        visitorPhone: phone,
                         message: visitForm.message
                       })
                     });
@@ -584,6 +605,7 @@ export default function PropertyDetailsPage() {
                     if (res.ok) {
                       setVisitStatus("success");
                       setVisitForm({ name: "", email: "", phone: "", message: "" });
+                      setVerifiedVisitPhone(null);
                       handleConfetti();
                       setTimeout(() => setVisitStatus("idle"), 5000);
                     } else {
@@ -591,7 +613,7 @@ export default function PropertyDetailsPage() {
                       alert(errData.message || "Failed to book visit");
                       setVisitStatus("error");
                     }
-                  } catch (error) {
+                  } catch {
                     alert("Something went wrong. Please try again.");
                     setVisitStatus("error");
                   }
@@ -616,9 +638,19 @@ export default function PropertyDetailsPage() {
                   type="tel"
                   required
                   value={visitForm.phone}
-                  onChange={(e) => setVisitForm({ ...visitForm, phone: e.target.value })}
+                  onChange={(e) => {
+                    setVisitForm({ ...visitForm, phone: e.target.value });
+                    setVerifiedVisitPhone(null);
+                  }}
                   placeholder="Phone Number *"
                   className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:border-gold transition-colors"
+                />
+                <PhoneOtpVerifier
+                  phone={visitForm.phone}
+                  verifiedPhoneE164={getVerifiedVisitPhoneE164()}
+                  recaptchaContainerId="buy-visit-phone-recaptcha"
+                  disabled={visitStatus === "submitting"}
+                  onVerified={setVerifiedVisitPhone}
                 />
                 <textarea
                   value={visitForm.message}

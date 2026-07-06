@@ -12,7 +12,6 @@ import { Property, PropertyType } from "@/types";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SearchFilterBar, { parsePriceRange, findPriceRangeLabel } from "@/components/SearchFilterBar";
-import StickyCTA from "@/components/StickyCTA";
 import SwipeablePropertyCard from "@/components/SwipeablePropertyCard";
 import PropertyGridCard from "@/components/PropertyGridCard";
 import { Layers, LayoutGrid } from "lucide-react";
@@ -82,6 +81,7 @@ export default function BuyPage() {
       const urlPropertyType = params.get("propertyType");
       const urlMinPrice = params.get("minPrice");
       const urlMaxPrice = params.get("maxPrice");
+      const urlBedrooms = params.get("bedrooms");
 
       // Reverse-map minPrice/maxPrice to a priceRange label for the dropdown
       const priceLabel = findPriceRangeLabel(
@@ -96,6 +96,7 @@ export default function BuyPage() {
         ...(urlPropertyType && { propertyType: urlPropertyType }),
         ...(urlMinPrice && { minPrice: urlMinPrice }),
         ...(urlMaxPrice && { maxPrice: urlMaxPrice }),
+        ...(urlBedrooms && { bedrooms: urlBedrooms }),
         ...(priceLabel && { priceRange: priceLabel }),
       }));
     }
@@ -449,7 +450,6 @@ export default function BuyPage() {
         )}
       </section>
 
-      <StickyCTA />
       <Footer />
     </main>
   );

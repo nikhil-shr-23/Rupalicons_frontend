@@ -59,6 +59,7 @@ export default function RentPage() {
       const urlPropertyType = params.get("propertyType");
       const urlMinPrice = params.get("minPrice");
       const urlMaxPrice = params.get("maxPrice");
+      const urlBedrooms = params.get("bedrooms");
 
       // Reverse-map minPrice/maxPrice to a priceRange label for the dropdown
       const priceLabel = findPriceRangeLabel(
@@ -73,6 +74,7 @@ export default function RentPage() {
         ...(urlPropertyType && { propertyType: urlPropertyType }),
         ...(urlMinPrice && { minPrice: urlMinPrice }),
         ...(urlMaxPrice && { maxPrice: urlMaxPrice }),
+        ...(urlBedrooms && { bedrooms: urlBedrooms }),
         ...(priceLabel && { priceRange: priceLabel }),
       }));
     }

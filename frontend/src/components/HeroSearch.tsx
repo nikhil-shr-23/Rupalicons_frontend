@@ -43,6 +43,16 @@ const propertyTypes = [
   "Shop",
 ];
 
+// Real configuration options (BHK) — shown alongside Budget so buyers can
+// filter by home size, not just price. Value = minimum bedrooms passed to search.
+const configurations: { label: string; value: string }[] = [
+  { label: "1 BHK", value: "1" },
+  { label: "2 BHK", value: "2" },
+  { label: "3 BHK", value: "3" },
+  { label: "4 BHK", value: "4" },
+  { label: "5+ BHK", value: "5" },
+];
+
 const possessionStatuses = [
   "Ready to Move",
   "Within 1 Year",
@@ -62,6 +72,7 @@ export default function HeroSearch({
   const [selectedCity, setSelectedCity] = useState("All Cities");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedBudget, setSelectedBudget] = useState("");
+  const [selectedConfig, setSelectedConfig] = useState("");
   const [selectedPropertyType, setSelectedPropertyType] = useState("");
   const [selectedPossession, setSelectedPossession] = useState("");
 
@@ -75,6 +86,7 @@ export default function HeroSearch({
   // Dropdown visibility
   const [showCityDropdown, setShowCityDropdown] = useState(false);
   const [showBudgetDropdown, setShowBudgetDropdown] = useState(false);
+  const [showConfigDropdown, setShowConfigDropdown] = useState(false);
   const [showPropertyTypeDropdown, setShowPropertyTypeDropdown] =
     useState(false);
   const [showPossessionDropdown, setShowPossessionDropdown] = useState(false);
@@ -82,6 +94,7 @@ export default function HeroSearch({
   // Refs for closing dropdowns on outside click
   const cityRef = useRef<HTMLDivElement>(null);
   const budgetRef = useRef<HTMLDivElement>(null);
+  const configRef = useRef<HTMLDivElement>(null);
   const propertyTypeRef = useRef<HTMLDivElement>(null);
   const possessionRef = useRef<HTMLDivElement>(null);
 
@@ -92,6 +105,8 @@ export default function HeroSearch({
         setShowCityDropdown(false);
       if (budgetRef.current && !budgetRef.current.contains(e.target as Node))
         setShowBudgetDropdown(false);
+      if (configRef.current && !configRef.current.contains(e.target as Node))
+        setShowConfigDropdown(false);
       if (
         propertyTypeRef.current &&
         !propertyTypeRef.current.contains(e.target as Node)
@@ -134,6 +149,7 @@ export default function HeroSearch({
   // Reset filters when switching tabs
   useEffect(() => {
     setSelectedBudget("");
+    setSelectedConfig("");
     setSelectedPropertyType("");
     setSelectedPossession("");
   }, [activeTab]);
@@ -162,7 +178,10 @@ export default function HeroSearch({
     
     if (rawMinPrice) params.set("minPrice", rawMinPrice);
     if (rawMaxPrice) params.set("maxPrice", rawMaxPrice);
-    
+
+    // Configuration (BHK) → bedrooms filter
+    if (selectedConfig) params.set("bedrooms", selectedConfig);
+
     // Derive propertyType from tab when not explicitly selected from dropdown
     let effectivePropertyType = selectedPropertyType;
     if (!effectivePropertyType) {
@@ -299,6 +318,45 @@ export default function HeroSearch({
             </div>
           )}
         </div>
+
+        {/* Configuration (BHK) Dropdown - Hidden for Plot & Commercial */}
+        {activeTab !== "plot" && activeTab !== "commercial" && (
+          <div ref={configRef} className="relative">
+            <button
+              onClick={() => setShowConfigDropdown(!showConfigDropdown)}
+              className="bg-white px-5 py-2.5 rounded-lg shadow-md text-xs md:text-sm font-medium text-gray-700 flex items-center gap-2 hover:bg-gray-50 transition-colors"
+            >
+              {configurations.find((c) => c.value === selectedConfig)?.label ||
+                "Configuration"}
+              <ChevronDown
+                size={14}
+                className={`text-gray-400 transition-transform ${showConfigDropdown ? "rotate-180" : ""}`}
+              />
+            </button>
+            {showConfigDropdown && (
+              <div className="absolute bottom-full left-0 mb-2 w-44 bg-white border border-gray-200 rounded-xl shadow-2xl z-50 py-2">
+                {configurations.map((config) => (
+                  <button
+                    key={config.value}
+                    onClick={() => {
+                      setSelectedConfig(
+                        selectedConfig === config.value ? "" : config.value,
+                      );
+                      setShowConfigDropdown(false);
+                    }}
+                    className={`w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors ${
+                      selectedConfig === config.value
+                        ? "text-gold font-semibold bg-gold/5"
+                        : "text-gray-700"
+                    }`}
+                  >
+                    {config.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Property Type Dropdown - Hidden for Plot & Land */}
         {activeTab !== "plot" && (

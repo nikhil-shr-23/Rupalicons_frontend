@@ -623,3 +623,134 @@ export async function createAdmin(data: { name: string; email: string; password:
     return false;
   }
 }
+
+// ─── Normal User (public visitor) API ────────────────────────────────────
+//
+// Backs the AuthContext account system with the real Spring Boot backend
+// (POST /normal-user/register|login, GET|PUT /normal-user/me). Tokens are
+// NORMAL_USER-typed JWTs, kept separate from the admin `adminToken`.
+
+export interface NormalUserAccount {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  phoneVerified: boolean;
+  phoneVerifiedAt?: string;
+  firebaseUid?: string;
+  createdAt: string;
+}
+
+export interface NormalUserAuthResult {
+  ok: boolean;
+  error?: string;
+  token?: string;
+  user?: NormalUserAccount;
+}
+
+function mapNormalUser(dto: Record<string, unknown>): NormalUserAccount {
+  return {
+    id: String(dto.id ?? ""),
+    name: (dto.name as string) || "",
+    email: (dto.email as string) || "",
+    phone: (dto.phone as string) || "",
+    phoneVerified: Boolean(dto.phoneVerified),
+    phoneVerifiedAt: dto.phoneVerifiedAt ? String(dto.phoneVerifiedAt) : undefined,
+    firebaseUid: dto.firebaseUid ? String(dto.firebaseUid) : undefined,
+    createdAt: dto.createdAt ? String(dto.createdAt) : "",
+  };
+}
+
+// Backend surfaces validation/business errors as { message } or { error }.
+async function readError(res: Response, fallback: string): Promise<string> {
+  try {
+    const data = await res.json();
+    return (data.message as string) || (data.error as string) || fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+export async function registerNormalUser(data: {
+  name: string;
+  email: string;
+  phone: string;
+  password: string;
+  phoneVerified: boolean;
+  firebaseUid: string;
+}): Promise<NormalUserAuthResult> {
+  try {
+    const res = await fetch(`${API_URL}/normal-user/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) {
+      return { ok: false, error: await readError(res, "Could not create your account. Please try again.") };
+    }
+    const body = await res.json();
+    return { ok: true, token: body.token, user: mapNormalUser(body.user) };
+  } catch (error) {
+    console.error("Failed to register normal user:", error);
+    return { ok: false, error: "Network error. Please check your connection and try again." };
+  }
+}
+
+export async function loginNormalUser(email: string, password: string): Promise<NormalUserAuthResult> {
+  try {
+    const res = await fetch(`${API_URL}/normal-user/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+    if (!res.ok) {
+      return { ok: false, error: await readError(res, "Invalid email or password.") };
+    }
+    const body = await res.json();
+    return { ok: true, token: body.token, user: mapNormalUser(body.user) };
+  } catch (error) {
+    console.error("Failed to log in normal user:", error);
+    return { ok: false, error: "Network error. Please check your connection and try again." };
+  }
+}
+
+export async function fetchNormalUserProfile(token: string): Promise<NormalUserAccount | null> {
+  try {
+    const res = await fetch(`${API_URL}/normal-user/me`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) return null;
+    return mapNormalUser(await res.json());
+  } catch (error) {
+    console.error("Failed to fetch normal user profile:", error);
+    return null;
+  }
+}
+
+export async function updateNormalUserProfile(
+  token: string,
+  data: {
+    name?: string;
+    phone?: string;
+    phoneVerified?: boolean;
+    firebaseUid?: string;
+  },
+): Promise<NormalUserAuthResult> {
+  try {
+    const res = await fetch(`${API_URL}/normal-user/me`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) {
+      return { ok: false, error: await readError(res, "Could not update your profile.") };
+    }
+    return { ok: true, user: mapNormalUser(await res.json()) };
+  } catch (error) {
+    console.error("Failed to update normal user profile:", error);
+    return { ok: false, error: "Network error. Please try again." };
+  }
+}

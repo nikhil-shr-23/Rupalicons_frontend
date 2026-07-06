@@ -4,8 +4,12 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { MapPin, Phone, Mail, Send, CheckCircle } from "lucide-react";
 import { submitContactForm } from "@/lib/api";
+import { useAuth } from "@/context/AuthContext";
+import PhoneOtpVerifier, { VerifiedPhone } from "@/components/PhoneOtpVerifier";
+import { normalizeIndianPhoneNumber } from "@/lib/firebase";
 
 export default function Contact() {
+  const { user, recordEnquiry } = useAuth();
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -16,11 +20,33 @@ export default function Contact() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
+  const [verifiedPhone, setVerifiedPhone] = useState<VerifiedPhone | null>(null);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (name === "phone") {
+      setVerifiedPhone(null);
+    }
+  };
+
+  const getVerifiedPhoneE164 = () => {
+    try {
+      const enteredPhone = normalizeIndianPhoneNumber(formData.phone);
+      if (verifiedPhone?.phoneE164 === enteredPhone) return enteredPhone;
+      if (
+        user?.phoneVerified &&
+        normalizeIndianPhoneNumber(user.phone) === enteredPhone
+      ) {
+        return enteredPhone;
+      }
+    } catch {
+      return undefined;
+    }
+
+    return undefined;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -28,9 +54,14 @@ export default function Contact() {
     if (!formData.name.trim()) return;
 
     // Validation
+    const phone = formData.phone.replace(/\D/g, "");
     const phoneRegex = /^[6-9]\d{9}$/;
-    if (formData.phone && !phoneRegex.test(formData.phone.replace(/\D/g, ""))) {
+    if (!phoneRegex.test(phone)) {
       setError("Please enter a valid 10-digit Indian mobile number.");
+      return;
+    }
+    if (!getVerifiedPhoneE164()) {
+      setError("Please verify your phone number with OTP before sending.");
       return;
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -45,12 +76,22 @@ export default function Contact() {
     // Format phone to digits only if it matches
     const submissionData = {
       ...formData,
-      phone: formData.phone.replace(/\D/g, ""),
+      phone,
     };
 
     const result = await submitContactForm(submissionData);
 
     if (result) {
+      // Log to the signed-in user's enquiry history so they can track it.
+      if (user) {
+        recordEnquiry({
+          type: "CONTACT",
+          subject: formData.message
+            ? formData.message.slice(0, 80)
+            : `Enquiry from ${formData.name}`,
+          message: formData.message,
+        });
+      }
       setSubmitted(true);
       setFormData({
         name: "",
@@ -59,6 +100,7 @@ export default function Contact() {
         location: "",
         message: "",
       });
+      setVerifiedPhone(null);
       setTimeout(() => setSubmitted(false), 5000);
     } else {
       setError("Something went wrong. Please try again.");
@@ -133,8 +175,18 @@ export default function Contact() {
                     value={formData.phone}
                     onChange={handleChange}
                     placeholder="+91 XXXXX XXXXX"
+                    required
                     className="w-full bg-[#1A2235] border border-gray-700/50 rounded-lg px-6 py-4 text-white focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold transition-all"
                   />
+                  <div className="mt-3 rounded-xl bg-white p-4 text-accent-dark">
+                    <PhoneOtpVerifier
+                      phone={formData.phone}
+                      verifiedPhoneE164={getVerifiedPhoneE164()}
+                      recaptchaContainerId="contact-phone-recaptcha"
+                      disabled={submitting}
+                      onVerified={setVerifiedPhone}
+                    />
+                  </div>
                 </div>
 
                 <div>

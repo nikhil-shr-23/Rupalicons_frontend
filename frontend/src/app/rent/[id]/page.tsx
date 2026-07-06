@@ -35,6 +35,8 @@ import {
 } from "@/lib/api";
 import { Property, PropertyType } from "@/types";
 import { formatIndianPrice } from "@/lib/utils";
+import PhoneOtpVerifier, { VerifiedPhone } from "@/components/PhoneOtpVerifier";
+import { normalizeIndianPhoneNumber } from "@/lib/firebase";
 
 export default function RentPropertyDetailsPage() {
   const params = useParams();
@@ -51,6 +53,26 @@ export default function RentPropertyDetailsPage() {
   const [showGallery, setShowGallery] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [otherProperties, setOtherProperties] = useState<Property[]>([]);
+  const [visitForm, setVisitForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    message: "",
+  });
+  const [visitError, setVisitError] = useState("");
+  const [verifiedVisitPhone, setVerifiedVisitPhone] =
+    useState<VerifiedPhone | null>(null);
+
+  const getVerifiedVisitPhoneE164 = () => {
+    try {
+      const enteredPhone = normalizeIndianPhoneNumber(visitForm.phone);
+      return verifiedVisitPhone?.phoneE164 === enteredPhone
+        ? enteredPhone
+        : undefined;
+    } catch {
+      return undefined;
+    }
+  };
 
   useEffect(() => {
     async function loadProperty() {
@@ -329,8 +351,8 @@ export default function RentPropertyDetailsPage() {
                           initial={{ opacity: 1, y: 0, scale: 0.5, x: 0 }}
                           animate={{
                             opacity: 0,
-                            y: -100 - Math.random() * 50,
-                            x: (Math.random() - 0.5) * 60,
+                            y: -100 - i * 12,
+                            x: (i - 2) * 18,
                             scale: 1.5,
                           }}
                           exit={{ opacity: 0 }}
@@ -513,28 +535,84 @@ export default function RentPropertyDetailsPage() {
               className="space-y-4"
               onSubmit={(e) => {
                 e.preventDefault();
+                setVisitError("");
+
+                const phone = visitForm.phone.replace(/\D/g, "");
+                if (!visitForm.name.trim() || !phone) {
+                  setVisitError("Please enter your name and phone number.");
+                  return;
+                }
+                if (!/^[6-9]\d{9}$/.test(phone)) {
+                  setVisitError("Please enter a valid 10-digit Indian mobile number.");
+                  return;
+                }
+                if (!getVerifiedVisitPhoneE164()) {
+                  setVisitError("Please verify your phone number with OTP before booking a visit.");
+                  return;
+                }
+                if (
+                  visitForm.email &&
+                  !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(visitForm.email)
+                ) {
+                  setVisitError("Please enter a valid email address.");
+                  return;
+                }
+
                 handleConfetti();
+                setVisitForm({ name: "", email: "", phone: "", message: "" });
+                setVerifiedVisitPhone(null);
               }}
             >
               <input
                 type="text"
+                required
+                value={visitForm.name}
+                onChange={(e) =>
+                  setVisitForm({ ...visitForm, name: e.target.value })
+                }
                 placeholder="Full Name"
                 className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:border-gold transition-colors"
               />
               <input
                 type="email"
+                value={visitForm.email}
+                onChange={(e) =>
+                  setVisitForm({ ...visitForm, email: e.target.value })
+                }
                 placeholder="Email Address"
                 className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:border-gold transition-colors"
               />
               <input
                 type="tel"
+                required
+                value={visitForm.phone}
+                onChange={(e) => {
+                  setVisitForm({ ...visitForm, phone: e.target.value });
+                  setVerifiedVisitPhone(null);
+                }}
                 placeholder="Phone Number"
                 className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:border-gold transition-colors"
               />
+              <PhoneOtpVerifier
+                phone={visitForm.phone}
+                verifiedPhoneE164={getVerifiedVisitPhoneE164()}
+                recaptchaContainerId="rent-visit-phone-recaptcha"
+                onVerified={setVerifiedVisitPhone}
+              />
               <textarea
+                value={visitForm.message}
+                onChange={(e) =>
+                  setVisitForm({ ...visitForm, message: e.target.value })
+                }
                 placeholder="I am interested in this rental property..."
                 className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:border-gold transition-colors h-32"
               ></textarea>
+
+              {visitError && (
+                <p className="rounded-lg bg-red-50 px-4 py-3 text-sm font-medium text-red-600">
+                  {visitError}
+                </p>
+              )}
 
               <button
                 type="submit"
