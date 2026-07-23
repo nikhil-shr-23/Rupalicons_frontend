@@ -3,6 +3,7 @@ package com.raghav.rupaliconstbackend.controller;
 import com.raghav.rupaliconstbackend.DTO.PropertyCreateDTO;
 import com.raghav.rupaliconstbackend.DTO.PropertyResponseDTO;
 import com.raghav.rupaliconstbackend.DTO.PropertyUpdateDTO;
+import com.raghav.rupaliconstbackend.DTO.BulkPropertyUploadResponse;
 import com.raghav.rupaliconstbackend.DTO.PurchaseRequestDTO;
 import com.raghav.rupaliconstbackend.DTO.PurchaseResponseDTO;
 import com.raghav.rupaliconstbackend.DTO.RentalRequestDTO;
@@ -28,6 +29,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 
@@ -46,6 +49,14 @@ public class AdminPropertyController {
                 adminPropertyService.createProperty(dto, userDetails.getUsername()),
                 HttpStatus.CREATED
         );
+    }
+
+    @PostMapping(value = "/bulk-upload", consumes = "multipart/form-data")
+    public ResponseEntity<BulkPropertyUploadResponse> bulkUploadProperties(
+            @RequestPart("file") MultipartFile file,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        return ResponseEntity.ok(adminPropertyService.bulkUploadProperties(file, userDetails.getUsername()));
     }
 
     @GetMapping

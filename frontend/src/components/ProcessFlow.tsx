@@ -117,16 +117,16 @@ export default function ProcessFlow() {
   return (
     <section
       ref={containerRef}
-      className="py-32 bg-background relative overflow-hidden"
+      className="py-16 md:py-32 bg-background relative overflow-hidden"
       id="process"
     >
-      <div className="max-w-7xl mx-auto px-6 relative z-10">
-        <div className="text-center mb-24">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
+        <div className="text-center mb-10 md:mb-24">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-5xl md:text-6xl font-bold font-syne text-accent-dark mb-6"
+            className="text-3xl sm:text-4xl md:text-6xl font-bold font-syne text-accent-dark mb-4 md:mb-6"
           >
             India&apos;s Most Trusted{" "}
             <span className="text-gold">Real Estate Platform</span>
@@ -136,7 +136,7 @@ export default function ProcessFlow() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="text-gray-600 text-lg max-w-2xl mx-auto"
+            className="text-gray-600 text-base md:text-lg max-w-2xl mx-auto"
           >
             Numbers that speak for our commitment to excellence, transparency,
             and customer satisfaction across every transaction.
@@ -163,7 +163,7 @@ export default function ProcessFlow() {
             </svg>
           </div>
 
-          <div className="space-y-32 relative z-10">
+          <div className="space-y-12 md:space-y-32 relative z-10">
             {steps.map((step, index) => {
               const isEven = index % 2 === 0;
               return (
@@ -182,12 +182,12 @@ export default function ProcessFlow() {
                     <motion.div
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      className={`bg-white p-8 rounded-3xl shadow-xl border border-gray-100 relative group transition-all duration-300 cursor-pointer hover:shadow-gold/10 hover:border-gold/30`}
+                      className={`bg-white p-5 md:p-8 rounded-2xl md:rounded-3xl shadow-xl border border-gray-100 relative group transition-all duration-300 cursor-pointer hover:shadow-gold/10 hover:border-gold/30`}
                     >
                       <div className="absolute -top-6 -right-6 w-12 h-12 bg-accent-dark text-white rounded-full flex items-center justify-center font-bold text-xl shadow-lg z-20 group-hover:bg-gold group-hover:scale-110 transition-all duration-300">
                         {index + 1}
                       </div>
-                      <h3 className="text-2xl font-bold font-syne text-accent-dark mb-4 group-hover:text-gold transition-colors">
+                      <h3 className="text-lg md:text-2xl font-bold font-syne text-accent-dark mb-2 md:mb-4 group-hover:text-gold transition-colors">
                         {step.title}
                       </h3>
                       <p className="text-gray-600 leading-relaxed">

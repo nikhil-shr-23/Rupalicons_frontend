@@ -22,6 +22,51 @@ function normalizePropertyStatus(status: unknown): PropertyStatus {
   return PropertyStatus.AVAILABLE;
 }
 
+type PropertySearchFilters = {
+  type?: PropertyType;
+  minPrice?: number;
+  maxPrice?: number;
+  location?: string;
+  search?: string;
+  propertyCategory?: string;
+  bedrooms?: number;
+};
+
+function matchesClientFilters(property: Property, filters?: PropertySearchFilters): boolean {
+  if (!filters) return true;
+  if (filters.type && property.type !== filters.type) return false;
+
+  const query = (filters.search || filters.location || "").trim().toLowerCase();
+  if (query) {
+    const searchable = [
+      property.title,
+      property.description,
+      property.location,
+      property.city,
+      property.microMarket,
+      property.locality,
+      property.propertyCategory,
+      property.buildingType,
+      property.tags,
+    ].filter(Boolean).join(" ").toLowerCase();
+    if (!searchable.includes(query)) return false;
+  }
+
+  if (filters.propertyCategory && filters.propertyCategory !== "Any Type") {
+    const category = filters.propertyCategory.toLowerCase();
+    const propertyCategory = `${property.propertyCategory || ""} ${property.buildingType || ""}`.toLowerCase();
+    if (!propertyCategory.includes(category)) return false;
+  }
+
+  if (filters.bedrooms !== undefined && (property.bedrooms ?? 0) < filters.bedrooms) return false;
+
+  const amount = filters.type === PropertyType.RENT ? property.rentAmount : property.price;
+  if (filters.minPrice !== undefined && (amount === undefined || amount < filters.minPrice)) return false;
+  if (filters.maxPrice !== undefined && (amount === undefined || amount > filters.maxPrice)) return false;
+
+  return true;
+}
+
 function readAdminPropertyCache(): Property[] {
   if (typeof window === "undefined") return [];
   try {
@@ -123,13 +168,7 @@ export async function fetchAdminProperties(
 export async function fetchProperties(
   page = 0,
   size = 12,
-  filters?: {
-    type?: PropertyType;
-    minPrice?: number;
-    maxPrice?: number;
-    location?: string;
-    bedrooms?: number;
-  }
+  filters?: PropertySearchFilters
 ): Promise<{ content: Property[]; totalPages: number; totalElements: number }> {
   try {
     const params = new URLSearchParams();
@@ -139,18 +178,36 @@ export async function fetchProperties(
     if (filters?.minPrice !== undefined) params.set("minPrice", String(filters.minPrice));
     if (filters?.maxPrice !== undefined) params.set("maxPrice", String(filters.maxPrice));
     if (filters?.location) params.set("location", filters.location);
+    if (filters?.search) {
+      params.set("search", filters.search);
+      // Keep location populated for older backend deployments while the new
+      // full-text search endpoint is rolled out.
+      if (!filters.location) params.set("location", filters.search);
+    }
+    if (filters?.propertyCategory && filters.propertyCategory !== "Any Type") params.set("propertyCategory", filters.propertyCategory);
     if (filters?.bedrooms !== undefined) params.set("bedrooms", String(filters.bedrooms));
+    if (filters?.bedrooms !== undefined) params.set("minBedrooms", String(filters.bedrooms));
 
     const res = await fetch(`${API_URL}/properties?${params.toString()}`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
 
-    const content: Property[] = (data.content || []).map(mapPropertyFromBackend);
+    const backendReturnedArray = Array.isArray(data);
+    const rawContent = backendReturnedArray ? data : (data.content || []);
+    const mappedContent: Property[] = rawContent.map(mapPropertyFromBackend);
+    const filteredContent = backendReturnedArray
+      ? mappedContent.filter((property) => matchesClientFilters(property, filters))
+      : mappedContent;
+    const totalElements = Number(data.totalElements ?? filteredContent.length);
+    const totalPages = Number(data.totalPages ?? Math.max(1, Math.ceil(totalElements / size)));
+    const content = backendReturnedArray
+      ? filteredContent.slice(page * size, page * size + size)
+      : filteredContent;
 
     return {
       content,
-      totalPages: data.totalPages || 0,
-      totalElements: data.totalElements || 0,
+      totalPages,
+      totalElements,
     };
   } catch (error) {
     console.error("Failed to fetch properties:", error);
@@ -192,6 +249,27 @@ export async function createProperty(property: Partial<Property>): Promise<Prope
     console.error("Failed to create property:", error);
     return null;
   }
+}
+
+export type BulkPropertyUploadResult = {
+  created: number;
+  failed: number;
+  errors: string[];
+};
+
+export async function bulkUploadProperties(file: File): Promise<BulkPropertyUploadResult> {
+  const formData = new FormData();
+  formData.append("file", file);
+  const res = await fetch(`${API_URL}/admin/properties/bulk-upload`, {
+    method: "POST",
+    headers: { ...getAuthHeader() },
+    body: formData,
+  });
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(errorText || `Bulk upload failed (HTTP ${res.status})`);
+  }
+  return res.json();
 }
 
 // Admin: Update Property

@@ -33,17 +33,17 @@ export default function BlogsPage() {
       <Navbar />
 
       {/* Hero Section for Blogs */}
-      <section className="pt-48 pb-20 px-6 bg-accent-dark text-white relative overflow-hidden">
+      <section className="pt-24 md:pt-48 pb-10 md:pb-20 px-4 sm:px-6 bg-accent-dark text-white relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10"></div>
         <div className="max-w-7xl mx-auto text-center relative z-10">
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-5xl md:text-7xl font-bold font-syne mb-6"
+            className="text-3xl sm:text-5xl md:text-7xl font-bold font-syne mb-4 md:mb-6"
           >
             Our <span className="text-gold">Journal</span>
           </motion.h1>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto font-outfit mb-8">
+          <p className="text-base md:text-xl text-gray-300 max-w-2xl mx-auto font-outfit mb-6 md:mb-8">
             Insights, trends, and stories from the world of luxury real estate
             and design.
           </p>
@@ -63,13 +63,13 @@ export default function BlogsPage() {
       </section>
 
       {/* Blogs Grid */}
-      <section className="py-32 px-6 max-w-7xl mx-auto w-full grow">
+      <section className="py-8 md:py-32 px-4 sm:px-6 max-w-7xl mx-auto w-full grow">
         {loading ? (
           <div className="flex justify-center items-center py-20">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gold"></div>
           </div>
         ) : blogs.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 lg:gap-10">
             {blogs.map((blog, index) => (
               <motion.article
                 key={blog.id}
@@ -79,7 +79,7 @@ export default function BlogsPage() {
                 transition={{ delay: index * 0.1 }}
                 className="bg-white rounded-3xl overflow-hidden shadow-lg border border-gray-100 group hover:shadow-2xl transition-all duration-300 flex flex-col"
               >
-                <div className="relative h-64 overflow-hidden w-full bg-gray-100">
+                <div className="relative h-36 sm:h-64 overflow-hidden w-full bg-gray-100">
                   {blog.imageType ? (
                     <Image
                       src={`${API_URL}/blogs/${blog.id}/image`}

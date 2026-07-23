@@ -69,10 +69,10 @@ const InstagramReels = () => {
   const shiftPercent = `-${100 / copiesCount}%`;
 
   return (
-    <section className="py-24 bg-background overflow-hidden relative">
-      <div className="max-w-7xl mx-auto px-6 mb-12 flex flex-col md:flex-row justify-between items-end gap-6">
+    <section className="py-14 md:py-24 bg-background overflow-hidden relative">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 mb-8 md:mb-12 flex flex-col md:flex-row justify-between items-end gap-5 md:gap-6">
         <div>
-          <h2 className="text-4xl md:text-5xl font-bold font-syne mb-4">
+          <h2 className="text-3xl md:text-5xl font-bold font-syne mb-3 md:mb-4">
             Follow Us On <span className="text-gold">Instagram</span>
           </h2>
           <p className="text-gray-500 text-lg max-w-xl">
@@ -161,7 +161,7 @@ const InstagramReels = () => {
               {displayPosts.map((post, index) => (
                 <article
                   key={`${post.id}-${index}`}
-                  className="relative group shrink-0 w-[280px] h-[500px] rounded-2xl overflow-hidden bg-gray-100"
+                  className="relative group shrink-0 w-[220px] sm:w-[280px] h-[390px] sm:h-[500px] rounded-2xl overflow-hidden bg-gray-100"
                 >
                   <Image
                     src={post.image}

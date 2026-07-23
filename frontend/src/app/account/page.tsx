@@ -49,7 +49,7 @@ export default function AccountPage() {
     return (
       <main className="bg-[#FDFCF8] min-h-screen">
         <Navbar />
-        <div className="pt-40 pb-40 flex justify-center">
+        <div className="pt-24 md:pt-40 pb-24 md:pb-40 flex justify-center">
           <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-gold" />
         </div>
       </main>
@@ -180,7 +180,7 @@ function SavedProperties({
     );
   }
   return (
-    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 lg:gap-8">
       {properties.map((property, i) => (
         <motion.div
           key={property.id}

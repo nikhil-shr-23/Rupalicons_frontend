@@ -34,15 +34,15 @@ export default function Services() {
   ];
 
   return (
-    <section id="services" className="py-32 bg-background relative">
-      <div className="max-w-7xl mx-auto px-6">
+    <section id="services" className="py-16 md:py-32 bg-background relative">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
         {/* Header Section */}
-        <div className="flex flex-col lg:flex-row justify-between items-start gap-12 mb-20">
+        <div className="flex flex-col lg:flex-row justify-between items-start gap-7 md:gap-12 mb-10 md:mb-20">
           <motion.h2
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="text-5xl md:text-6xl font-bold font-syne text-accent-dark leading-tight max-w-xl"
+            className="text-3xl sm:text-4xl md:text-6xl font-bold font-syne text-accent-dark leading-tight max-w-xl"
           >
             Buy, Sell & Finance <span className="text-gold">Your Property</span>
           </motion.h2>
@@ -72,7 +72,7 @@ export default function Services() {
         </div>
 
         {/* Services Grid */}
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-3 gap-4 md:gap-8">
           {services.map((service, index) => (
             <motion.div
               key={index}

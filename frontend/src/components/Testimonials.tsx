@@ -71,13 +71,13 @@ export default function Testimonials() {
   const row = [...testimonials, ...testimonials]; // Duplicated for seamless loop
 
   return (
-    <section className="py-32 bg-gray-50 relative overflow-hidden">
-      <div className="max-w-7xl mx-auto px-6 mb-20 text-center">
+    <section className="py-16 md:py-32 bg-gray-50 relative overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 mb-10 md:mb-20 text-center">
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-5xl md:text-6xl font-bold font-syne text-accent-dark mb-6"
+          className="text-3xl sm:text-4xl md:text-6xl font-bold font-syne text-accent-dark mb-4 md:mb-6"
         >
           What People <span className="text-gold">Say About Us</span>
         </motion.h2>

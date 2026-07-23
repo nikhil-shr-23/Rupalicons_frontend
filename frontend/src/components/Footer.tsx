@@ -4,12 +4,12 @@ import { Phone, Mail, MapPin, Instagram, Facebook, Heart } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="bg-[#FDF6F0] text-gray-700 pt-16 pb-8 border-t border-gray-200">
+    <footer className="bg-[#FDF6F0] text-gray-700 pt-6 md:pt-16 pb-4 md:pb-8 border-t border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-x-5 gap-y-5 md:gap-12 mb-6 md:mb-12">
           {/* Column 1: Brand & About */}
-          <div className="space-y-6">
-            <Link href="/" className="inline-block relative h-16 w-64">
+          <div className="space-y-4 md:space-y-6 col-span-2 md:col-span-1">
+            <Link href="/" className="inline-block relative h-12 w-48 md:h-16 md:w-64">
               <Image
                 src="/logo_rupali.png"
                 alt="Rupali Homes"
@@ -17,12 +17,12 @@ export default function Footer() {
                 className="object-contain object-left"
               />
             </Link>
-            <p className="text-sm leading-relaxed text-gray-500">
+            <p className="hidden sm:block text-sm leading-relaxed text-gray-500">
               India&apos;s premier luxury real estate platform. We specialize in
               connecting discerning buyers with the finest residential and
               commercial properties across top metropolitan cities.
             </p>
-            <div className="flex items-center gap-4 pt-4">
+            <div className="flex items-center gap-4 pt-1 md:pt-4">
               <a
                 href="https://www.instagram.com/rupali_homes/"
                 className="text-[#E1306C] hover:opacity-80 transition-opacity"
@@ -45,11 +45,11 @@ export default function Footer() {
           </div>
 
           {/* Column 2: Popular Localities */}
-          <div>
-            <h4 className="text-lg font-bold font-syne text-accent-dark mb-6">
+          <div className="hidden md:block">
+            <h4 className="text-base md:text-lg font-bold font-syne text-accent-dark mb-3 md:mb-6">
               Top Localities
             </h4>
-            <ul className="space-y-4 text-sm text-gray-500">
+            <ul className="space-y-2 md:space-y-4 text-xs md:text-sm text-gray-500">
               <li>
                 <Link
                   href="/buy?location=Southern%20Peripheral"
@@ -100,10 +100,10 @@ export default function Footer() {
 
           {/* Column 3: Property Types */}
           <div>
-            <h4 className="text-lg font-bold font-syne text-accent-dark mb-6">
+            <h4 className="text-base md:text-lg font-bold font-syne text-accent-dark mb-3 md:mb-6">
               Explore
             </h4>
-            <ul className="space-y-4 text-sm text-gray-500">
+            <ul className="space-y-2.5 md:space-y-4 text-xs md:text-sm text-gray-500">
               <li>
                 <Link
                   href="/buy?type=Apartment"
@@ -157,25 +157,28 @@ export default function Footer() {
 
           {/* Column 4: Contact & Quick Links */}
           <div>
-            <h4 className="text-lg font-bold font-syne text-accent-dark mb-6">
+            <h4 className="text-base md:text-lg font-bold font-syne text-accent-dark mb-3 md:mb-6">
               Get in Touch
             </h4>
-            <ul className="space-y-4 text-sm text-gray-500 mb-8">
+            <ul className="space-y-2 md:space-y-4 text-xs md:text-sm text-gray-500 mb-4 md:mb-8">
               <li className="flex items-start gap-3">
                 <MapPin size={18} className="text-gold mt-1 shrink-0" />
                 <span className="leading-relaxed">
-                  Level 4, DLF Cyber City,
-                  <br />
-                  Gurugram, Haryana 122002
+                  <span className="sm:hidden">Gurugram, Haryana</span>
+                  <span className="hidden sm:inline">
+                    3rd & 4th Floor, Knowledge Center,
+                    <br />
+                    M3M Broadway, Sector 71, Gurugram, Haryana 122101
+                  </span>
                 </span>
               </li>
               <li className="flex items-center gap-3">
                 <Phone size={18} className="text-gold shrink-0" />
-                <span>+91 98765 43210</span>
+                <span>+91 9310831272</span>
               </li>
               <li className="flex items-center gap-3">
                 <Mail size={18} className="text-gold shrink-0" />
-                <span>contact@rupalihomes.com</span>
+                <span>[EMAIL_ADDRESS]</span>
               </li>
             </ul>
 
@@ -202,11 +205,11 @@ export default function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-8 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-gray-400">
+        <div className="pt-5 md:pt-8 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center gap-2 md:gap-4 text-center md:text-left">
+          <p className="text-[11px] md:text-sm text-gray-400">
             &copy; {new Date().getFullYear()} Rupali Homes. All rights reserved.
           </p>
-          <p className="text-sm text-gray-400 flex items-center gap-1">
+          <p className="hidden sm:flex text-[11px] md:text-sm text-gray-400 items-center gap-1">
             Crafted with <Heart size={14} className="text-gold" /> for real
             estate excellence.
           </p>

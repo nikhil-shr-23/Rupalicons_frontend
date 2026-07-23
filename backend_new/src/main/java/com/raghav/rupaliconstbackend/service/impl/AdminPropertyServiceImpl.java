@@ -2,6 +2,7 @@ package com.raghav.rupaliconstbackend.service.impl;
 
 import com.raghav.rupaliconstbackend.DTO.PropertyCreateDTO;
 import com.raghav.rupaliconstbackend.DTO.PropertyResponseDTO;
+import com.raghav.rupaliconstbackend.DTO.BulkPropertyUploadResponse;
 import com.raghav.rupaliconstbackend.DTO.PropertyUpdateDTO;
 import com.raghav.rupaliconstbackend.DTO.PurchaseRequestDTO;
 import com.raghav.rupaliconstbackend.DTO.PurchaseResponseDTO;
@@ -23,8 +24,23 @@ import com.raghav.rupaliconstbackend.exception.ResourceNotFoundException;
 import com.raghav.rupaliconstbackend.repository.PropertyLikeRepository;
 import com.raghav.rupaliconstbackend.service.AdminPropertyService;
 import lombok.RequiredArgsConstructor;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.time.LocalDateTime;
 
 @Service
@@ -74,8 +90,152 @@ public class AdminPropertyServiceImpl implements AdminPropertyService {
         property.setTags(dto.getTags());
         property.setFurnishingDetails(dto.getFurnishingDetails());
         property.setFurnishingStatus(dto.getFurnishingStatus());
+        property.setAgentName(dto.getAgentName());
+        property.setAgentPhotoUrl(dto.getAgentPhotoUrl());
+        property.setAmenities(dto.getAmenities());
 
         return toDto(propertyRepository.save(property));
+    }
+
+    @Override
+    public BulkPropertyUploadResponse bulkUploadProperties(MultipartFile file, String adminEmail) {
+        if (file == null || file.isEmpty()) {
+            throw new BadRequestException("Please select a non-empty .xlsx file");
+        }
+        String filename = file.getOriginalFilename() == null ? "" : file.getOriginalFilename().toLowerCase(Locale.ROOT);
+        if (!filename.endsWith(".xlsx")) {
+            throw new BadRequestException("Only .xlsx Excel files are supported");
+        }
+
+        int created = 0;
+        int failed = 0;
+        List<String> errors = new ArrayList<>();
+        DataFormatter formatter = new DataFormatter();
+
+        try (Workbook workbook = WorkbookFactory.create(file.getInputStream())) {
+            if (workbook.getNumberOfSheets() == 0) {
+                throw new BadRequestException("The workbook does not contain a sheet");
+            }
+            Sheet sheet = workbook.getSheetAt(0);
+            Row headerRow = sheet.getRow(0);
+            Map<String, Integer> headers = readHeaders(headerRow, formatter);
+            for (String required : List.of("title", "description", "location", "type")) {
+                if (!headers.containsKey(required)) {
+                    throw new BadRequestException("Missing required column: " + required);
+                }
+            }
+
+            for (int rowIndex = 1; rowIndex <= sheet.getLastRowNum(); rowIndex++) {
+                Row row = sheet.getRow(rowIndex);
+                if (isBlankRow(row, formatter)) continue;
+                try {
+                    PropertyCreateDTO dto = toPropertyDto(row, headers, formatter, rowIndex + 1);
+                    createProperty(dto, adminEmail);
+                    created++;
+                } catch (Exception ex) {
+                    failed++;
+                    errors.add("Row " + (rowIndex + 1) + ": " + safeMessage(ex));
+                }
+            }
+        } catch (IOException | RuntimeException ex) {
+            if (ex instanceof BadRequestException badRequest) throw badRequest;
+            throw new BadRequestException("Could not read the Excel file: " + safeMessage(ex));
+        }
+
+        return new BulkPropertyUploadResponse(created, failed, errors);
+    }
+
+    private Map<String, Integer> readHeaders(Row row, DataFormatter formatter) {
+        if (row == null) throw new BadRequestException("The first row must contain column headers");
+        Map<String, Integer> headers = new HashMap<>();
+        for (Cell cell : row) {
+            String header = formatter.formatCellValue(cell).trim().toLowerCase(Locale.ROOT)
+                    .replace(" ", "").replace("_", "");
+            if (!header.isBlank()) headers.put(header, cell.getColumnIndex());
+        }
+        return headers;
+    }
+
+    private PropertyCreateDTO toPropertyDto(Row row, Map<String, Integer> headers, DataFormatter formatter, int rowNumber) {
+        PropertyCreateDTO dto = new PropertyCreateDTO();
+        dto.setTitle(requiredText(row, headers, formatter, "title", rowNumber));
+        dto.setDescription(requiredText(row, headers, formatter, "description", rowNumber));
+        dto.setLocation(requiredText(row, headers, formatter, "location", rowNumber));
+        String type = requiredText(row, headers, formatter, "type", rowNumber).toUpperCase(Locale.ROOT);
+        try {
+            dto.setType(PropertyType.valueOf(type));
+        } catch (IllegalArgumentException ex) {
+            throw new BadRequestException("type must be SALE or RENT");
+        }
+        dto.setPrice(decimal(row, headers, formatter, "price"));
+        dto.setRentAmount(decimal(row, headers, formatter, "rentamount"));
+        dto.setSize(text(row, headers, formatter, "size"));
+        dto.setImageUrl(text(row, headers, formatter, "imageurl"));
+        dto.setImageGallery(text(row, headers, formatter, "imagegallery"));
+        dto.setBrochureUrl(text(row, headers, formatter, "brochureurl"));
+        dto.setBedrooms(integer(row, headers, formatter, "bedrooms"));
+        dto.setBathrooms(integer(row, headers, formatter, "bathrooms"));
+        dto.setSqft(integer(row, headers, formatter, "sqft"));
+        dto.setFeatured(booleanValue(row, headers, formatter, "featured"));
+        dto.setBuildingType(text(row, headers, formatter, "buildingtype"));
+        dto.setPropertyCategory(text(row, headers, formatter, "propertycategory"));
+        dto.setCity(text(row, headers, formatter, "city"));
+        dto.setMicroMarket(text(row, headers, formatter, "micromarket"));
+        dto.setLocality(text(row, headers, formatter, "locality"));
+        dto.setFlooring(text(row, headers, formatter, "flooring"));
+        dto.setFloorNumber(integer(row, headers, formatter, "floornumber"));
+        dto.setTotalFloors(integer(row, headers, formatter, "totalfloors"));
+        dto.setUnitNumber(integer(row, headers, formatter, "unitnumber"));
+        dto.setAvailableFrom(text(row, headers, formatter, "availablefrom"));
+        dto.setTags(text(row, headers, formatter, "tags"));
+        dto.setFurnishingDetails(text(row, headers, formatter, "furnishingdetails"));
+        dto.setFurnishingStatus(text(row, headers, formatter, "furnishingstatus"));
+        dto.setAgentName(text(row, headers, formatter, "agentname"));
+        dto.setAgentPhotoUrl(text(row, headers, formatter, "agentphotourl"));
+        dto.setAmenities(text(row, headers, formatter, "amenities"));
+        return dto;
+    }
+
+    private String requiredText(Row row, Map<String, Integer> headers, DataFormatter formatter, String key, int rowNumber) {
+        String value = text(row, headers, formatter, key);
+        if (value == null || value.isBlank()) throw new BadRequestException(key + " is required");
+        return value;
+    }
+
+    private String text(Row row, Map<String, Integer> headers, DataFormatter formatter, String key) {
+        Integer column = headers.get(key);
+        if (column == null) return null;
+        Cell cell = row.getCell(column, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
+        return cell == null ? null : formatter.formatCellValue(cell).trim();
+    }
+
+    private BigDecimal decimal(Row row, Map<String, Integer> headers, DataFormatter formatter, String key) {
+        String value = text(row, headers, formatter, key);
+        if (value == null || value.isBlank()) return null;
+        try { return new BigDecimal(value.replace(",", "")); }
+        catch (NumberFormatException ex) { throw new BadRequestException(key + " must be a number"); }
+    }
+
+    private Integer integer(Row row, Map<String, Integer> headers, DataFormatter formatter, String key) {
+        String value = text(row, headers, formatter, key);
+        if (value == null || value.isBlank()) return null;
+        try { return new BigDecimal(value.replace(",", "")).intValueExact(); }
+        catch (ArithmeticException | NumberFormatException ex) { throw new BadRequestException(key + " must be a whole number"); }
+    }
+
+    private boolean booleanValue(Row row, Map<String, Integer> headers, DataFormatter formatter, String key) {
+        String value = text(row, headers, formatter, key);
+        return value != null && (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("yes") || value.equals("1"));
+    }
+
+    private boolean isBlankRow(Row row, DataFormatter formatter) {
+        if (row == null) return true;
+        for (Cell cell : row) if (!formatter.formatCellValue(cell).trim().isBlank()) return false;
+        return true;
+    }
+
+    private String safeMessage(Exception ex) {
+        return ex.getMessage() == null || ex.getMessage().isBlank() ? ex.getClass().getSimpleName() : ex.getMessage();
     }
 
     @Override

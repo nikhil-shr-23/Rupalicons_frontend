@@ -51,12 +51,12 @@ export default function Navbar() {
       initial="hidden"
       animate="visible"
       variants={navVariants}
-      className={`fixed w-full z-50 transition-all duration-300 bg-white/90 backdrop-blur-md shadow-sm py-4`}
+      className={`fixed w-full z-50 transition-all duration-300 bg-white/90 backdrop-blur-md shadow-sm py-2.5 md:py-4`}
     >
-      <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex justify-between items-center">
         <Link
           href="/"
-          className="relative h-16 w-64 transition-opacity hover:opacity-80"
+          className="relative h-12 w-44 md:h-16 md:w-64 transition-opacity hover:opacity-80"
         >
           <Image
             src="/logo_rupali.png"
@@ -160,52 +160,52 @@ export default function Navbar() {
 
       {/* Mobile Overlay */}
       <AnimatePresence>
-        {isOpen && (
+          {isOpen && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "100vh" }}
             exit={{ opacity: 0, height: 0 }}
-            className="fixed inset-0 bg-accent-dark z-40 flex flex-col items-center justify-center space-y-8"
+            className="fixed inset-0 bg-accent-dark z-40 flex flex-col items-center justify-center space-y-5"
           >
             <Link
               href="/"
               onClick={() => setIsOpen(false)}
-              className="text-2xl text-white font-syne hover:text-gold"
+              className="text-xl text-white font-syne hover:text-gold"
             >
               Home
             </Link>
             <Link
               href="/buy"
               onClick={() => setIsOpen(false)}
-              className="text-2xl text-white font-syne hover:text-gold"
+              className="text-xl text-white font-syne hover:text-gold"
             >
               Buy
             </Link>
             <Link
               href="/rent"
               onClick={() => setIsOpen(false)}
-              className="text-2xl text-white font-syne hover:text-gold"
+              className="text-xl text-white font-syne hover:text-gold"
             >
               Rent
             </Link>
             <Link
               href="/sell"
               onClick={() => setIsOpen(false)}
-              className="text-2xl text-white font-syne hover:text-gold"
+              className="text-xl text-white font-syne hover:text-gold"
             >
               Sell
             </Link>
             <Link
               href="/finance"
               onClick={() => setIsOpen(false)}
-              className="text-2xl text-white font-syne hover:text-gold"
+              className="text-xl text-white font-syne hover:text-gold"
             >
               Home Loans
             </Link>
             <Link
               href="/blogs"
               onClick={() => setIsOpen(false)}
-              className="text-2xl text-white font-syne hover:text-gold"
+              className="text-xl text-white font-syne hover:text-gold"
             >
               Blogs
             </Link>
@@ -213,7 +213,7 @@ export default function Navbar() {
             <Link
               href="/liked"
               onClick={() => setIsOpen(false)}
-              className="text-2xl text-white font-syne hover:text-gold flex items-center gap-3"
+              className="text-xl text-white font-syne hover:text-gold flex items-center gap-3"
             >
               <Heart size={24} className="text-red-400" />
               Liked ({isClient ? likedCount : 0})
@@ -222,13 +222,13 @@ export default function Navbar() {
             <Link
               href={isClient && user ? "/account" : "/account/login"}
               onClick={() => setIsOpen(false)}
-              className="text-2xl text-white font-syne hover:text-gold flex items-center gap-3"
+              className="text-xl text-white font-syne hover:text-gold flex items-center gap-3"
             >
               <User size={24} className="text-gold" />
               {isClient && user ? "My Account" : "Login / Sign Up"}
             </Link>
 
-            <div className="flex gap-6 mt-8">
+            <div className="flex gap-5 mt-5">
               <Link
                 href="https://instagram.com"
                 target="_blank"

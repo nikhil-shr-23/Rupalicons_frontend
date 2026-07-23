@@ -48,10 +48,10 @@ export default function HeroV2() {
   }, [activeTab]);
 
   return (
-    <div className="relative min-h-[85vh] flex flex-col justify-start px-4 pt-44 pb-16 overflow-hidden bg-grid">
+    <div className="relative min-h-0 md:min-h-[85vh] flex flex-col justify-start px-4 pt-28 pb-8 md:pt-44 md:pb-16 overflow-hidden bg-grid">
       <HeroSvgAnimation />
 
-      <div className="max-w-6xl mx-auto w-full grid lg:grid-cols-[1.15fr_0.85fr] gap-12 items-center relative z-10">
+      <div className="max-w-6xl mx-auto w-full grid lg:grid-cols-[1.15fr_0.85fr] gap-6 md:gap-12 items-center relative z-10">
         {/* Text Content */}
         <motion.div
           style={{ y: yText }}
@@ -60,16 +60,16 @@ export default function HeroV2() {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="z-10"
         >
-          <div className="flex items-center gap-4 mb-6">
-            <div className="w-12 h-px bg-gold"></div>
-            <span className="text-sm font-semibold tracking-widest uppercase text-gold">
+          <div className="flex items-center gap-3 mb-4 md:mb-6">
+            <div className="w-8 md:w-12 h-px bg-gold"></div>
+            <span className="text-[11px] md:text-sm font-semibold tracking-[0.18em] md:tracking-widest uppercase text-gold">
               Premium Real Estate
             </span>
           </div>
 
           <h1
             ref={headingRef}
-            className="text-4xl md:text-[3.4rem] lg:text-[3.8rem] font-semibold leading-[1.04] text-accent-dark mb-6 font-syne tracking-tight"
+            className="text-[2.35rem] md:text-[3.4rem] lg:text-[3.8rem] font-semibold leading-[1.04] text-accent-dark mb-5 md:mb-6 font-syne tracking-tight"
           >
             {currentHeading.prefix}{" "}
             <span className="relative inline-block text-gold">
@@ -81,7 +81,7 @@ export default function HeroV2() {
             </span>
           </h1>
 
-          <div className="w-full relative z-20 mt-12">
+          <div className="w-full relative z-20 mt-6 md:mt-12">
             <HeroSearch onTabChange={setActiveTab} />
           </div>
         </motion.div>
@@ -92,9 +92,9 @@ export default function HeroV2() {
           initial={{ opacity: 0, scale: 0.97 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1, delay: 0.2 }}
-          className="relative h-[440px] md:h-[500px] flex items-center justify-end pointer-events-none"
+          className="relative h-[140px] sm:h-[200px] md:h-[430px] flex items-center justify-center lg:justify-end pointer-events-none"
         >
-          <div className="relative z-10 w-[96%] h-full flex justify-end items-center translate-x-6">
+          <div className="relative z-10 w-[78%] sm:w-[82%] md:w-[68%] lg:w-[76%] h-full flex justify-center lg:justify-end items-center translate-x-0">
             <motion.img
               src={
                 activeTab === "commercial"
@@ -108,7 +108,7 @@ export default function HeroV2() {
                         : "/touse.png"
               }
               alt="Luxury Home"
-              className="object-contain w-full h-full scale-100 drop-shadow-2xl"
+              className="block w-auto h-auto max-w-full max-h-full object-contain drop-shadow-2xl"
             />
           </div>
         </motion.div>

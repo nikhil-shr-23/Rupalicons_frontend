@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Search, ChevronDown } from "lucide-react";
+import { Search, ChevronDown, MapPin } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { getLocationSuggestions } from "@/lib/locationSuggestions";
 
 const cities = [
   "All Cities",
@@ -15,6 +16,66 @@ const cities = [
   "Pune",
   "Chennai",
   "Kolkata",
+];
+
+// Delhi NCR localities used for the search autocomplete dropdown.
+// Shown when the user types at least 3 characters in the main search input.
+const delhiNcrLocations = [
+  // South & Central Delhi
+  "Saket, Delhi",
+  "Hauz Khas, Delhi",
+  "Vasant Kunj, Delhi",
+  "Vasant Vihar, Delhi",
+  "Greater Kailash, Delhi",
+  "Defence Colony, Delhi",
+  "Lajpat Nagar, Delhi",
+  "Chanakyapuri, Delhi",
+  "Connaught Place, Delhi",
+  "Karol Bagh, Delhi",
+  "Rajouri Garden, Delhi",
+  "Dwarka, Delhi",
+  "Janakpuri, Delhi",
+  "Punjabi Bagh, Delhi",
+  "Pitampura, Delhi",
+  "Rohini, Delhi",
+  "Model Town, Delhi",
+  "Mayur Vihar, Delhi",
+  "Preet Vihar, Delhi",
+  // Gurgaon
+  "Golf Course Road, Gurgaon",
+  "Golf Course Extension Road, Gurgaon",
+  "Sohna Road, Gurgaon",
+  "MG Road, Gurgaon",
+  "DLF Phase 1, Gurgaon",
+  "DLF Phase 2, Gurgaon",
+  "DLF Phase 3, Gurgaon",
+  "DLF Phase 5, Gurgaon",
+  "Sushant Lok, Gurgaon",
+  "Sector 56, Gurgaon",
+  "Sector 57, Gurgaon",
+  "Cyber City, Gurgaon",
+  "New Gurgaon, Gurgaon",
+  "Dwarka Expressway, Gurgaon",
+  "Manesar, Gurgaon",
+  // Noida & Greater Noida
+  "Sector 18, Noida",
+  "Sector 62, Noida",
+  "Sector 76, Noida",
+  "Sector 137, Noida",
+  "Noida Extension, Greater Noida",
+  "Greater Noida West, Greater Noida",
+  "Pari Chowk, Greater Noida",
+  "Yamuna Expressway, Greater Noida",
+  // Ghaziabad
+  "Indirapuram, Ghaziabad",
+  "Vaishali, Ghaziabad",
+  "Vasundhara, Ghaziabad",
+  "Raj Nagar Extension, Ghaziabad",
+  "Crossings Republik, Ghaziabad",
+  // Faridabad
+  "Sector 15, Faridabad",
+  "Neharpar, Faridabad",
+  "Greater Faridabad, Faridabad",
 ];
 
 const budgetRanges = {
@@ -76,6 +137,12 @@ export default function HeroSearch({
   const [selectedPropertyType, setSelectedPropertyType] = useState("");
   const [selectedPossession, setSelectedPossession] = useState("");
 
+  // Location autocomplete (Delhi NCR) — appears at 3+ characters
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
+
+  const locationSuggestions = getLocationSuggestions(searchQuery);
+
   // Notify parent of tab changes
   useEffect(() => {
     if (onTabChange) {
@@ -117,6 +184,8 @@ export default function HeroSearch({
         !possessionRef.current.contains(e.target as Node)
       )
         setShowPossessionDropdown(false);
+      if (searchRef.current && !searchRef.current.contains(e.target as Node))
+        setShowSuggestions(false);
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
@@ -155,10 +224,14 @@ export default function HeroSearch({
   }, [activeTab]);
 
   const handleSearch = () => {
+    setShowSuggestions(false);
     // Navigate to buy or rent page with filters
     const target = activeTab === "rent" ? "/rent" : "/buy";
     const params = new URLSearchParams();
-    if (searchQuery) params.set("q", searchQuery);
+    if (searchQuery) {
+      params.set("q", searchQuery);
+      params.set("location", searchQuery);
+    }
     if (selectedCity !== "All Cities") params.set("city", selectedCity);
     
     let rawMinPrice = "";
@@ -188,7 +261,10 @@ export default function HeroSearch({
       if (activeTab === "plot") effectivePropertyType = "Plot";
       else if (activeTab === "commercial") effectivePropertyType = "Commercial";
     }
-    if (effectivePropertyType) params.set("propertyType", effectivePropertyType);
+    if (effectivePropertyType) {
+      params.set("propertyType", effectivePropertyType);
+      params.set("type", effectivePropertyType);
+    }
     if (selectedPossession) params.set("possession", selectedPossession);
 
     const queryString = params.toString();
@@ -200,14 +276,14 @@ export default function HeroSearch({
   };
 
   return (
-    <div className="w-full max-w-4xl mt-20  mb-20 relative z-20">
+    <div className="w-full max-w-full mt-8 mb-8 md:mt-20 md:mb-20 relative z-20">
       {/* Tabs */}
-      <div className="flex overflow-x-auto no-scrollbar bg-slate-900/80 backdrop-blur-md rounded-t-lg border-b border-white/10">
+      <div className="grid grid-cols-5 bg-slate-900/80 backdrop-blur-md rounded-t-lg border-b border-white/10 overflow-hidden">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as typeof activeTab)}
-            className={`flex items-center gap-2 px-5 py-3 text-xs md:text-sm font-medium transition-colors whitespace-nowrap ${
+            className={`min-w-0 flex items-center justify-center gap-1 px-1.5 py-2.5 text-[10px] leading-tight text-center md:gap-2 md:px-3 md:py-3 md:text-sm font-medium transition-colors ${
               activeTab === tab.id
                 ? "bg-white text-slate-900"
                 : "text-gray-300 hover:text-white hover:bg-white/10"
@@ -259,16 +335,45 @@ export default function HeroSearch({
         </div>
 
         {/* Main Search Input */}
-        <div className="grow w-full relative flex items-center px-2">
+        <div ref={searchRef} className="grow w-full relative flex items-center px-2">
           <Search className="text-gray-400 w-4 h-4 absolute left-3.5" />
           <input
             type="text"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setShowSuggestions(true);
+            }}
+            onFocus={() => setShowSuggestions(true)}
             onKeyDown={handleKeyDown}
             placeholder={placeholders[currentPlaceholderIndex]}
             className="w-full pl-10 pr-3 py-2.5 outline-none text-gray-700 placeholder-gray-400 text-sm text-ellipsis transition-all duration-500"
           />
+
+          {/* Location Suggestions Dropdown (Delhi NCR) */}
+          {showSuggestions && searchQuery.trim().length >= 3 && (
+            <div className="absolute top-full left-2 right-2 mt-2 bg-white border border-gray-200 rounded-xl shadow-2xl z-50 py-2 max-h-72 overflow-y-auto">
+              {locationSuggestions.length > 0 ? (
+                locationSuggestions.map((loc) => (
+                  <button
+                    key={loc}
+                    onClick={() => {
+                      setSearchQuery(loc);
+                      setShowSuggestions(false);
+                    }}
+                    className="w-full flex items-center gap-2.5 text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                  >
+                    <MapPin size={15} className="text-gold shrink-0" />
+                    <span className="truncate">{loc}</span>
+                  </button>
+                ))
+              ) : (
+                <p className="px-4 py-2.5 text-sm text-gray-400">
+                  No locations found in Delhi NCR
+                </p>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Search Button */}
@@ -281,7 +386,7 @@ export default function HeroSearch({
       </div>
 
       {/* Secondary Filters Row */}
-      <div className="flex gap-3 mt-3 px-1.5 flex-wrap">
+      <div className="flex gap-3 mt-3 px-1.5 flex-nowrap md:flex-wrap overflow-x-auto no-scrollbar pb-1">
         {/* Budget Dropdown */}
         <div ref={budgetRef} className="relative">
           <button

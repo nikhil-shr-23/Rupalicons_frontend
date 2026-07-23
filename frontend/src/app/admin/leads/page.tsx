@@ -31,6 +31,47 @@ import { fetchInquiries, deleteInquiry } from "@/lib/api";
 import { Inquiry } from "@/types";
 import { useAdminAuth } from "@/context/AdminAuthContext";
 
+// Renders a message string, converting image URLs to inline images and other URLs to links
+function MessageWithMedia({ message }: { message: string }) {
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  const imageExtensions = /\.(jpg|jpeg|png|gif|webp|svg|bmp|ico)(\?.*)?$/i;
+  const parts = message.split(urlRegex);
+
+  return (
+    <div className="text-sm text-gray-700 whitespace-pre-wrap break-words space-y-2">
+      {parts.map((part, i) => {
+        if (!urlRegex.test(part)) {
+          return part ? <span key={i}>{part}</span> : null;
+        }
+        // Check if the URL points to an image
+        if (imageExtensions.test(part) || part.includes("firebasestorage.googleapis.com")) {
+          return (
+            <img
+              key={i}
+              src={part}
+              alt="Attached media"
+              className="max-w-full sm:max-w-xs rounded-lg border border-gray-200 shadow-sm mt-1 cursor-pointer hover:opacity-90 transition-opacity"
+              onClick={() => window.open(part, "_blank")}
+              loading="lazy"
+            />
+          );
+        }
+        return (
+          <a
+            key={i}
+            href={part}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 hover:underline"
+          >
+            {part}
+          </a>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function LeadsPage() {
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [loading, setLoading] = useState(true);

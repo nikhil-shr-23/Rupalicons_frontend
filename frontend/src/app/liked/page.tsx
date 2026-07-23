@@ -35,7 +35,7 @@ export default function LikedPage() {
       <Navbar />
 
       {/* Hero Banner */}
-      <section className="pt-32 pb-16 px-6 bg-gradient-to-b from-red-50 to-background">
+      <section className="pt-24 md:pt-32 pb-10 md:pb-16 px-4 sm:px-6 bg-gradient-to-b from-red-50 to-background">
         <div className="max-w-7xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -46,7 +46,7 @@ export default function LikedPage() {
               <Heart size={18} className="fill-red-500" />
               Your Favorites
             </div>
-            <h1 className="text-5xl md:text-7xl font-bold font-syne text-accent-dark mb-4">
+            <h1 className="text-3xl sm:text-5xl md:text-7xl font-bold font-syne text-accent-dark mb-3 md:mb-4">
               Liked Properties
             </h1>
             <p className="text-gray-500 text-lg max-w-xl mx-auto">
@@ -58,13 +58,13 @@ export default function LikedPage() {
       </section>
 
       {/* Properties Grid */}
-      <section className="py-16 px-6 max-w-7xl mx-auto w-full grow">
+      <section className="py-8 md:py-16 px-4 sm:px-6 max-w-7xl mx-auto w-full grow">
         {loading ? (
           <div className="flex justify-center items-center py-20">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-500"></div>
           </div>
         ) : properties.length > 0 ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
+          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 lg:gap-10">
             {properties.map((property, index) => (
               <motion.div
                 key={property.id}

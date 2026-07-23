@@ -17,7 +17,8 @@ export default function Projects() {
   useEffect(() => {
     async function loadProperties() {
       try {
-        const data = await fetchProperties(0, 100);
+        // The public properties endpoint caps page size at 50.
+        const data = await fetchProperties(0, 50);
         if (data && data.content) {
           const featured = data.content.filter((p: Property) => p.featured);
           setProperties(featured);
@@ -45,15 +46,15 @@ export default function Projects() {
   return (
     <section
       id="projects"
-      className="py-32 bg-accent-dark text-white overflow-hidden relative"
+      className="py-14 md:py-32 bg-accent-dark text-white overflow-hidden relative"
     >
       {/* Background Grid Pattern for Dark Section */}
       <div className="absolute inset-0 opacity-10 bg-[linear-gradient(rgba(255,255,255,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.1)_1px,transparent_1px)] bg-size-[50px_50px]"></div>
 
-      <div className="max-w-7xl mx-auto px-6 relative z-10">
-        <div className="grid lg:grid-cols-2 gap-16 items-end mb-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
+        <div className="grid lg:grid-cols-2 gap-8 md:gap-16 items-end mb-10 md:mb-20">
           <div>
-            <h2 className="text-5xl md:text-6xl font-bold font-syne leading-tight">
+            <h2 className="text-3xl sm:text-4xl md:text-6xl font-bold font-syne leading-tight">
               Find Your{" "}
               <span className="relative inline-block">
                 <span className="text-gold">Dream</span>
@@ -119,7 +120,7 @@ export default function Projects() {
         </div>
 
         {/* Dynamic Project Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5 md:gap-8">
           {properties.length > 0 ? (
             properties.map((property, index) => (
               <motion.div
@@ -128,7 +129,7 @@ export default function Projects() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1, duration: 0.6 }}
                 viewport={{ once: true }}
-                className="group relative h-[400px] rounded-2xl overflow-hidden cursor-pointer"
+                className="group relative h-[250px] sm:h-[320px] md:h-[400px] rounded-xl md:rounded-2xl overflow-hidden cursor-pointer"
               >
                 {property.imageUrl ? (
                   <Image
@@ -146,11 +147,11 @@ export default function Projects() {
                 {/* Overlay */}
                 <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity"></div>
 
-                <div className="absolute bottom-0 left-0 p-8 w-full translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                  <span className="text-gold text-xs font-bold uppercase tracking-widest mb-2 block">
+                <div className="absolute bottom-0 left-0 p-3 sm:p-5 md:p-8 w-full translate-y-1 md:translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                  <span className="text-gold text-[9px] sm:text-xs font-bold uppercase tracking-widest mb-1 md:mb-2 block">
                     {property.type}
                   </span>
-                  <h3 className="text-2xl font-bold font-syne mb-2">
+                  <h3 className="text-sm sm:text-lg md:text-2xl font-bold font-syne mb-1 md:mb-2 line-clamp-2">
                     {property.title}
                   </h3>
                   <div className="h-0 group-hover:h-auto overflow-hidden transition-all duration-300">

@@ -92,7 +92,7 @@ export default function PropertyGridCard({ property, index = 0 }: PropertyGridCa
       <Link href={detailPath} className="block group">
         <div className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl border border-gray-100 transition-all duration-500 hover:-translate-y-1">
           {/* Image */}
-          <div className="relative h-56 sm:h-64 overflow-hidden">
+          <div className="relative h-36 sm:h-56 md:h-64 overflow-hidden">
             {property.imageUrl ? (
               <Image
                 src={property.imageUrl}
@@ -152,10 +152,10 @@ export default function PropertyGridCard({ property, index = 0 }: PropertyGridCa
           </div>
 
           {/* Content */}
-          <div className="p-5">
+          <div className="p-3 sm:p-5">
             {/* Price */}
             <div className="flex items-baseline justify-between mb-2">
-              <span className="text-xl font-bold font-syne text-accent-dark group-hover:text-gold transition-colors">
+              <span className="text-base sm:text-xl font-bold font-syne text-accent-dark group-hover:text-gold transition-colors truncate">
                 {formattedPrice}
               </span>
               <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
@@ -164,7 +164,7 @@ export default function PropertyGridCard({ property, index = 0 }: PropertyGridCa
             </div>
 
             {/* Title */}
-            <h3 className="text-lg font-bold text-accent-dark font-syne mb-1.5 line-clamp-1 group-hover:text-gold transition-colors duration-300">
+            <h3 className="text-sm sm:text-lg font-bold text-accent-dark font-syne mb-1.5 line-clamp-2 sm:line-clamp-1 group-hover:text-gold transition-colors duration-300">
               {property.title}
             </h3>
 
@@ -176,20 +176,20 @@ export default function PropertyGridCard({ property, index = 0 }: PropertyGridCa
 
             {/* Stats */}
             <div className="flex items-center justify-between border-t border-gray-100 pt-4">
-              <div className="flex items-center gap-1.5 text-gray-600">
+              <div className="flex items-center gap-1 sm:gap-1.5 text-gray-600">
                 <Bed size={16} className="text-accent-light" />
                 <span className="text-sm font-semibold">{property.bedrooms || "—"}</span>
-                <span className="text-xs text-gray-400">Beds</span>
+                <span className="hidden sm:inline text-xs text-gray-400">Beds</span>
               </div>
-              <div className="flex items-center gap-1.5 text-gray-600">
+              <div className="flex items-center gap-1 sm:gap-1.5 text-gray-600">
                 <Bath size={16} className="text-accent-light" />
                 <span className="text-sm font-semibold">{property.bathrooms || "—"}</span>
-                <span className="text-xs text-gray-400">Baths</span>
+                <span className="hidden sm:inline text-xs text-gray-400">Baths</span>
               </div>
-              <div className="flex items-center gap-1.5 text-gray-600">
+              <div className="flex items-center gap-1 sm:gap-1.5 text-gray-600">
                 <Square size={16} className="text-accent-light" />
                 <span className="text-sm font-semibold">{(property.areaSqFt as number) || property.sqft || "—"}</span>
-                <span className="text-xs text-gray-400">sqft</span>
+                <span className="hidden sm:inline text-xs text-gray-400">sqft</span>
               </div>
             </div>
           </div>

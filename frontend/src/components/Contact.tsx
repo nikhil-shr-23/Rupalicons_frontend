@@ -111,12 +111,12 @@ export default function Contact() {
   return (
     <section
       id="contact"
-      className="py-32 bg-accent-dark text-white relative overflow-hidden"
+      className="py-16 md:py-32 bg-accent-dark text-white relative overflow-hidden"
     >
-      <div className="max-w-7xl mx-auto px-6 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
         {/* Header */}
         <div className="text-center mb-16">
-          <h2 className="text-5xl font-bold font-syne mb-6">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold font-syne mb-4 md:mb-6">
             Get In <span className="text-gold">Touch</span>
           </h2>
           <p className="text-gray-400 text-lg">
@@ -125,7 +125,7 @@ export default function Contact() {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-16">
+        <div className="grid lg:grid-cols-2 gap-8 md:gap-16">
           {/* Contact Form */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}

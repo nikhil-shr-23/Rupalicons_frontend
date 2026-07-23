@@ -16,7 +16,10 @@ public interface PropertyService {
             BigDecimal maxPrice,
             BigDecimal minRent,
             BigDecimal maxRent,
-            String location
+            String location,
+            String search,
+            String propertyCategory,
+            Integer minBedrooms
     );
     PropertyResponseDTO getAvailableProperty(Long id);
 

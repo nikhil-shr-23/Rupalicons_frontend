@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Search,
   SlidersHorizontal,
@@ -9,6 +9,7 @@ import {
   Home,
   Bed,
 } from "lucide-react";
+import { getLocationSuggestions } from "@/lib/locationSuggestions";
 
 export interface SearchFilters {
   location: string;
@@ -66,8 +67,21 @@ export default function SearchFilterBar({ onSearch, initialFilters, mode = "buy"
   const [propertyType, setPropertyType] = useState(initialFilters?.propertyType || "");
   const [priceRange, setPriceRange] = useState(initialFilters?.priceRange || "");
   const [bedrooms, setBedrooms] = useState(initialFilters?.bedrooms || "");
+  const [showLocationSuggestions, setShowLocationSuggestions] = useState(false);
+  const locationRef = useRef<HTMLDivElement>(null);
 
   const priceOptions = mode === "rent" ? rentPriceRanges : buyPriceRanges;
+  const locationSuggestions = getLocationSuggestions(location);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (locationRef.current && !locationRef.current.contains(event.target as Node)) {
+        setShowLocationSuggestions(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Sync when initialFilters change (e.g. from URL params parsed after mount)
   useEffect(() => {
@@ -87,13 +101,13 @@ export default function SearchFilterBar({ onSearch, initialFilters, mode = "buy"
   };
 
   return (
-    <div className="bg-white rounded-full shadow-lg border border-gray-100 p-2 flex flex-col md:flex-row items-center gap-2 max-w-6xl mx-auto mt-8">
+    <div className="bg-white rounded-2xl md:rounded-full shadow-lg border border-gray-100 p-2 flex flex-col md:flex-row items-center gap-1.5 md:gap-2 max-w-6xl mx-auto mt-6 md:mt-8">
       {/* Location */}
-      <div className="flex-1 w-full md:w-auto px-6 py-2 border-b md:border-b-0 md:border-r border-gray-100 flex items-center gap-3">
+      <div className="flex-1 w-full md:w-auto px-3 md:px-6 py-2 border-b md:border-b-0 md:border-r border-gray-100 flex items-center gap-2 md:gap-3">
         <div className="p-2 bg-gray-50 rounded-full text-gray-400">
           <MapPin size={18} />
         </div>
-        <div className="flex-1">
+        <div ref={locationRef} className="flex-1 relative">
           <p className="text-xs text-gray-400 uppercase tracking-wider font-medium mb-1">
             Location
           </p>
@@ -101,15 +115,39 @@ export default function SearchFilterBar({ onSearch, initialFilters, mode = "buy"
             type="text"
             placeholder="Golf Course Road, Gurgaon"
             value={location}
-            onChange={(e) => setLocation(e.target.value)}
+            onChange={(e) => {
+              setLocation(e.target.value);
+              setShowLocationSuggestions(true);
+            }}
+            onFocus={() => setShowLocationSuggestions(true)}
             onKeyDown={handleKeyDown}
             className="w-full text-sm font-medium text-accent-dark placeholder-gray-300 focus:outline-none bg-transparent"
           />
+          {showLocationSuggestions && location.trim().length >= 3 && (
+            <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-2xl z-50 py-2 max-h-72 overflow-y-auto">
+              {locationSuggestions.length > 0 ? locationSuggestions.map((suggestion) => (
+                <button
+                  key={suggestion}
+                  type="button"
+                  onClick={() => {
+                    setLocation(suggestion);
+                    setShowLocationSuggestions(false);
+                  }}
+                  className="w-full flex items-center gap-2.5 text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  <MapPin size={15} className="text-gold shrink-0" />
+                  <span className="truncate">{suggestion}</span>
+                </button>
+              )) : (
+                <p className="px-4 py-2.5 text-sm text-gray-400">No locations found in Delhi NCR</p>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
       {/* Property Type */}
-      <div className="flex-1 w-full md:w-auto px-6 py-2 border-b md:border-b-0 md:border-r border-gray-100 flex items-center gap-3">
+      <div className="flex-1 w-full md:w-auto px-3 md:px-6 py-2 border-b md:border-b-0 md:border-r border-gray-100 flex items-center gap-2 md:gap-3">
         <div className="p-2 bg-gray-50 rounded-full text-gray-400">
           <Home size={18} />
         </div>
@@ -138,7 +176,7 @@ export default function SearchFilterBar({ onSearch, initialFilters, mode = "buy"
       </div>
 
       {/* Price Range - Dropdown */}
-      <div className="flex-1 w-full md:w-auto px-6 py-2 border-b md:border-b-0 md:border-r border-gray-100 flex items-center gap-3">
+      <div className="flex-1 w-full md:w-auto px-3 md:px-6 py-2 border-b md:border-b-0 md:border-r border-gray-100 flex items-center gap-2 md:gap-3">
         <div className="p-2 bg-gray-50 rounded-full text-gray-400">
           <IndianRupee size={18} />
         </div>
@@ -166,7 +204,7 @@ export default function SearchFilterBar({ onSearch, initialFilters, mode = "buy"
       </div>
 
       {/* Bedrooms */}
-      <div className="flex-1 w-full md:w-auto px-6 py-2 border-b md:border-b-0 md:border-r border-gray-100 flex items-center gap-3">
+      <div className="flex-1 w-full md:w-auto px-3 md:px-6 py-2 border-b md:border-b-0 md:border-r border-gray-100 flex items-center gap-2 md:gap-3">
         <div className="p-2 bg-gray-50 rounded-full text-gray-400">
           <Bed size={18} />
         </div>
@@ -194,10 +232,10 @@ export default function SearchFilterBar({ onSearch, initialFilters, mode = "buy"
       </div>
 
       {/* Actions */}
-      <div className="flex items-center gap-2 pl-2">
+      <div className="flex items-center gap-2 pl-0 md:pl-2 w-full md:w-auto">
         <button
           onClick={handleSearch}
-          className="px-8 py-4 bg-accent-dark text-white rounded-full font-medium hover:bg-gold hover:text-accent-dark transition-all shadow-md flex items-center gap-2"
+          className="w-full md:w-auto justify-center px-6 md:px-8 py-3 md:py-4 bg-accent-dark text-white rounded-xl md:rounded-full font-medium hover:bg-gold hover:text-accent-dark transition-all shadow-md flex items-center gap-2"
         >
           <Search size={18} />
           Search

@@ -34,11 +34,11 @@ export default function Portfolio() {
       <Navbar />
 
       {/* Portfolio Hero */}
-      <section className="pt-40 pb-20 px-6 bg-accent-dark text-white text-center">
+      <section className="pt-24 md:pt-40 pb-10 md:pb-20 px-4 sm:px-6 bg-accent-dark text-white text-center">
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-5xl md:text-7xl font-bold font-syne mb-6"
+          className="text-3xl sm:text-5xl md:text-7xl font-bold font-syne mb-4 md:mb-6"
         >
           Our <span className="text-gold">Portfolio</span>
         </motion.h1>
@@ -54,13 +54,13 @@ export default function Portfolio() {
       </section>
 
       {/* Projects Grid */}
-      <section className="py-24 px-6 max-w-7xl mx-auto w-full grow">
+      <section className="py-8 md:py-24 px-4 sm:px-6 max-w-7xl mx-auto w-full grow">
         {loading ? (
           <div className="flex justify-center items-center py-20">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gold"></div>
           </div>
         ) : properties.length > 0 ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
+          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 lg:gap-10">
             {properties.map((property, index) => (
               <motion.div
                 key={property.id}

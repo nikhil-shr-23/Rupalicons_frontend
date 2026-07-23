@@ -29,18 +29,18 @@ export default function AboutUsPage() {
     <main className="min-h-screen bg-background flex flex-col">
       <Navbar />
 
-      <section className="pt-32 pb-20 px-6 flex-grow">
+      <section className="pt-24 md:pt-32 pb-10 md:pb-20 px-4 sm:px-6 flex-grow">
         <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-12 items-center mb-20">
+          <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-8 md:gap-12 items-center mb-10 md:mb-20">
             <div>
               <span className="text-gold font-bold tracking-widest uppercase text-sm mb-4 block">
                 About Rupali Homes
               </span>
-              <h1 className="text-4xl md:text-6xl font-bold font-syne text-accent-dark mb-6 leading-tight">
+              <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold font-syne text-accent-dark mb-4 md:mb-6 leading-tight">
                 A trusted real estate advisory brand for serious property
                 decisions
               </h1>
-              <p className="text-lg text-gray-600 leading-relaxed mb-6">
+              <p className="text-base md:text-lg text-gray-600 leading-relaxed mb-5 md:mb-6">
                 Rupali Homes helps buyers, sellers, investors, and tenants make
                 clearer property decisions across high-demand micro-markets. The
                 work is advisory-led: understand the client, verify the property
@@ -74,7 +74,7 @@ export default function AboutUsPage() {
             </div>
 
             <div className="relative">
-              <div className="relative h-[520px] rounded-3xl overflow-hidden shadow-2xl">
+              <div className="relative h-[320px] sm:h-[420px] md:h-[520px] rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl">
                 <Image
                   src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
                   alt="Premium residential property represented by Rupali Homes"

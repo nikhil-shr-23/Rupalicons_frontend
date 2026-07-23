@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   fetchProperties,
   likeProperty,
@@ -11,7 +12,7 @@ import {
 import { Property, PropertyType } from "@/types";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import SearchFilterBar, { parsePriceRange, findPriceRangeLabel } from "@/components/SearchFilterBar";
+import SearchFilterBar, { parsePriceRange, findPriceRangeLabel, type SearchFilters } from "@/components/SearchFilterBar";
 import SwipeablePropertyCard from "@/components/SwipeablePropertyCard";
 import PropertyGridCard from "@/components/PropertyGridCard";
 import { Layers, LayoutGrid } from "lucide-react";
@@ -41,9 +42,14 @@ function useIsMobile(breakpoint = 768) {
 }
 
 export default function BuyPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [likedIds, setLikedIds] = useState<Set<number>>(new Set());
+  const [totalElements, setTotalElements] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [page, setPage] = useState(0);
   const [filters, setFilters] = useState<FilterState>({
     location: "",
     minPrice: "",
@@ -65,23 +71,41 @@ export default function BuyPage() {
   // Determine effective view mode
   const viewMode = isMobile ? mobileViewMode : "grid";
 
+  const applySearchFilters = useCallback((newFilters: SearchFilters) => {
+    const params = new URLSearchParams();
+    const price = parsePriceRange(newFilters.priceRange);
+    if (newFilters.location.trim()) params.set("location", newFilters.location.trim());
+    if (newFilters.propertyType) params.set("propertyType", newFilters.propertyType);
+    if (newFilters.bedrooms) params.set("bedrooms", newFilters.bedrooms);
+    if (price.min !== undefined) params.set("minPrice", String(price.min));
+    if (price.max !== undefined) params.set("maxPrice", String(price.max));
+
+    setFilters({
+      location: newFilters.location,
+      propertyType: newFilters.propertyType,
+      bedrooms: newFilters.bedrooms,
+      priceRange: newFilters.priceRange,
+      minPrice: price.min?.toString() || "",
+      maxPrice: price.max?.toString() || "",
+    });
+    setCurrentIndex(0);
+    setPage(0);
+    router.replace(params.size ? `/buy?${params.toString()}` : "/buy", { scroll: false });
+  }, [router]);
+
   useEffect(() => {
     fetchLikedPropertyIds().then((ids) => setLikedIds(new Set(ids)));
+  }, []);
 
-    // Parse URL parameters for initial filters (e.g. from Hero search or Footer links)
-    if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search);
-      const q = params.get("q");
-      const city = params.get("city");
-      const locList: string[] = [];
-      if (q) locList.push(q);
-      if (city) locList.push(city);
-      const urlLocation = params.get("location") || locList.join(", ");
+  useEffect(() => {
+      const q = searchParams.get("q");
+      const city = searchParams.get("city");
+      const urlLocation = searchParams.get("location") || [q, city].filter(Boolean).join(", ");
 
-      const urlPropertyType = params.get("propertyType");
-      const urlMinPrice = params.get("minPrice");
-      const urlMaxPrice = params.get("maxPrice");
-      const urlBedrooms = params.get("bedrooms");
+      const urlPropertyType = searchParams.get("propertyType") || searchParams.get("type");
+      const urlMinPrice = searchParams.get("minPrice");
+      const urlMaxPrice = searchParams.get("maxPrice");
+      const urlBedrooms = searchParams.get("bedrooms");
 
       // Reverse-map minPrice/maxPrice to a priceRange label for the dropdown
       const priceLabel = findPriceRangeLabel(
@@ -99,8 +123,9 @@ export default function BuyPage() {
         ...(urlBedrooms && { bedrooms: urlBedrooms }),
         ...(priceLabel && { priceRange: priceLabel }),
       }));
-    }
-  }, []);
+      setPage(0);
+      setCurrentIndex(0);
+  }, [searchParams]);
 
   const applyFilters = useCallback(async () => {
     const requestId = ++currentRequestId.current;
@@ -120,9 +145,10 @@ export default function BuyPage() {
     }
 
     try {
-      const data = await fetchProperties(0, 100, {
+      const data = await fetchProperties(page, 12, {
         type: PropertyType.SALE,
-        location: filters.location || undefined,
+        search: filters.location || undefined,
+        propertyCategory: filters.propertyType || undefined,
         minPrice: minPrice,
         maxPrice: maxPrice,
         bedrooms: filters.bedrooms ? Number(filters.bedrooms) : undefined,
@@ -131,40 +157,9 @@ export default function BuyPage() {
       if (requestId !== currentRequestId.current) return;
 
       if (data && data.content) {
-        let filtered = data.content;
-
-        // Client-side filtering to fix backend search limitations
-        if (filters.location) {
-          const locStr = filters.location.toLowerCase();
-          filtered = filtered.filter(p =>
-            (p.location?.toLowerCase().includes(locStr)) ||
-            (p.city?.toLowerCase().includes(locStr)) ||
-            (p.microMarket?.toLowerCase().includes(locStr)) ||
-            (p.locality?.toLowerCase().includes(locStr))
-          );
-        }
-
-        if (filters.propertyType && filters.propertyType !== "Any Type") {
-          const ptLower = filters.propertyType.toLowerCase();
-          filtered = filtered.filter(p =>
-            p.propertyCategory?.toLowerCase().includes(ptLower) ||
-            p.buildingType?.toLowerCase().includes(ptLower)
-          );
-        }
-
-        if (filters.bedrooms && filters.bedrooms !== "Any") {
-          const minBeds = Number(filters.bedrooms);
-          filtered = filtered.filter(p => p.bedrooms && p.bedrooms >= minBeds);
-        }
-
-        if (minPrice !== undefined) {
-          filtered = filtered.filter(p => p.price && p.price >= minPrice!);
-        }
-        if (maxPrice !== undefined) {
-          filtered = filtered.filter(p => p.price && p.price <= maxPrice!);
-        }
-
-        setProperties(filtered);
+        setProperties(data.content);
+        setTotalElements(data.totalElements);
+        setTotalPages(data.totalPages);
       }
     } catch (error) {
       if (requestId !== currentRequestId.current) return;
@@ -174,7 +169,7 @@ export default function BuyPage() {
         setLoading(false);
       }
     }
-  }, [filters]);
+  }, [filters, page]);
 
   useEffect(() => {
     applyFilters();
@@ -250,6 +245,7 @@ export default function BuyPage() {
             priceRange: "",
           });
           setCurrentIndex(0);
+          setPage(0);
         }}
         className="bg-gold text-white font-bold py-3.5 px-8 rounded-full shadow-lg hover:bg-yellow-600 hover:-translate-y-1 transition-all"
       >
@@ -263,7 +259,7 @@ export default function BuyPage() {
       <Navbar />
 
       {/* Featured & Search Section */}
-      <section className="pt-32 pb-12 px-6">
+      <section className="pt-24 md:pt-32 pb-8 md:pb-12 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
           {/* Search Bar */}
           <motion.div
@@ -279,18 +275,7 @@ export default function BuyPage() {
                 bedrooms: filters.bedrooms,
                 priceRange: filters.priceRange || "",
               }}
-              onSearch={(newFilters) => {
-                setFilters((prev) => ({
-                  ...prev,
-                  location: newFilters.location,
-                  propertyType: newFilters.propertyType,
-                  bedrooms: newFilters.bedrooms,
-                  priceRange: newFilters.priceRange,
-                  minPrice: "", // Clear direct min/max so priceRange is single source of truth
-                  maxPrice: "",
-                }));
-                setCurrentIndex(0);
-              }}
+              onSearch={applySearchFilters}
             />
           </motion.div>
 
@@ -303,7 +288,7 @@ export default function BuyPage() {
               className="flex items-center justify-between mt-6"
             >
               <p className="text-sm text-gray-500 font-medium">
-                {properties.length} {properties.length === 1 ? "property" : "properties"} found
+                {totalElements} {totalElements === 1 ? "property" : "properties"} found
               </p>
               <div className="flex bg-gray-100 rounded-xl p-1 gap-0.5">
                 <button
@@ -342,14 +327,14 @@ export default function BuyPage() {
               transition={{ delay: 0.4 }}
               className="text-sm text-gray-500 font-medium mt-6"
             >
-              {properties.length} {properties.length === 1 ? "property" : "properties"} found
+              {totalElements} {totalElements === 1 ? "property" : "properties"} found
             </motion.p>
           )}
         </div>
       </section>
 
       {/* Properties Section */}
-      <section className="py-12 px-6 max-w-7xl mx-auto w-full grow">
+      <section className="py-8 md:py-12 px-4 sm:px-6 max-w-7xl mx-auto w-full grow">
         {loading ? (
           <div className="flex justify-center items-center py-20 min-h-[500px]">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gold"></div>
@@ -362,7 +347,7 @@ export default function BuyPage() {
           /* ============================================= */
           <div className="flex flex-col items-center justify-center">
             {currentIndex < properties.length ? (
-              <div className="relative w-full max-w-md h-[650px] perspective-1000 mt-8 mb-[100px]">
+              <div className="relative w-full max-w-md h-[560px] sm:h-[650px] perspective-1000 mt-6 md:mt-8 mb-12 md:mb-[100px]">
                 {/* Render active and next card for smooth overlap depth performance */}
                 {[...properties]
                   .slice(currentIndex, currentIndex + 2)
@@ -436,7 +421,7 @@ export default function BuyPage() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+              className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6"
             >
               {properties.map((property, index) => (
                 <PropertyGridCard
@@ -449,6 +434,14 @@ export default function BuyPage() {
           </AnimatePresence>
         )}
       </section>
+
+      {totalElements > 0 && (
+        <nav className="flex items-center justify-center gap-3 pb-12" aria-label="Property pages">
+          <button disabled={page === 0} onClick={() => { setPage((p) => p - 1); setCurrentIndex(0); }} className="px-4 py-2 rounded-full border disabled:opacity-40">Previous</button>
+          <span className="text-sm text-gray-600">Page {page + 1} of {Math.max(totalPages, 1)} · {totalElements} results</span>
+          <button disabled={page >= totalPages - 1} onClick={() => { setPage((p) => p + 1); setCurrentIndex(0); }} className="px-4 py-2 rounded-full border disabled:opacity-40">Next</button>
+        </nav>
+      )}
 
       <Footer />
     </main>

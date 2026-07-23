@@ -9,9 +9,13 @@ import com.raghav.rupaliconstbackend.DTO.RentalRequestDTO;
 import com.raghav.rupaliconstbackend.DTO.RentalResponseDTO;
 
 import java.util.UUID;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface AdminPropertyService {
     PropertyResponseDTO createProperty(PropertyCreateDTO dto, String adminEmail);
+
+    com.raghav.rupaliconstbackend.DTO.BulkPropertyUploadResponse bulkUploadProperties(
+            MultipartFile file, String adminEmail);
 
     PropertyResponseDTO updateProperty(Long id, PropertyUpdateDTO dto);
 

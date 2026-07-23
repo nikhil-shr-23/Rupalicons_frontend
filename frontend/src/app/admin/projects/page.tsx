@@ -38,6 +38,7 @@ import {
   fetchAdminProperties,
   deleteProperty,
   createProperty,
+  bulkUploadProperties,
   updateProperty,
   uploadImage,
   fetchDashboardStats,
@@ -92,6 +93,12 @@ export default function AdminProjects() {
   const [showForm, setShowForm] = useState(false);
   const [editingProperty, setEditingProperty] = useState<Property | null>(null);
   const [saving, setSaving] = useState(false);
+  const [bulkUploading, setBulkUploading] = useState(false);
+  const [bulkUploadResult, setBulkUploadResult] = useState<{
+    created: number;
+    failed: number;
+    errors: string[];
+  } | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [filterType, setFilterType] = useState<string>("ALL");
   const [filterStatus, setFilterStatus] = useState<string>("ALL");
@@ -252,6 +259,24 @@ export default function AdminProjects() {
       else if (index !== undefined) setUploadingGalleryIdx(null);
       // reset file input
       e.target.value = "";
+    }
+  };
+
+  const handleBulkUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    setBulkUploading(true);
+    setBulkUploadResult(null);
+    try {
+      const result = await bulkUploadProperties(file);
+      setBulkUploadResult(result);
+      await loadProperties();
+    } catch (error) {
+      console.error("Bulk property upload failed", error);
+      alert(error instanceof Error ? error.message : "Bulk upload failed");
+    } finally {
+      setBulkUploading(false);
+      event.target.value = "";
     }
   };
 
@@ -444,7 +469,7 @@ export default function AdminProjects() {
             Manage your real estate listings.
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap justify-end gap-2">
           <Button
             variant="outline"
             size="icon"
@@ -455,6 +480,31 @@ export default function AdminProjects() {
             <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
           </Button>
           <Button
+            variant="outline"
+            className="gap-2"
+            disabled={bulkUploading}
+            asChild
+          >
+            <label htmlFor="bulk-property-upload" className="cursor-pointer">
+              <Upload size={16} /> {bulkUploading ? "Uploading..." : "Upload Excel"}
+            </label>
+          </Button>
+          <input
+            id="bulk-property-upload"
+            type="file"
+            accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            className="hidden"
+            onChange={handleBulkUpload}
+            disabled={bulkUploading}
+          />
+          <a
+            href="/properties_bulk_upload_sample.xlsx"
+            download
+            className="inline-flex h-9 items-center gap-2 rounded-md border border-gray-200 px-3 text-sm font-medium text-gray-700 hover:bg-gray-50"
+          >
+            <FileDown size={16} /> Sample
+          </a>
+          <Button
             className="gap-2 bg-accent-dark hover:bg-accent-dark/90 text-white"
             onClick={openCreateForm}
           >
@@ -462,6 +512,23 @@ export default function AdminProjects() {
           </Button>
         </div>
       </div>
+
+      {bulkUploadResult && (
+        <div className={`rounded-xl border p-4 text-sm ${bulkUploadResult.failed ? "border-amber-200 bg-amber-50" : "border-green-200 bg-green-50"}`}>
+          <p className="font-semibold text-accent-dark">
+            Excel upload complete: {bulkUploadResult.created} created, {bulkUploadResult.failed} failed.
+          </p>
+          {bulkUploadResult.errors.length > 0 && (
+            <ul className="mt-2 space-y-1 text-amber-800 list-disc list-inside">
+              {bulkUploadResult.errors.slice(0, 8).map((error) => <li key={error}>{error}</li>)}
+              {bulkUploadResult.errors.length > 8 && <li>More row errors were omitted from this preview.</li>}
+            </ul>
+          )}
+          <p className="mt-2 text-xs text-gray-600">
+            Use <code>properties_bulk_upload_sample.xlsx</code> in the repository root for the required column structure.
+          </p>
+        </div>
+      )}
 
       {/* Dashboard Stats */}
       {dashboardStats && (

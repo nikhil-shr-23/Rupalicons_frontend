@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   fetchProperties,
   likeProperty,
@@ -16,7 +17,7 @@ import Footer from "@/components/Footer";
 import { ArrowUpRight, Heart } from "lucide-react";
 import confetti from "canvas-confetti";
 import BounceCards from "@/components/BouncyCards";
-import SearchFilterBar, { parsePriceRange, findPriceRangeLabel } from "@/components/SearchFilterBar";
+import SearchFilterBar, { parsePriceRange, findPriceRangeLabel, type SearchFilters } from "@/components/SearchFilterBar";
 import SwipeablePropertyCard from "@/components/SwipeablePropertyCard";
 
 interface FilterState {
@@ -29,9 +30,14 @@ interface FilterState {
 }
 
 export default function RentPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [likedIds, setLikedIds] = useState<Set<number>>(new Set());
+  const [totalElements, setTotalElements] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [page, setPage] = useState(0);
   const [filters, setFilters] = useState<FilterState>({
     location: "",
     minPrice: "",
@@ -43,23 +49,41 @@ export default function RentPage() {
   // Swipe State Tracking
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  const applySearchFilters = useCallback((newFilters: SearchFilters) => {
+    const params = new URLSearchParams();
+    const price = parsePriceRange(newFilters.priceRange);
+    if (newFilters.location.trim()) params.set("location", newFilters.location.trim());
+    if (newFilters.propertyType) params.set("propertyType", newFilters.propertyType);
+    if (newFilters.bedrooms) params.set("bedrooms", newFilters.bedrooms);
+    if (price.min !== undefined) params.set("minPrice", String(price.min));
+    if (price.max !== undefined) params.set("maxPrice", String(price.max));
+
+    setFilters({
+      location: newFilters.location,
+      propertyType: newFilters.propertyType,
+      bedrooms: newFilters.bedrooms,
+      priceRange: newFilters.priceRange,
+      minPrice: price.min?.toString() || "",
+      maxPrice: price.max?.toString() || "",
+    });
+    setCurrentIndex(0);
+    setPage(0);
+    router.replace(params.size ? `/rent?${params.toString()}` : "/rent", { scroll: false });
+  }, [router]);
+
   useEffect(() => {
     fetchLikedPropertyIds().then((ids) => setLikedIds(new Set(ids)));
+  }, []);
     
-    // Parse URL parameters for initial filters
-    if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search);
-      const q = params.get("q");
-      const city = params.get("city");
-      const locList: string[] = [];
-      if (q) locList.push(q);
-      if (city) locList.push(city);
-      const urlLocation = params.get("location") || locList.join(", ");
+  useEffect(() => {
+      const q = searchParams.get("q");
+      const city = searchParams.get("city");
+      const urlLocation = searchParams.get("location") || [q, city].filter(Boolean).join(", ");
       
-      const urlPropertyType = params.get("propertyType");
-      const urlMinPrice = params.get("minPrice");
-      const urlMaxPrice = params.get("maxPrice");
-      const urlBedrooms = params.get("bedrooms");
+      const urlPropertyType = searchParams.get("propertyType") || searchParams.get("type");
+      const urlMinPrice = searchParams.get("minPrice");
+      const urlMaxPrice = searchParams.get("maxPrice");
+      const urlBedrooms = searchParams.get("bedrooms");
 
       // Reverse-map minPrice/maxPrice to a priceRange label for the dropdown
       const priceLabel = findPriceRangeLabel(
@@ -77,8 +101,9 @@ export default function RentPage() {
         ...(urlBedrooms && { bedrooms: urlBedrooms }),
         ...(priceLabel && { priceRange: priceLabel }),
       }));
-    }
-  }, []);
+      setPage(0);
+      setCurrentIndex(0);
+  }, [searchParams]);
 
   const applyFilters = useCallback(async () => {
     const requestId = ++currentRequestId.current;
@@ -98,9 +123,10 @@ export default function RentPage() {
     }
 
     try {
-      const data = await fetchProperties(0, 100, {
+      const data = await fetchProperties(page, 12, {
         type: PropertyType.RENT,
-        location: filters.location || undefined,
+        search: filters.location || undefined,
+        propertyCategory: filters.propertyType || undefined,
         minPrice: minPrice,
         maxPrice: maxPrice,
         bedrooms: filters.bedrooms ? Number(filters.bedrooms) : undefined,
@@ -109,40 +135,9 @@ export default function RentPage() {
       if (requestId !== currentRequestId.current) return;
 
       if (data && data.content) {
-        let filtered = data.content;
-        
-        // Client-side filtering to fix backend search limitations
-        if (filters.location) {
-          const locStr = filters.location.toLowerCase();
-          filtered = filtered.filter(p => 
-            (p.location?.toLowerCase().includes(locStr)) || 
-            (p.city?.toLowerCase().includes(locStr)) ||
-            (p.microMarket?.toLowerCase().includes(locStr)) ||
-            (p.locality?.toLowerCase().includes(locStr))
-          );
-        }
-        
-        if (filters.propertyType && filters.propertyType !== "Any Type") {
-          const ptLower = filters.propertyType.toLowerCase();
-          filtered = filtered.filter(p => 
-            p.propertyCategory?.toLowerCase().includes(ptLower) ||
-            p.buildingType?.toLowerCase().includes(ptLower)
-          );
-        }
-
-        if (filters.bedrooms && filters.bedrooms !== "Any") {
-          const minBeds = Number(filters.bedrooms);
-          filtered = filtered.filter(p => p.bedrooms && p.bedrooms >= minBeds);
-        }
-        
-        if (minPrice !== undefined) {
-          filtered = filtered.filter(p => p.rentAmount && p.rentAmount >= minPrice!);
-        }
-        if (maxPrice !== undefined) {
-          filtered = filtered.filter(p => p.rentAmount && p.rentAmount <= maxPrice!);
-        }
-
-        setProperties(filtered);
+        setProperties(data.content);
+        setTotalElements(data.totalElements);
+        setTotalPages(data.totalPages);
       }
     } catch (error) {
       if (requestId !== currentRequestId.current) return;
@@ -152,7 +147,7 @@ export default function RentPage() {
         setLoading(false);
       }
     }
-  }, [filters]);
+  }, [filters, page]);
 
   useEffect(() => {
     applyFilters();
@@ -208,12 +203,12 @@ export default function RentPage() {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="pt-40 pb-20 px-6 bg-accent-dark text-white text-center relative overflow-hidden">
+      <section className="pt-24 md:pt-40 pb-10 md:pb-20 px-4 sm:px-6 bg-accent-dark text-white text-center relative overflow-hidden">
         <div className="relative z-10">
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-5xl md:text-7xl font-bold font-syne mb-6"
+            className="text-3xl sm:text-5xl md:text-7xl font-bold font-syne mb-4 md:mb-6"
           >
             Properties for <span className="text-gold">Rent</span>
           </motion.h1>
@@ -229,7 +224,7 @@ export default function RentPage() {
       </section>
 
       {/* Filters Section */}
-      <section className="pt-8 px-6 sticky top-0 z-20">
+      <section className="pt-4 md:pt-8 px-4 sm:px-6 sticky top-0 z-20">
         <div className="max-w-7xl mx-auto">
           <SearchFilterBar
             mode="rent"
@@ -239,30 +234,19 @@ export default function RentPage() {
               bedrooms: filters.bedrooms || "",
               priceRange: filters.priceRange || "",
             }}
-            onSearch={(newFilters) => {
-              setFilters((prev) => ({
-                ...prev,
-                location: newFilters.location,
-                propertyType: newFilters.propertyType,
-                bedrooms: newFilters.bedrooms,
-                priceRange: newFilters.priceRange,
-                minPrice: "", // Clear direct min/max so priceRange is single source of truth
-                maxPrice: "",
-              }));
-              setCurrentIndex(0);
-            }}
+            onSearch={applySearchFilters}
           />
         </div>
       </section>
 
       {/* Properties Swipe Container */}
-      <section className="py-24 px-6 max-w-7xl mx-auto w-full grow flex flex-col items-center justify-center">
+      <section className="py-8 md:py-24 px-4 sm:px-6 max-w-7xl mx-auto w-full grow flex flex-col items-center justify-center">
         {loading ? (
           <div className="flex justify-center items-center py-20 min-h-[500px]">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gold"></div>
           </div>
         ) : properties.length > 0 && currentIndex < properties.length ? (
-          <div className="relative w-full max-w-md h-[650px] perspective-1000 mt-8 mb-[100px]">
+          <div className="relative w-full max-w-md h-[560px] sm:h-[650px] perspective-1000 mt-6 md:mt-8 mb-12 md:mb-[100px]">
             {/* Render active and next card for smooth overlap depth performance */}
             {[...properties]
               .slice(currentIndex, currentIndex + 2)
@@ -320,6 +304,14 @@ export default function RentPage() {
           </div>
         )}
       </section>
+
+      {totalElements > 0 && (
+        <nav className="flex items-center justify-center gap-3 pb-12" aria-label="Property pages">
+          <button disabled={page === 0} onClick={() => { setPage((p) => p - 1); setCurrentIndex(0); }} className="px-4 py-2 rounded-full border disabled:opacity-40">Previous</button>
+          <span className="text-sm text-gray-600">Page {page + 1} of {totalPages} · {totalElements} results</span>
+          <button disabled={page >= totalPages - 1} onClick={() => { setPage((p) => p + 1); setCurrentIndex(0); }} className="px-4 py-2 rounded-full border disabled:opacity-40">Next</button>
+        </nav>
+      )}
 
       <Footer />
     </main>

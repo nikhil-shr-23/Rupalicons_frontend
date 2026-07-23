@@ -103,7 +103,7 @@ export default function FinancePage() {
       <Navbar />
 
       {/* Hero */}
-      <section className="relative pt-40 pb-20 px-6 overflow-hidden bg-grid">
+      <section className="relative pt-24 md:pt-40 pb-10 md:pb-20 px-4 sm:px-6 overflow-hidden bg-grid">
         <div className="max-w-6xl mx-auto relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -111,16 +111,16 @@ export default function FinancePage() {
             transition={{ duration: 0.7 }}
             className="max-w-3xl"
           >
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-12 h-px bg-gold"></div>
-              <span className="text-sm font-semibold tracking-widest uppercase text-gold">
+            <div className="flex items-center gap-3 mb-4 md:mb-6">
+              <div className="w-8 md:w-12 h-px bg-gold"></div>
+              <span className="text-[11px] md:text-sm font-semibold tracking-widest uppercase text-gold">
                 Home Loans &amp; Finance
               </span>
             </div>
-            <h1 className="text-4xl md:text-6xl font-semibold font-syne text-accent-dark leading-tight mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-6xl font-semibold font-syne text-accent-dark leading-tight mb-4 md:mb-6">
               Home loans made <span className="text-gold">simple</span>.
             </h1>
-            <p className="text-lg text-gray-600 leading-relaxed mb-8">
+            <p className="text-base md:text-lg text-gray-600 leading-relaxed mb-6 md:mb-8">
               Compare rates, calculate your EMI, and get matched with the right
               lender — all with dedicated guidance from the Rupali Homes finance
               desk. No jargon, no hidden charges.

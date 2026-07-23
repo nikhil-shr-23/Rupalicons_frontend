@@ -25,7 +25,8 @@ public class PropertyServiceImpl implements PropertyService {
     @Override
     public Page<PropertyResponseDTO> getAvailableProperties(Pageable pageable, PropertyType type, BigDecimal minPrice,
                                                             BigDecimal maxPrice, BigDecimal minRent, BigDecimal maxRent,
-                                                            String location) {
+                                                            String location, String search, String propertyCategory,
+                                                            Integer minBedrooms) {
         Specification<Property> spec =
                 (root, query, cb) -> cb.equal(root.get("status"), PropertyStatus.AVAILABLE);
 
@@ -33,28 +34,55 @@ public class PropertyServiceImpl implements PropertyService {
             spec = spec.and((root, query, cb) -> cb.equal(root.get("type"), type));
         }
         if (location != null && !location.isBlank()) {
-            String locationLower = "%" + location.toLowerCase() + "%";
+            String locationLower = "%" + escapeLike(location) + "%";
             spec = spec.and((root, query, cb) -> cb.or(
-                    cb.like(cb.lower(root.get("location")), locationLower),
-                    cb.like(cb.lower(root.get("city")), locationLower),
-                    cb.like(cb.lower(root.get("microMarket")), locationLower),
-                    cb.like(cb.lower(root.get("locality")), locationLower)
-            ));
+                    cb.like(cb.lower(root.get("location")), locationLower, '\\'),
+                    cb.like(cb.lower(root.get("city")), locationLower, '\\'),
+                    cb.like(cb.lower(root.get("microMarket")), locationLower, '\\'),
+                    cb.like(cb.lower(root.get("locality")), locationLower, '\\')));
         }
-        if (minPrice != null) {
-            spec = spec.and((root, query, cb) -> cb.greaterThanOrEqualTo(root.get("price"), minPrice));
+        if (search != null && !search.isBlank()) {
+            String searchLower = "%" + escapeLike(search) + "%";
+            spec = spec.and((root, query, cb) -> cb.or(
+                    cb.like(cb.lower(root.get("title")), searchLower, '\\'),
+                    cb.like(cb.lower(root.get("description")), searchLower, '\\'),
+                    cb.like(cb.lower(root.get("location")), searchLower, '\\'),
+                    cb.like(cb.lower(root.get("city")), searchLower, '\\'),
+                    cb.like(cb.lower(root.get("locality")), searchLower, '\\'),
+                    cb.like(cb.lower(root.get("propertyCategory")), searchLower, '\\'),
+                    cb.like(cb.lower(root.get("tags")), searchLower, '\\')));
         }
-        if (maxPrice != null) {
-            spec = spec.and((root, query, cb) -> cb.lessThanOrEqualTo(root.get("price"), maxPrice));
+        if (propertyCategory != null && !propertyCategory.isBlank() && !"Any Type".equalsIgnoreCase(propertyCategory)) {
+            String category = "%" + escapeLike(propertyCategory) + "%";
+            spec = spec.and((root, query, cb) -> cb.or(
+                    cb.like(cb.lower(root.get("propertyCategory")), category, '\\'),
+                    cb.like(cb.lower(root.get("buildingType")), category, '\\')));
         }
-        if (minRent != null) {
-            spec = spec.and((root, query, cb) -> cb.greaterThanOrEqualTo(root.get("rentAmount"), minRent));
+        if (minBedrooms != null) {
+            spec = spec.and((root, query, cb) -> cb.greaterThanOrEqualTo(root.get("bedrooms"), minBedrooms));
         }
-        if (maxRent != null) {
-            spec = spec.and((root, query, cb) -> cb.lessThanOrEqualTo(root.get("rentAmount"), maxRent));
+        BigDecimal effectiveMinPrice = type == PropertyType.RENT ? minRentOr(minPrice, minRent) : minPrice;
+        BigDecimal effectiveMaxPrice = type == PropertyType.RENT ? maxRentOr(maxPrice, maxRent) : maxPrice;
+        if (effectiveMinPrice != null) {
+            spec = spec.and((root, query, cb) -> cb.greaterThanOrEqualTo(root.get(type == PropertyType.RENT ? "rentAmount" : "price"), effectiveMinPrice));
+        }
+        if (effectiveMaxPrice != null) {
+            spec = spec.and((root, query, cb) -> cb.lessThanOrEqualTo(root.get(type == PropertyType.RENT ? "rentAmount" : "price"), effectiveMaxPrice));
         }
 
         return propertyRepository.findAll(spec, pageable).map(this::toDto);
+    }
+
+    private static BigDecimal minRentOr(BigDecimal minPrice, BigDecimal minRent) {
+        return minPrice != null ? minPrice : minRent;
+    }
+
+    private static BigDecimal maxRentOr(BigDecimal maxPrice, BigDecimal maxRent) {
+        return maxPrice != null ? maxPrice : maxRent;
+    }
+
+    private static String escapeLike(String value) {
+        return value.trim().toLowerCase().replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_");
     }
 
     @Override
@@ -86,7 +114,7 @@ public class PropertyServiceImpl implements PropertyService {
         dto.setSize(property.getSize());
         dto.setType(property.getType());
         dto.setStatus(property.getStatus());
-        dto.setCreatedBy(property.getCreatedBy().getId());
+        dto.setCreatedBy(property.getCreatedBy() == null ? null : property.getCreatedBy().getId());
         dto.setCreatedAt(property.getCreatedAt());
         dto.setImageUrl(property.getImageUrl());
         dto.setImageGallery(property.getImageGallery());

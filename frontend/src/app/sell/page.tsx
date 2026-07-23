@@ -182,17 +182,17 @@ export default function SellPropertyPage() {
     <main className="min-h-screen flex flex-col bg-background">
       <Navbar />
 
-      <div className="flex-1 pt-32 pb-24">
-        <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16 items-start">
+      <div className="flex-1 pt-24 md:pt-32 pb-12 md:pb-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 grid lg:grid-cols-2 gap-8 md:gap-16 items-start">
           <div>
             <span className="text-gold font-bold tracking-widest uppercase text-sm mb-4 block">
               What&apos;s My Property Worth?
             </span>
-            <h1 className="text-5xl md:text-6xl font-bold font-syne text-accent-dark leading-tight mb-6">
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold font-syne text-accent-dark leading-tight mb-4 md:mb-6">
               Get a sharper valuation before you{" "}
               <span className="text-gold">sell</span>
             </h1>
-            <p className="text-lg text-gray-600 mb-10 leading-relaxed">
+            <p className="text-base md:text-lg text-gray-600 mb-7 md:mb-10 leading-relaxed">
               Share the exact address, property details, and recent photos. Our
               advisors review location, condition, demand, and comparable deals
               before recommending a practical market range.
@@ -246,7 +246,7 @@ export default function SellPropertyPage() {
             </div>
           </div>
 
-          <div className="bg-white p-8 md:p-10 rounded-3xl shadow-2xl border border-gray-100 relative overflow-hidden">
+          <div className="bg-white p-5 sm:p-8 md:p-10 rounded-2xl md:rounded-3xl shadow-2xl border border-gray-100 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-32 h-32 bg-gold/5 rounded-bl-full z-0" />
 
             {status === "success" ? (
